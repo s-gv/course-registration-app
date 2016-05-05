@@ -25,12 +25,37 @@ class CustomUserManager(BaseUserManager):
         return self._create_user(email, password, True, True, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
+    USER_TYPE_FACULTY = 0
+    USER_TYPE_STUDENT = 1
+    USER_TYPE_OTHER = 2
+
+    PROGRAM_OTHER = 0
+    PROGRAM_MTECH = 1
+    PROGRAM_MSC = 2
+    PROGRAM_PHD = 3
+    PROGRAM_ME = 4
+
+
     email = models.EmailField(max_length=254, unique=True)
     full_name = models.CharField(max_length=250)
+    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=(
+        (USER_TYPE_FACULTY, "Faculty"),
+        (USER_TYPE_STUDENT, "Student"),
+        (USER_TYPE_OTHER, "Other"),
+    ))
+    adviser = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+    program = models.IntegerField(default=PROGRAM_OTHER, choices=(
+        (PROGRAM_OTHER, 'Other'),
+        (PROGRAM_ME, 'ME'),
+        (PROGRAM_MTECH, 'MTech'),
+        (PROGRAM_MSC, 'MSc'),
+        (PROGRAM_PHD, 'PhD'),
+    ))
+    date_joined = models.DateTimeField(default=timezone.now)
+    sr_no = models.CharField(max_length=200, default='-')
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
 
     objects = CustomUserManager()
 
