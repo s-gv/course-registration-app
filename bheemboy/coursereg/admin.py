@@ -31,11 +31,13 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('course_num', 'title', 'department', 'last_reg_date')
-    ordering = ('last_reg_date',)
+    list_display = ('num', 'title', 'department', 'last_reg_date')
+    ordering = ('-last_reg_date',)
+    search_fields = ('title', 'num', 'department')
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'state', 'grade')
+    search_fields = ('user__email', 'course__title', 'course__num')
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)

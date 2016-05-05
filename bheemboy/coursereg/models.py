@@ -82,7 +82,7 @@ class Course(models.Model):
         (TERM_OTHER, "Other"),
     )
 
-    course_num = models.CharField(max_length=100)
+    num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
     last_reg_date = models.DateField(default=timezone.now)
@@ -90,7 +90,7 @@ class Course(models.Model):
     department = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return self.course_num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
+        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
 
 class Participant(models.Model):
     PARTICIPANT_CREDIT = 0
