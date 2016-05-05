@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User
+from .models import User, Course, Participant
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 
 class CustomUserAdmin(UserAdmin):
@@ -30,4 +30,13 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email', 'full_name')
     ordering = ('email',)
 
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('course_num', 'title', 'department', 'last_reg_date')
+    ordering = ('last_reg_date',)
+
+class ParticipantAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'participant_type', 'state', 'grade')
+
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Course, CourseAdmin)
+admin.site.register(Participant, ParticipantAdmin)

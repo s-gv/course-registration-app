@@ -43,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         (USER_TYPE_STUDENT, "Student"),
         (USER_TYPE_OTHER, "Other"),
     ))
-    adviser = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+    adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
     program = models.IntegerField(default=PROGRAM_OTHER, choices=(
         (PROGRAM_OTHER, 'Other'),
         (PROGRAM_ME, 'ME'),
@@ -67,3 +67,72 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.full_name.strip()
+
+
+class Course(models.Model):
+    TERM_AUG = 0
+    TERM_JAN = 1
+    TERM_SUMMER = 2
+    TERM_OTHER = 3
+
+    TERM_CHOICES = (
+        (TERM_AUG, "Aug-Dec"),
+        (TERM_JAN, "Jan-Apr"),
+        (TERM_SUMMER, "Summer"),
+        (TERM_OTHER, "Other"),
+    )
+
+    course_num = models.CharField(max_length=100)
+    title = models.CharField(max_length=200)
+    term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
+    last_reg_date = models.DateField(default=timezone.now)
+    credits = models.IntegerField(default=3)
+    department = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.course_num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
+
+class Participant(models.Model):
+    PARTICIPANT_CREDIT = 0
+    PARTICIPANT_AUDIT = 1
+    PARTICIPANT_INSTRUCTOR = 2
+    PARTICIPANT_TA = 3
+
+    GRADE_NA = 0
+    GRADE_S = 1
+    GRADE_A = 2
+    GRADE_B = 3
+    GRADE_C = 4
+    GRADE_D = 5
+    GRADE_F = 6
+
+    STATE_REQUESTED = 0
+    STATE_ADVISOR_DONE = 1
+    STATE_INSTRUCTOR_DONE = 2
+    STATE_FINAL_APPROVED = 3
+    STATE_NA = 4
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    participant_type = models.IntegerField(default=PARTICIPANT_CREDIT, choices=(
+        (PARTICIPANT_CREDIT, 'Credit'),
+        (PARTICIPANT_AUDIT, 'Audit'),
+        (PARTICIPANT_INSTRUCTOR, 'Instructor'),
+        (PARTICIPANT_TA, 'TA'),
+    ))
+    state = models.IntegerField(default=STATE_NA, choices=(
+        (STATE_REQUESTED, 'Requested'),
+        (STATE_ADVISOR_DONE, 'Advisor approved'),
+        (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
+        (STATE_FINAL_APPROVED, 'Final Approved'),
+        (STATE_NA, 'N/A')
+    ))
+    grade = models.IntegerField(default=GRADE_NA, choices=(
+        (GRADE_NA, 'N/A'),
+        (GRADE_S, 'S'),
+        (GRADE_A, 'A'),
+        (GRADE_B, 'B'),
+        (GRADE_C, 'C'),
+        (GRADE_D, 'D'),
+        (GRADE_F, 'F'),
+    ))
