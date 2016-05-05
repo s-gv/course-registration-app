@@ -37,6 +37,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'state', 'grade')
+    ordering = ('-course__last_reg_date',)
     search_fields = ('user__email', 'course__title', 'course__num')
 
 admin.site.register(User, CustomUserAdmin)
