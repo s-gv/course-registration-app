@@ -136,3 +136,6 @@ class Participant(models.Model):
         (GRADE_D, 'D'),
         (GRADE_F, 'F'),
     ))
+
+    def __unicode__(self):
+        return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
