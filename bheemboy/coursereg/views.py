@@ -11,15 +11,16 @@ def index(request):
 
 def signin(request):
     if request.method == 'GET':
-        context = {'next_url': request.GET.get('next', reverse('coursereg:index'))}
+        context = {'signin_url': request.get_full_path()}
         return render(request, 'coursereg/signin.html', context)
     else:
         user = authenticate(email=request.POST['email'], password=request.POST['password'])
         if user is not None:
             login(request, user)
+            return redirect(request.GET.get('next', reverse('coursereg:index')))
         else:
             messages.error(request, 'E-mail or password is incorrect.')
-        return redirect(request.POST['next'])
+            return redirect(request.get_full_path())
 
 
 def signout(request):

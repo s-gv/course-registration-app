@@ -30,7 +30,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-3 col-md-offset-4">
-                    <form class="form-signin" action="{% url 'coursereg:signin' %}" method="POST">
+                    <form class="form-signin" action="{{ signin_url }}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ next_url }}">
                         <div class="form-group">
