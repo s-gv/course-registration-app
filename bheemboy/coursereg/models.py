@@ -35,6 +35,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     PROGRAM_PHD = 3
     PROGRAM_ME = 4
 
+    PROGRAM_CHOICES = (
+        (PROGRAM_OTHER, 'Other'),
+        (PROGRAM_ME, 'ME'),
+        (PROGRAM_MTECH, 'MTech'),
+        (PROGRAM_MSC, 'MSc'),
+        (PROGRAM_PHD, 'PhD'),
+    )
 
     email = models.EmailField(max_length=254, unique=True)
     full_name = models.CharField(max_length=250)
@@ -44,13 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         (USER_TYPE_OTHER, "Other"),
     ))
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
-    program = models.IntegerField(default=PROGRAM_OTHER, choices=(
-        (PROGRAM_OTHER, 'Other'),
-        (PROGRAM_ME, 'ME'),
-        (PROGRAM_MTECH, 'MTech'),
-        (PROGRAM_MSC, 'MSc'),
-        (PROGRAM_PHD, 'PhD'),
-    ))
+    program = models.IntegerField(default=PROGRAM_OTHER, choices=PROGRAM_CHOICES)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
 

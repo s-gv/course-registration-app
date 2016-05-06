@@ -4,10 +4,20 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from . import models
 
 @login_required
 def index(request):
-    return HttpResponse("Logged in.")
+    if request.user.user_type == models.User.USER_TYPE_STUDENT:
+        context = {
+            'user_full_name': request.user.full_name,
+            'adviser_full_name': request.user.adviser.full_name,
+            'program': models.User.PROGRAM_CHOICES[request.user.program][1],
+            'sr_no': request.user.sr_no,
+        }
+        return render(request, 'coursereg/student.html', context)
+    else:
+        return HttpResponse("Logged in.")
 
 def signin(request):
     if request.method == 'GET':
@@ -25,4 +35,4 @@ def signin(request):
 
 def signout(request):
     logout(request)
-    return HttpResponse("Logged out")
+    return redirect(reverse('coursereg:index'))
