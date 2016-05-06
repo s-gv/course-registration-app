@@ -122,3 +122,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'coursereg.User'
+
+LOGIN_URL = '/signin/'
