@@ -107,11 +107,29 @@ class Participant(models.Model):
     GRADE_D = 5
     GRADE_F = 6
 
+    GRADE_CHOICES = (
+        (GRADE_NA, 'N/A'),
+        (GRADE_S, 'S'),
+        (GRADE_A, 'A'),
+        (GRADE_B, 'B'),
+        (GRADE_C, 'C'),
+        (GRADE_D, 'D'),
+        (GRADE_F, 'F'),
+    )
+
     STATE_REQUESTED = 0
     STATE_ADVISOR_DONE = 1
     STATE_INSTRUCTOR_DONE = 2
     STATE_FINAL_APPROVED = 3
     STATE_NA = 4
+
+    STATE_CHOICES = (
+        (STATE_REQUESTED, 'Requested'),
+        (STATE_ADVISOR_DONE, 'Advisor approved'),
+        (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
+        (STATE_FINAL_APPROVED, 'Final Approved'),
+        (STATE_NA, 'N/A')
+    )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -121,22 +139,8 @@ class Participant(models.Model):
         (PARTICIPANT_INSTRUCTOR, 'Instructor'),
         (PARTICIPANT_TA, 'TA'),
     ))
-    state = models.IntegerField(default=STATE_NA, choices=(
-        (STATE_REQUESTED, 'Requested'),
-        (STATE_ADVISOR_DONE, 'Advisor approved'),
-        (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
-        (STATE_FINAL_APPROVED, 'Final Approved'),
-        (STATE_NA, 'N/A')
-    ))
-    grade = models.IntegerField(default=GRADE_NA, choices=(
-        (GRADE_NA, 'N/A'),
-        (GRADE_S, 'S'),
-        (GRADE_A, 'A'),
-        (GRADE_B, 'B'),
-        (GRADE_C, 'C'),
-        (GRADE_D, 'D'),
-        (GRADE_F, 'F'),
-    ))
+    state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
+    grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
