@@ -13,6 +13,8 @@ def student(request):
             p.course,
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
         ) for p in models.Participant.objects.filter(user=request.user)]
     context = {
         'user_full_name': request.user.full_name,
@@ -26,10 +28,24 @@ def student(request):
     return render(request, 'coursereg/student.html', context)
 
 @login_required
+def participant_delete(request):
+    assert request.method == 'POST'
+    participant = models.Participant.objects.get(id=request.POST['participant_id'])
+    assert participant.user_id == request.user.id
+    if participant.state != models.Participant.STATE_REQUESTED:
+        messages.error(request, 'Unable to unregister from the course. Please speak to the administrator.')
+    else:
+        participant.delete()
+        messages.success(request, 'Unregistered from %s.' % participant.course)
+    return redirect('coursereg:index')
+
+@login_required
 def participant_create(request):
     assert request.method == 'POST'
     course_id = request.POST['course_id']
     user_id = request.POST['user_id']
+    assert int(user_id) == int(request.user.id)
+
     course = models.Course.objects.get(id=course_id)
     if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
         messages.error(request, 'Already registered for %s.' % course)
