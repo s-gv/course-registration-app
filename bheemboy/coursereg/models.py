@@ -37,10 +37,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     PROGRAM_CHOICES = (
         (PROGRAM_OTHER, 'Other'),
-        (PROGRAM_ME, 'ME'),
         (PROGRAM_MTECH, 'MTech'),
         (PROGRAM_MSC, 'MSc'),
         (PROGRAM_PHD, 'PhD'),
+        (PROGRAM_ME, 'ME'),
     )
 
     email = models.EmailField(max_length=254, unique=True)
