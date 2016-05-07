@@ -28,3 +28,6 @@ Notes for devs
 [localhost:8000/sudo](http://localhost:8000/sudo).
 - The email address of the super-user in the SQLite database shipped with this
 repo is `admin@ece.iisc.ernet.in` and the password is `test12345`.
+- Using the admin login we could add users and courses and modify existing user's passwords.
+- Currently the a simple student page has been setup through which we could register to courses and track their approval process.
+- To tryout an individual st login, first log in as admin, create a new student or modify an existing student's password. Log out and go to [localhost:8000/] and re-log in with student ID.
