@@ -53,7 +53,7 @@ def faculty(request):
                 p.course,
                 models.Participant.STATE_CHOICES[p.state][1],
                 ##models.Participant.GRADE_CHOICES[p.grade][1],
-                #models.Participant.participant_type,
+                p.participant_type,
                 p.state == models.Participant.STATE_REQUESTED,
                 p.id
             ) for p in models.Participant.objects.filter(user=advisee[0])]
@@ -69,23 +69,103 @@ def faculty(request):
     }        
     return render(request, 'coursereg/faculty.html', context)
 
+
+def course_page(request):
+    assert request.method == 'POST'
+    current_course = models.Course.objects.get(id=request.POST['course_id'])  
+    students = []
+    instructors = []
+    TAs = []
+
+    for p in models.Participant.objects.filter(course=current_course):
+        if( ( p.participant_type == 0 or  p.participant_type == 1) and p.state == models.Participant.STATE_ADVISOR_DONE) :
+                req = (p.user.id,
+                    p.user.full_name,
+                    p.user.program,
+                    models.Participant.STATE_CHOICES[p.state][1],
+                    models.Participant.GRADE_CHOICES[p.grade][1],
+                    p.state == models.Participant.STATE_ADVISOR_DONE,
+                    p.id)
+                students.append(req)                
+        if( ( p.participant_type == 2) ):
+                req = (p.user.id,
+                    p.user.full_name,
+                    p.id)
+                instructors.append(req)
+        if( ( p.participant_type == 3) ):
+                req = (p.user.id,
+                    p.user.full_name,
+                    p.id)
+                TAs.append(req)
+                
+        
+    context = {
+        'course_id': current_course.id,
+        'course_name': current_course,        
+        'course_credits': current_course.credits,        
+        'students': students,
+        'instructors': instructors,
+        'TAs': TAs,
+    }
+    return render(request, 'coursereg/course.html', context)
+
+
+
 @login_required
 def participant_advisor_act(request):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     advisee     = models.User.objects.get(id=request.POST['advisee_id'])
     assert participant.user_id == advisee.id
-    print 'Assertion Done!'    
     if participant.state != models.Participant.STATE_REQUESTED:
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
-        print 'Error in accrpting!'    
     else:
         participant.state = models.Participant.STATE_ADVISOR_DONE
         participant.save()
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
-        print 'Success!' + str( participant.course) + str( participant.course)
     return redirect('coursereg:index')
+
+
+@login_required
+def participant_instr_act(request):
+    assert request.method == 'POST'
+    participant = models.Participant.objects.get(id=request.POST['participant_id'])
+    student     = models.User.objects.get(id=request.POST['student_id'])
+    ## Collect the course page context and pass it back to the course page
+    current_course     = models.Course.objects.get(id=request.POST['course_id'])
+
+    assert participant.user_id == student.id
+    if participant.state != models.Participant.STATE_ADVISOR_DONE:
+        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+    else:
+        participant.state = models.Participant.STATE_INSTRUCTOR_DONE
+        req_info = str(student.full_name) + ' for ' + str(participant.course)
+        participant.save()        
+        messages.success(request, 'Instructor Accepted the enrolment request of %s.' % req_info)
+
+    ## Read the DB and re-render the course page.
+    students = []
+    for p in models.Participant.objects.filter(course=current_course):
+        if( ( p.participant_type == 0 or  p.participant_type == 1) and p.state == models.Participant.STATE_ADVISOR_DONE) :
+                req = (p.user.id,
+                    p.user.full_name,
+                    p.user.program,
+                    models.Participant.STATE_CHOICES[p.state][1],
+                    models.Participant.GRADE_CHOICES[p.grade][1],
+                    p.state == models.Participant.STATE_ADVISOR_DONE,
+                    p.id)
+                students.append(req)                
+        
+    context = {
+        'course_id': current_course.id,
+        'course_name': current_course,        
+        'course_credits': current_course.credits,        
+        'students': students,
+    }
+    return render(request, 'coursereg/course.html', context)
+        
+
 
 
 @login_required

@@ -29,4 +29,8 @@ Notes for devs
 - The email address of the super-user in the SQLite database shipped with this
 repo is `admin@ece.iisc.ernet.in` and the password is `test12345`. Use the same
 password for all accounts where possible.
-- Currently the a simple student page has been setup through which students can register for courses and track the approval process.
+- Currently simple verisons of Student, Facutly and Course(Instructor) pages have been setup through which:
+    - Students can browse and  register for courses and track the approval process.
+    - Advisors can view the enrolment requests from their Advisees
+    - Course instructors can view all the enrolment requests in one page per course and approve them.
+- You could create more user accounts(Faculty or Students) and Courses by logging in as admin (with credentials given above).
