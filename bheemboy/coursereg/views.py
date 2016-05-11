@@ -57,7 +57,7 @@ def faculty(request):
                 p.state == models.Participant.STATE_REQUESTED,
                 p.id
             ) for p in models.Participant.objects.filter(user=advisee[0])]
-        advisee_requests = advisee_requests + advisee_reqs         
+        advisee_requests = advisee_requests + advisee_reqs
     context = {
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
@@ -66,13 +66,13 @@ def faculty(request):
         'advisees' : advisees,
         'advisee_requests' : advisee_requests,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now()),
-    }        
+    }
     return render(request, 'coursereg/faculty.html', context)
 
 
 def course_page(request):
     assert request.method == 'POST'
-    current_course = models.Course.objects.get(id=request.POST['course_id'])  
+    current_course = models.Course.objects.get(id=request.POST['course_id'])
     students = []
     instructors = []
     TAs = []
@@ -86,7 +86,7 @@ def course_page(request):
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
                     p.id)
-                students.append(req)                
+                students.append(req)
         if( ( p.participant_type == 2) ):
                 req = (p.user.id,
                     p.user.full_name,
@@ -97,12 +97,12 @@ def course_page(request):
                     p.user.full_name,
                     p.id)
                 TAs.append(req)
-                
-        
+
+
     context = {
         'course_id': current_course.id,
-        'course_name': current_course,        
-        'course_credits': current_course.credits,        
+        'course_name': current_course,
+        'course_credits': current_course.credits,
         'students': students,
         'instructors': instructors,
         'TAs': TAs,
@@ -141,7 +141,7 @@ def participant_instr_act(request):
     else:
         participant.state = models.Participant.STATE_INSTRUCTOR_DONE
         req_info = str(student.full_name) + ' for ' + str(participant.course)
-        participant.save()        
+        participant.save()
         messages.success(request, 'Instructor Accepted the enrolment request of %s.' % req_info)
 
     ## Read the DB and re-render the course page.
@@ -155,16 +155,16 @@ def participant_instr_act(request):
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
                     p.id)
-                students.append(req)                
-        
+                students.append(req)
+
     context = {
         'course_id': current_course.id,
-        'course_name': current_course,        
-        'course_credits': current_course.credits,        
+        'course_name': current_course,
+        'course_credits': current_course.credits,
         'students': students,
     }
     return render(request, 'coursereg/course.html', context)
-        
+
 
 
 
@@ -187,20 +187,24 @@ def participant_create(request):
     user_id = request.POST['user_id']
     assert int(user_id) == int(request.user.id)
 
-    course = models.Course.objects.get(id=course_id)
-    if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
-        messages.error(request, 'Already registered for %s.' % course)
-    elif timezone.now().date() > course.last_reg_date:
-        messages.error(request, 'Registration for %s is now closed.' % course)
+    if not course_id.isdigit():
+        messages.error(request, 'Choose the course you want to join.')
     else:
-        models.Participant.objects.create(
-            user_id=user_id,
-            course_id=course_id,
-            participant_type=models.Participant.PARTICIPANT_CREDIT,
-            state=models.Participant.STATE_REQUESTED,
-            grade=models.Participant.GRADE_NA
-        )
-        messages.success(request, 'Successfully applied for %s.' % course)
+        course = models.Course.objects.get(id=course_id)
+        if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
+            messages.error(request, 'Already registered for %s.' % course)
+        elif timezone.now().date() > course.last_reg_date:
+            messages.error(request, 'Registration for %s is now closed.' % course)
+        else:
+            models.Participant.objects.create(
+                user_id=user_id,
+                course_id=course_id,
+                participant_type=models.Participant.PARTICIPANT_CREDIT,
+                state=models.Participant.STATE_REQUESTED,
+                grade=models.Participant.GRADE_NA
+            )
+            messages.success(request, 'Successfully applied for %s.' % course)
+
     return redirect('coursereg:index')
 
 @login_required
