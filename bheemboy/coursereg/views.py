@@ -8,8 +8,8 @@ from django.utils import timezone
 from . import models
 
 def student(request):
-    if not request.user.adviser or not request.user.full_name:
-        messages.error(request, 'Student profile is incomplete. Contact the administrator.')
+    if not request.user.adviser:
+        messages.error(request, 'Adviser not assigned. Contact the administrator.')
         return redirect('coursereg:fatal_error')
     participants = [
         (

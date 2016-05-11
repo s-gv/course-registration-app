@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
 from .models import User, Course, Participant
-from .forms import CustomUserChangeForm, CustomUserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
@@ -19,13 +19,14 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
+            'fields': ('email', 'password1', 'password2', 'full_name', 'user_type', 'adviser', 'program', 'sr_no', 'date_joined')}
         ),
     )
-    form = CustomUserChangeForm
-    add_form = CustomUserCreationForm
-    list_display = ('email', 'full_name', 'user_type')
+    form = UserChangeForm
+    add_form = UserCreationForm
+    list_display = ('email', 'full_name', 'user_type', 'sr_no')
     search_fields = ('email', 'full_name')
+    raw_id_fields = ('adviser',)
     ordering = ('email',)
 
 class CourseAdmin(admin.ModelAdmin):
