@@ -8,6 +8,9 @@ from django.utils import timezone
 from . import models
 
 def student(request):
+    if not request.user.adviser or not request.user.full_name:
+        messages.error(request, 'Student profile is incomplete. Contact the administrator.')
+        return redirect('coursereg:fatal_error')
     participants = [
         (
             p.course,
@@ -213,9 +216,9 @@ def index(request):
         return student(request)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         return faculty(request)
-        #return HttpResponse("Logged in. TODO: Faculty view.")
     else:
-        return HttpResponse("Logged in. Nothing to show because you are neither student nor faculty.")
+        messages.error(request, 'Nothing to show in the index page because you are neither student nor faculty.')
+        return redirect('coursereg:fatal_error')
 
 def signin(request):
     if request.method == 'GET':
@@ -234,3 +237,7 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect(reverse('coursereg:index'))
+
+def fatal_error(request):
+    context = {}
+    return render(request, 'coursereg/fatal.html', context)
