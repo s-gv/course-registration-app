@@ -126,8 +126,8 @@
         <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>
         <script type="text/javascript">
             $("#course_select_box").chosen({
-                no_results_text: "Oops, nothing found!",
                 placeholder_text_single: "Choose a course...",
+                search_contains: true,
             });
         </script>
     </body>
