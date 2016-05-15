@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_FACULTY = 0
     USER_TYPE_STUDENT = 1
     USER_TYPE_OTHER = 2
+    #USER_TYPE_ADMIN = 3
 
     PROGRAM_OTHER = 0
     PROGRAM_MTECH = 1
