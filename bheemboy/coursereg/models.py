@@ -134,9 +134,9 @@ class Participant(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    participant_type = models.IntegerField(default=PARTICIPANT_CREDIT, choices=(
-        (PARTICIPANT_CREDIT, 'Credit'),
-        (PARTICIPANT_AUDIT, 'Audit'),
+    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=(
+        (PARTICIPANT_CREDIT, 'Student Credit'),
+        (PARTICIPANT_AUDIT, 'Student Audit'),
         (PARTICIPANT_INSTRUCTOR, 'Instructor'),
         (PARTICIPANT_TA, 'TA'),
     ))

@@ -29,10 +29,20 @@ class CustomUserAdmin(UserAdmin):
     raw_id_fields = ('adviser',)
     ordering = ('email',)
 
+class ParticipantInline(admin.TabularInline):
+    model = Participant
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    raw_id_fields = ('user',)
+    fields = ('user', 'participant_type', 'state')
+    ordering = ('-participant_type',)
+
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')
     ordering = ('-last_reg_date',)
     search_fields = ('title', 'num', 'department')
+    inlines = [ParticipantInline]
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'state', 'grade')
