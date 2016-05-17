@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .models import User, Course, Participant
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from dateutil.relativedelta import relativedelta
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
@@ -45,7 +46,28 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ParticipantInline]
     actions = ['clone_courses_increment_year']
     def clone_courses_increment_year(self, request, queryset):
-        queryset.update(status='p')
+        for course in queryset:
+            new_last_reg_date = course.last_reg_date + relativedelta(years=1)
+            if not Course.objects.filter(
+                    last_reg_date__gte=new_last_reg_date-relativedelta(days=30),
+                    last_reg_date__lte=new_last_reg_date+relativedelta(days=30)
+                ):
+                new_course = Course.objects.create(
+                    num=course.num,
+                    title=course.title,
+                    term=course.term,
+                    last_reg_date=new_last_reg_date,
+                    credits=course.credits,
+                    department=course.department
+                )
+                for participant in Participant.objects.filter(course=course, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
+                    Participant.objects.create(
+                        user=participant.user,
+                        course=new_course,
+                        participant_type=participant.participant_type,
+                        state=participant.state,
+                        grade=participant.grade
+                    )
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
 
 
