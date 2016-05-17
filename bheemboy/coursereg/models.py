@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_FACULTY = 0
     USER_TYPE_STUDENT = 1
     USER_TYPE_OTHER = 2
+    #USER_TYPE_ADMIN = 3
 
     PROGRAM_OTHER = 0
     PROGRAM_MTECH = 1
@@ -133,9 +134,9 @@ class Participant(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    participant_type = models.IntegerField(default=PARTICIPANT_CREDIT, choices=(
-        (PARTICIPANT_CREDIT, 'Credit'),
-        (PARTICIPANT_AUDIT, 'Audit'),
+    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=(
+        (PARTICIPANT_CREDIT, 'Student Credit'),
+        (PARTICIPANT_AUDIT, 'Student Audit'),
         (PARTICIPANT_INSTRUCTOR, 'Instructor'),
         (PARTICIPANT_TA, 'TA'),
     ))

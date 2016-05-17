@@ -6,11 +6,30 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.utils import timezone
 from . import models
+import ast # Added by Arthi
+
+#Added by Arthi
+def admin(request):
+	participants = [
+        (
+            p.course,
+            models.Participant.STATE_CHOICES[p.state][1],
+            models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
+        ) for p in models.Participant.objects.filter(user=request.user)]
+	context = {
+        'user_full_name': request.user.full_name,
+        'user_id': request.user.id,
+        'adviser_full_name': 'nil',
+        'program': 'models.User.PROGRAM_CHOICES[request.user.program][1]',
+        'sr_no': 1,
+        'participants': participants,
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now()),
+    	}
+	return render(request, 'coursereg/admin.html', context)
 
 def student(request):
-    if not request.user.adviser:
-        messages.error(request, 'Adviser not assigned. Contact the administrator.')
-        return redirect('coursereg:fatal_error')
     participants = [
         (
             p.course,
@@ -60,7 +79,7 @@ def faculty(request):
                 p.state == models.Participant.STATE_REQUESTED,
                 p.id
             ) for p in models.Participant.objects.filter(user=advisee[0])]
-        advisee_requests = advisee_requests + advisee_reqs
+        advisee_requests = advisee_requests + advisee_reqs         
     context = {
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
@@ -69,13 +88,13 @@ def faculty(request):
         'advisees' : advisees,
         'advisee_requests' : advisee_requests,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now()),
-    }
+    }        
     return render(request, 'coursereg/faculty.html', context)
 
 
 def course_page(request):
     assert request.method == 'POST'
-    current_course = models.Course.objects.get(id=request.POST['course_id'])
+    current_course = models.Course.objects.get(id=request.POST['course_id'])  
     students = []
     instructors = []
     TAs = []
@@ -89,7 +108,7 @@ def course_page(request):
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
                     p.id)
-                students.append(req)
+                students.append(req)                
         if( ( p.participant_type == 2) ):
                 req = (p.user.id,
                     p.user.full_name,
@@ -100,12 +119,12 @@ def course_page(request):
                     p.user.full_name,
                     p.id)
                 TAs.append(req)
-
-
+                
+        
     context = {
         'course_id': current_course.id,
-        'course_name': current_course,
-        'course_credits': current_course.credits,
+        'course_name': current_course,        
+        'course_credits': current_course.credits,        
         'students': students,
         'instructors': instructors,
         'TAs': TAs,
@@ -144,7 +163,7 @@ def participant_instr_act(request):
     else:
         participant.state = models.Participant.STATE_INSTRUCTOR_DONE
         req_info = str(student.full_name) + ' for ' + str(participant.course)
-        participant.save()
+        participant.save()        
         messages.success(request, 'Instructor Accepted the enrolment request of %s.' % req_info)
 
     ## Read the DB and re-render the course page.
@@ -158,19 +177,16 @@ def participant_instr_act(request):
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
                     p.id)
-                students.append(req)
-
+                students.append(req)                
+        
     context = {
         'course_id': current_course.id,
-        'course_name': current_course,
-        'course_credits': current_course.credits,
+        'course_name': current_course,        
+        'course_credits': current_course.credits,        
         'students': students,
     }
     return render(request, 'coursereg/course.html', context)
-
-
-
-
+        
 @login_required
 def participant_delete(request):
     assert request.method == 'POST'
@@ -190,24 +206,59 @@ def participant_create(request):
     user_id = request.POST['user_id']
     assert int(user_id) == int(request.user.id)
 
-    if not course_id.isdigit():
-        messages.error(request, 'Choose the course you want to join.')
+    course = models.Course.objects.get(id=course_id)
+    if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
+        messages.error(request, 'Already registered for %s.' % course)
+    elif timezone.now().date() > course.last_reg_date:
+        messages.error(request, 'Registration for %s is now closed.' % course)
     else:
-        course = models.Course.objects.get(id=course_id)
-        if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
-            messages.error(request, 'Already registered for %s.' % course)
-        elif timezone.now().date() > course.last_reg_date:
-            messages.error(request, 'Registration for %s is now closed.' % course)
-        else:
-            models.Participant.objects.create(
-                user_id=user_id,
-                course_id=course_id,
-                participant_type=models.Participant.PARTICIPANT_CREDIT,
-                state=models.Participant.STATE_REQUESTED,
-                grade=models.Participant.GRADE_NA
-            )
-            messages.success(request, 'Successfully applied for %s.' % course)
+        models.Participant.objects.create(
+            user_id=user_id,
+            course_id=course_id,
+            participant_type=models.Participant.PARTICIPANT_CREDIT,
+            state=models.Participant.STATE_REQUESTED,
+            grade=models.Participant.GRADE_NA
+        )
+        messages.success(request, 'Successfully applied for %s.' % course)
+    return redirect('coursereg:index')
 
+#Added by Arthi
+@login_required
+def adduser(request):
+	
+    assert request.method == 'POST'
+    full_name = request.POST['full_name']
+    password = request.POST['password']
+    email = request.POST['email']
+    is_superuser_text = request.POST['is_superuser']
+    is_superuser = ast.literal_eval(is_superuser_text)
+    user_type = request.POST['user_type']
+    program = request.POST['program']
+    date_joined = request.POST['date_joined']
+    sr_no = request.POST['sr_no']
+    adviser_id = request.POST['adviser_id']
+    is_staff_text = request.POST['is_staff']
+    is_staff = ast.literal_eval(is_staff_text)
+    is_active_text = request.POST['is_active']
+    is_active = ast.literal_eval(is_active_text)
+    user_id = request.POST['user_id']
+    if models.User.objects.filter(user__id=user_id):
+        messages.error(request, 'Already registered for %s.' % course)
+    else:
+	models.User.objects.create(
+		full_name = full_name,
+		password = password,
+		email = email,
+		is_superuser = is_superuser,
+		user_type = user_type,
+		program = program,
+		date_joined = date_joined,
+		sr_no = sr_no,
+		is_staff = is_staff,
+		adviser_id = adviser_id,
+		is_active = is_active,
+	)
+	#messages.success(request, 'Successfully applied for %s.' % course)
     return redirect('coursereg:index')
 
 @login_required
@@ -216,9 +267,11 @@ def index(request):
         return student(request)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         return faculty(request)
+        #return HttpResponse("Logged in. TODO: Faculty view.")
+    elif request.user.user_type == 2:
+        return admin(request)
     else:
-        messages.error(request, 'Nothing to show in the index page because you are neither student nor faculty.')
-        return redirect('coursereg:fatal_error')
+        return HttpResponse("Logged in. Nothing to show because you are neither student nor faculty.")
 
 def signin(request):
     if request.method == 'GET':
@@ -237,7 +290,3 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect(reverse('coursereg:index'))
-
-def fatal_error(request):
-    context = {}
-    return render(request, 'coursereg/fatal.html', context)
