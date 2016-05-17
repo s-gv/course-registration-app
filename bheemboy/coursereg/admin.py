@@ -40,9 +40,14 @@ class ParticipantInline(admin.TabularInline):
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')
-    ordering = ('-last_reg_date',)
+    ordering = ('-last_reg_date', 'department', 'num', 'title')
     search_fields = ('title', 'num', 'department', 'last_reg_date')
     inlines = [ParticipantInline]
+    actions = ['clone_courses_increment_year']
+    def clone_courses_increment_year(self, request, queryset):
+        queryset.update(status='p')
+    clone_courses_increment_year.short_description = "Clone selected courses and increment year"
+
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'state', 'grade')
