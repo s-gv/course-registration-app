@@ -14,7 +14,10 @@
 
         <style>
             .top-buffer-1 {
-                margin-top:20px;
+                margin-top: 20px;
+            }
+            .container {
+                margin-bottom: 50px;
             }
         </style>
 
@@ -57,6 +60,37 @@
             </div>
             <div class="row top-buffer-1">
                 <div class="col-md-12">
+                    <form class="form-inline" method="post" action="{% url 'coursereg:participant_create' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="course_select">Register for a new course: </label>
+                            <select class="form-control" id="course_select_box" name="course_id">
+                                <option value=""></option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="user_id" value="{{ user_id }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
+                    </form>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="row top-buffer-1">
+                        <div class="col-md-12">
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                            <div class="alert alert-success" role="alert">{{ message }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="row top-buffer-1">
+                <div class="col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Registered Courses</h3>
@@ -88,37 +122,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <form class="form-inline" method="post" action="{% url 'coursereg:participant_create' %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="course_select">Register for a new course: </label>
-                            <select class="form-control" id="course_select_box" name="course_id">
-                                <option value=""></option>
-                                {% for course in courses %}
-                                    <option value="{{ course.id }}">{{ course }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <input type="hidden" name="user_id" value="{{ user_id }}">
-                        <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
-                    </form>
-                </div>
-            </div>
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="row top-buffer-1">
-                        <div class="col-md-12">
-                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                            <div class="alert alert-danger" role="alert">{{ message }}</div>
-                            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-                            <div class="alert alert-success" role="alert">{{ message }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
