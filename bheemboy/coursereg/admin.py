@@ -25,7 +25,8 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'sr_no')
+    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no')
+    list_filter = ('user_type', 'program')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
     ordering = ('email',)
@@ -45,6 +46,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('title', 'num', 'department', 'last_reg_date')
     inlines = [ParticipantInline]
     actions = ['clone_courses_increment_year']
+
     def clone_courses_increment_year(self, request, queryset):
         for course in queryset:
             d = course.last_reg_date
@@ -80,6 +82,16 @@ class ParticipantAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
     raw_id_fields = ('user', 'course')
     list_filter = ('participant_type', 'state', 'course__last_reg_date')
+    actions = ['final_approve']
+
+    def final_approve(self, request, queryset):
+        for participant in queryset:
+            ptype = participant.participant_type
+            if ptype == Participant.PARTICIPANT_CREDIT or ptype == Participant.PARTICIPANT_AUDIT:
+                participant.state = Participant.STATE_FINAL_APPROVED
+                participant.save()
+
+    final_approve.short_description = "Final approve selected students"
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
