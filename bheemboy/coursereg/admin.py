@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .models import User, Course, Participant
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
@@ -47,11 +47,14 @@ class CourseAdmin(admin.ModelAdmin):
     actions = ['clone_courses_increment_year']
     def clone_courses_increment_year(self, request, queryset):
         for course in queryset:
-            new_last_reg_date = course.last_reg_date + relativedelta(years=1)
-            if not Course.objects.filter(
-                    last_reg_date__gte=new_last_reg_date-relativedelta(days=30),
-                    last_reg_date__lte=new_last_reg_date+relativedelta(days=30)
-                ):
+            d = course.last_reg_date
+            try:
+                new_last_reg_date = d.replace(year=d.year+1)
+            except ValueError:
+                new_last_reg_date = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
+            if not Course.objects.filter(num=course.num,
+                    last_reg_date__gte=new_last_reg_date-timedelta(days=30),
+                    last_reg_date__lte=new_last_reg_date+timedelta(days=30)):
                 new_course = Course.objects.create(
                     num=course.num,
                     title=course.title,
