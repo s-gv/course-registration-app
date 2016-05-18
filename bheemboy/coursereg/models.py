@@ -87,7 +87,7 @@ class Course(models.Model):
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
-    last_reg_date = models.DateField(default=timezone.now)
+    last_reg_date = models.DateField(verbose_name="Last Registration Date", default=timezone.now)
     credits = models.IntegerField(default=3)
     department = models.CharField(max_length=100)
 
