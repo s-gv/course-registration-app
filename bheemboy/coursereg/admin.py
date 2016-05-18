@@ -6,6 +6,26 @@ from .models import User, Course, Participant
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
+class ParticipantInline(admin.TabularInline):
+    model = Participant
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    raw_id_fields = ('user',)
+    fields = ('user', 'participant_type', 'state')
+    ordering = ('-participant_type',)
+
+class CourseInline(admin.TabularInline):
+    model = Participant
+    verbose_name = "Course"
+    verbose_name_plural = "Courses"
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    #readonly_fields=('course', 'participant_type')
+    fields = ('course', 'participant_type', 'state')
+    ordering = ('-course__last_reg_date',)
+
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
 
@@ -25,20 +45,12 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no')
+    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'date_joined')
     list_filter = ('user_type', 'program')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
     ordering = ('email',)
-
-class ParticipantInline(admin.TabularInline):
-    model = Participant
-    extra = 0
-    can_delete = False
-    show_change_link = True
-    raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'state')
-    ordering = ('-participant_type',)
+    inlines = [CourseInline]
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')
