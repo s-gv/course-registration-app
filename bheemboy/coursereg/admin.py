@@ -22,6 +22,7 @@ class CourseInline(admin.TabularInline):
     extra = 0
     can_delete = False
     show_change_link = True
+    raw_id_fields = ('course',)
     #readonly_fields=('course', 'participant_type')
     fields = ('course', 'participant_type', 'state')
     ordering = ('-course__last_reg_date',)
