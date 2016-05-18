@@ -24,7 +24,7 @@ class CourseInline(admin.TabularInline):
     show_change_link = True
     raw_id_fields = ('course',)
     #readonly_fields=('course', 'participant_type')
-    fields = ('course', 'participant_type', 'state')
+    fields = ('course', 'participant_type', 'state', 'grade')
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):

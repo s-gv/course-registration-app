@@ -10,7 +10,6 @@
         {% load staticfiles %}
         <!-- Bootstrap -->
         <link href="{% static 'coursereg/css/bootstrap.min.css' %}" rel="stylesheet">
-        <link href="{% static 'coursereg/css/chosen.css' %}" rel="stylesheet">
 
         <style>
             .top-buffer-1 {
@@ -44,7 +43,7 @@
                     <div id="navbar" class="navbar-collapse collapse">
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
+                            <li><a href="{% url 'coursereg:index' %}">Home</a></li>
                             <li><a href="{% url 'coursereg:student_faq' %}">FAQ</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -53,7 +52,7 @@
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="{% url 'coursereg:student_profile' %}">Profile</a></li>
+                                    <li class="active"><a href="{% url 'coursereg:student_profile' %}">Profile</a></li>
                                     <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
                                 </ul>
                             </li>
@@ -64,25 +63,38 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
-                        <h1>Courses</h1>
+                        <h1>{{ user_full_name }}</h1>
                     </div>
+                    <p>Adviser: {{ adviser_full_name }}</p>
+                    <p>Program: {{ program }}</p>
+                    <p>Sr No: {{ sr_no }}</p>
                 </div>
             </div>
             <div class="row top-buffer-1">
-                <div class="col-md-12">
-                    <form class="form-inline" method="post" action="{% url 'coursereg:participant_create' %}">
+                <div class="col-md-4">
+                    <h3>Password</h3>
+                </div>
+            </div>
+            <div class="row top-buffer-1">
+                <div class="col-md-4">
+                    <form method="post" action="{% url 'coursereg:change_passwd' %}">
                         {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'coursereg:student_profile' %}">
                         <div class="form-group">
-                            <label for="course_select">Register for a new course: </label>
-                            <select class="form-control" id="course_select_box" name="course_id">
-                                <option value=""></option>
-                                {% for course in courses %}
-                                    <option value="{{ course.id }}">{{ course }}</option>
-                                {% endfor %}
-                            </select>
+                            <label for="inputPassword" class="sr-only">Current password</label>
+                            <input type="password" class="form-control" id="inputPassword" name="passwd" placeholder="Current password">
                         </div>
-                        <input type="hidden" name="user_id" value="{{ user_id }}">
-                        <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
+                        <div class="form-group">
+                            <label for="inputNewPassword" class="sr-only">New password</label>
+                            <input type="password" class="form-control" id="inputNewPassword" name="newpasswd" placeholder="New password">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNewPasswordAgain" class="sr-only">Verify password</label>
+                            <input type="password" class="form-control" id="inputNewPasswordAgain" name="newpasswd2" placeholder="New password again">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -99,50 +111,9 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            <div class="row top-buffer-1">
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Registered Courses</h3>
-                        </div>
-                        <div class="panel-body">
-                            {% for course, state, grade, deleteable, participant_id in participants %}
-                            <div class="row">
-                                {% if forloop.counter0 != 0 %}
-                                <hr>
-                                {% endif %}
-                                <div class="col-md-6">{{ course }}</div>
-                                <div class="col-md-2">{{ state }}</div>
-                                <div class="col-md-1">
-                                    {% if grade != 'N/A' %}
-                                    {{ grade }} grade
-                                    {% endif %}
-                                </div>
-                                {% if deleteable %}
-                                <div class="col-md-1">
-                                    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                        <button type="submit" class="btn btn-danger btn-xs">Cancel</button>
-                                    </form>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>
-        <script type="text/javascript">
-            $("#course_select_box").chosen({
-                placeholder_text_single: "Choose a course...",
-                search_contains: true,
-            });
-        </script>
     </body>
 </html>

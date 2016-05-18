@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>bheemboy</title>
+
+        {% load staticfiles %}
+        <!-- Bootstrap -->
+        <link href="{% static 'coursereg/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <style>
+            .top-buffer-1 {
+                margin-top: 20px;
+            }
+            .container {
+                margin-bottom: 50px;
+            }
+        </style>
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="container">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">Bheemboy</a>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <p class="navbar-text navbar-left"></p>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="{% url 'coursereg:index' %}">Home</a></li>
+                            <li class="active"><a href="{% url 'coursereg:student_faq' %}">FAQ</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                    {{ user_email }}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'coursereg:student_profile' %}">Profile</a></li>
+                                    <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div><!--/.container-fluid -->
+            </nav>
+            <div class="row top-buffer-1">
+                <div class="col-md-12">
+                    <div class="jumbotron">
+                        <div class="page-header"><h1>Questions?</h1></div>
+                        <p>Please see if this page has the information you're looking for before contacting the staff.</p>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">How does this course registration platform work?</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseOne" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Discuss with your adviser and apply for courses you want to take. Your request will be approved first by your adviser and then by the course instructor.
+                                        Finally, the department will review all the courses you have taken.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">The course I want to register for is not listed. What do I do?</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwo" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Please inform the administrator of the missing course.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">How do I remove a course that my adviser has already approved?</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseThree" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Please contact the administrator to assist you.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /container -->
+
+        <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
+        <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
+    </body>
+</html>

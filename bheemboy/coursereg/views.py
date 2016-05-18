@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from . import models
+from django.contrib.auth import update_session_auth_hash
 import ast # Added by Arthi
 
 #Added by Arthi
@@ -40,16 +41,32 @@ def student(request):
             p.id
         ) for p in models.Participant.objects.filter(user=request.user)]
     context = {
-        'user_full_name': request.user.full_name,
+		'user_email': request.user.email,
         'user_id': request.user.id,
-        'adviser_full_name': request.user.adviser.full_name,
-        'program': models.User.PROGRAM_CHOICES[request.user.program][1],
-        'sr_no': request.user.sr_no,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
                                                 last_reg_date__lte=timezone.now()+timedelta(days=100)),
     }
     return render(request, 'coursereg/student.html', context)
+
+@login_required
+def student_faq(request):
+	context = {
+		'user_email': request.user.email,
+	}
+	return render(request, 'coursereg/student_faq.html', context)
+
+@login_required
+def student_profile(request):
+    context = {
+		'user_email': request.user.email,
+        'user_full_name': request.user.full_name,
+        'user_id': request.user.id,
+        'adviser_full_name': request.user.adviser.full_name,
+        'program': models.User.PROGRAM_CHOICES[request.user.program][1],
+        'sr_no': request.user.sr_no,
+    }
+    return render(request, 'coursereg/student_profile.html', context)
 
 def faculty(request):
     participants = [
@@ -278,6 +295,26 @@ def index(request):
         return admin(request)
     else:
         return HttpResponse("Logged in. Nothing to show because you are neither student nor faculty.")
+
+@login_required
+def change_passwd(request):
+	if request.method == 'POST':
+		newpass = request.POST['newpasswd']
+		u = request.user
+		if authenticate(email=u.email, password=request.POST['passwd']):
+			if newpass == request.POST['newpasswd2']:
+				if len(newpass) >= 8:
+					u.set_password(newpass)
+					u.save()
+					update_session_auth_hash(request, u)
+					messages.success(request, 'Password changed successfully.')
+				else:
+					messages.error(request, 'New password must have at least 8 characters.')
+			else:
+				messages.error(request, 'New password does not match. Your new password must be confirmed by entering it twice.')
+		else:
+			messages.error(request, 'Current password is incorrect.')
+		return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 def signin(request):
     if request.method == 'GET':
