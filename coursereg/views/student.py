@@ -36,6 +36,7 @@ def index(request):
 def faq(request):
 	context = {
 		'user_email': request.user.email,
+        'faqs': models.Faq.objects.filter(faq_for=models.Faq.FAQ_STUDENT),
 	}
 	return render(request, 'coursereg/student_faq.html', context)
 

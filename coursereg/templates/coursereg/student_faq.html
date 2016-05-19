@@ -66,45 +66,22 @@
                         <div class="page-header"><h1>Questions?</h1></div>
                         <p>Please see if this page has the information you're looking for before contacting the staff.</p>
                         <div class="panel-group" id="accordion">
+                            {% for faq in faqs %}
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
-                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">How does this course registration platform work?</a>
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter0 }}">
+                                            {{ faq.question }}
+                                        </a>
                                     </h4>
                                 </div>
-                                <div id="collapseOne" class="panel-collapse collapse">
+                                <div id="collapse{{ forloop.counter0 }}" class="panel-collapse collapse">
                                     <div class="panel-body">
-                                        Discuss with your adviser and apply for courses you want to take. Your request will be approved first by your adviser and then by the course instructor.
-                                        Finally, the department will review all the courses you have taken.
+                                        {{ faq.answer }}
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">The course I want to register for is not listed. What do I do?</a>
-                                    </h4>
-                                </div>
-                                <div id="collapseTwo" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        Please inform the administrator of the missing course.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">How do I remove a course that my adviser has already approved?</a>
-                                    </h4>
-                                </div>
-                                <div id="collapseThree" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        Please contact the administrator to assist you.
-                                    </div>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

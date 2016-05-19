@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant
+from .models import User, Course, Participant, Faq
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
@@ -110,6 +110,12 @@ class ParticipantAdmin(admin.ModelAdmin):
 
     final_approve.short_description = "Final approve selected students"
 
+class FaqAdmin(admin.ModelAdmin):
+    list_display = ('question', 'faq_for')
+    search_fields = ('question', 'answer')
+    list_filter = ('faq_for',)
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
+admin.site.register(Faq, FaqAdmin)

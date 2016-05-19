@@ -145,3 +145,19 @@ class Participant(models.Model):
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
+
+class Faq(models.Model):
+    FAQ_STUDENT = 0
+    FAQ_FACULTY = 1
+
+    FAQ_CHOICES = (
+        (FAQ_STUDENT, "Student"),
+        (FAQ_FACULTY, "Faculty"),
+    )
+
+    faq_for = models.IntegerField(default=FAQ_STUDENT, choices=FAQ_CHOICES)
+    question = models.TextField()
+    answer = models.TextField()
+
+    def __unicode__(self):
+        return self.question
