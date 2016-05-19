@@ -115,18 +115,18 @@
                                 <div class="col-md-2">
                                 {% if grade == 0 %}
                                     {% if state == 0 %}
-                                    <button type="button" class="btn btn-default btn-xs">{{ state_str }}</button>
+                                    <span class="label label-default">{{ state_str }}</span>
                                     {% elif state == 1 %}
-                                    <button type="button" class="btn btn-info btn-xs">{{ state_str }}</button>
+                                    <span class="label label-info">{{ state_str }}</span>
                                     {% elif state == 2 %}
-                                    <button type="button" class="btn btn-primary btn-xs">{{ state_str }}</button>
+                                    <span class="label label-primary">{{ state_str }}</span>
                                     {% elif state == 3 %}
-                                    <button type="button" class="btn btn-success btn-xs">{{ state_str }}</button>
+                                    <span class="label label-success">{{ state_str }}</span>
                                     {% else %}
-                                    <button type="button" class="btn btn-default btn-xs">{{ state_str }}</button>
+                                    <span class="label label-default">{{ state_str }}</span>
                                     {% endif %}
                                 {% else %}
-                                    <button type="button" class="btn btn-primary btn-xs">{{ grade_str }} grade</button>
+                                    <span class="label label-primary">{{ grade_str }} grade</span>
                                 {% endif %}
                                 </div>
                                 <div class="col-md-1">
