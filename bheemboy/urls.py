@@ -17,6 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
+    url(r'^sudo/logout/$', 'coursereg.views.user.signout'),
     url(r'^sudo/', admin.site.urls),
     url(r'', include('coursereg.urls'))
 ]
