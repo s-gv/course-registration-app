@@ -8,12 +8,11 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
-from . import user
 
 def index(request):
     if not request.user.adviser:
         messages.error(request, 'Adviser not assigned. Contact the administrator.')
-        return redirect('coursereg:fatal_error')
+        return redirect('coursereg:fatal')
     participants = [
         (
             p.course,

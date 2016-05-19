@@ -7,7 +7,6 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from . import user, student
 from django.contrib.auth import update_session_auth_hash
 
 def faculty(request):

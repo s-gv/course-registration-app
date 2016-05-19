@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from . import user, student, faculty, light_admin
+from . import student, faculty, light_admin
 from django.contrib.auth import update_session_auth_hash
 
 @login_required
