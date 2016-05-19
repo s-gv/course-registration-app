@@ -12,7 +12,9 @@ from django.contrib.auth import update_session_auth_hash
 
 @login_required
 def index(request):
-    if request.user.user_type == models.User.USER_TYPE_STUDENT:
+    if request.user.is_superuser:
+        return redirect('admin:index')
+    elif request.user.user_type == models.User.USER_TYPE_STUDENT:
         return student.index(request)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         return faculty.faculty(request)
