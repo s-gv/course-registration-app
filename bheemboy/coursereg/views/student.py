@@ -16,6 +16,8 @@ def index(request):
     participants = [
         (
             p.course,
+            p.state,
+            p.grade,
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
             p.state == models.Participant.STATE_REQUESTED,

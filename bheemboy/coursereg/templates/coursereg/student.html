@@ -106,27 +106,41 @@
                             <h3 class="panel-title">Registered Courses</h3>
                         </div>
                         <div class="panel-body">
-                            {% for course, state, grade, deleteable, participant_id in participants %}
+                            {% for course, state, grade, state_str, grade_str, deleteable, participant_id in participants %}
                             <div class="row">
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
-                                <div class="col-md-6">{{ course }}</div>
-                                <div class="col-md-2">{{ state }}</div>
-                                <div class="col-md-1">
-                                    {% if grade != 'N/A' %}
-                                    {{ grade }} grade
+                                <div class="col-md-9">{{ course }}</div>
+                                <div class="col-md-2">
+                                {% if grade == 0 %}
+                                    {% if state == 0 %}
+                                    <button type="button" class="btn btn-default btn-xs">{{ state_str }}</button>
+                                    {% elif state == 1 %}
+                                    <button type="button" class="btn btn-info btn-xs">{{ state_str }}</button>
+                                    {% elif state == 2 %}
+                                    <button type="button" class="btn btn-primary btn-xs">{{ state_str }}</button>
+                                    {% elif state == 3 %}
+                                    <button type="button" class="btn btn-success btn-xs">{{ state_str }}</button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-default btn-xs">{{ state_str }}</button>
                                     {% endif %}
+                                {% else %}
+                                    <button type="button" class="btn btn-primary btn-xs">{{ grade_str }} grade</button>
+                                {% endif %}
                                 </div>
-                                {% if deleteable %}
                                 <div class="col-md-1">
+                                    {% if deleteable %}
                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
                                         {% csrf_token %}
+
                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                        <button type="submit" class="btn btn-danger btn-xs">Cancel</button>
+                                        <button type="submit" class="btn btn-danger btn-circle btn-xs">
+                                            <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Cancel
+                                        </button>
                                     </form>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                             {% endfor %}
                         </div>
