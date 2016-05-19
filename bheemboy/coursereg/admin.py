@@ -28,14 +28,9 @@ class CourseInline(admin.TabularInline):
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):
-    # The forms to add and change user instances
-
-    # The fields to be used in displaying the User model.
-    # These override the definitions on the base UserAdmin
-    # that reference the removed 'username' field
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal info'), {'fields': ('full_name', 'user_type', 'adviser', 'program', 'sr_no')}),
+        (None, {'fields': ('full_name', 'user_type', 'adviser', 'program', 'sr_no', 'is_active')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
@@ -46,12 +41,21 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'date_joined')
-    list_filter = ('user_type', 'program')
+    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'date_joined', 'is_active')
+    list_filter = ('is_active', 'user_type', 'program')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
-    ordering = ('email',)
+    ordering = ('-date_joined',)
     inlines = [CourseInline]
+    actions = ['make_inactive', 'make_active']
+
+    def make_inactive(self, request, queryset):
+        queryset.update(is_active=False)
+    make_inactive.short_description = "Activate selected users"
+
+    def make_active(self, request, queryset):
+        queryset.update(is_active=True)
+    make_active.short_description = "Deactivate selected users"
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')

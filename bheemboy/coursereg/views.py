@@ -323,11 +323,14 @@ def signin(request):
     else:
         user = authenticate(email=request.POST['email'], password=request.POST['password'])
         if user is not None:
-            login(request, user)
-            return redirect(request.GET.get('next', reverse('coursereg:index')))
+            if user.is_active:
+                login(request, user)
+                return redirect(request.GET.get('next', reverse('coursereg:index')))
+            else:
+                messages.error(request, 'Account inactive.')
         else:
             messages.error(request, 'E-mail or password is incorrect.')
-            return redirect(request.get_full_path())
+        return redirect(request.get_full_path())
 
 
 def signout(request):
