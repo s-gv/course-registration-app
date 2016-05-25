@@ -91,6 +91,34 @@ def course_page(request):
     }
     return render(request, 'coursereg/course.html', context)
 
+def student_details(request):
+    assert request.method == 'POST'
+    current_student_id = request.POST['student_id']
+    participants = [
+        (
+            p.course,
+            p.state,
+            p.grade,
+            models.Participant.STATE_CHOICES[p.state][1],
+            models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
+        ) for p in models.Participant.objects.filter(user=current_student_id)]
+    context = {
+        'student_name': models.User.objects.filter(pk=current_student_id),   
+	'user_email': request.user.email,
+        'user_id': request.user.id,
+        'participants': participants,
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
+    }
+    return render(request, 'coursereg/student_details.html', context)
+
+
+
+
+
+
 
 
 @login_required

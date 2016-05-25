@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^participant/advisor_act/$', views.faculty.participant_advisor_act, name='participant_advisor_act'),
     url(r'^participant/instr_act/$', views.faculty.participant_instr_act, name='participant_instr_act'),
     url(r'^course_page/$', views.faculty.course_page, name='course_page'),
+    url(r'^student_details/$', views.faculty.student_details, name='student_details'),
 
     url(r'^fatal/$', views.misc.fatal_error, name='fatal'),
     url(r'^$', views.misc.index, name='index'),
