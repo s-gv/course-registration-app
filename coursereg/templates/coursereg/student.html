@@ -80,7 +80,14 @@
                                     <option value="{{ course.id }}">{{ course }}</option>
                                 {% endfor %}
                             </select>
+                            <label class="radio-inline">
+                                <input type="radio" name="reg_type" value="credit" checked>Credit
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="reg_type" value="audit">Audit
+                            </label>
                         </div>
+
                         <input type="hidden" name="user_id" value="{{ user_id }}">
                         <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
                     </form>
@@ -106,12 +113,19 @@
                             <h3 class="panel-title">Registered Courses</h3>
                         </div>
                         <div class="panel-body">
-                            {% for course, state, grade, state_str, grade_str, deleteable, participant_id in participants %}
+                            {% for course, state, grade, ptype, state_str, grade_str, ptype_str, deleteable, participant_id in participants %}
                             <div class="row">
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
-                                <div class="col-md-9">{{ course }}</div>
+                                <div class="col-md-8">{{ course }}</div>
+                                <div class="col-md-1">
+                                    {% if ptype == 0 %}
+                                    <span class="label label-primary">{{ ptype_str }}
+                                    {% else %}
+                                    <span class="label label-default">{{ ptype_str }}
+                                    {% endif %}
+                                </div>
                                 <div class="col-md-2">
                                 {% if grade == 0 %}
                                     {% if state == 0 %}

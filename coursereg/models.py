@@ -100,6 +100,13 @@ class Participant(models.Model):
     PARTICIPANT_INSTRUCTOR = 2
     PARTICIPANT_TA = 3
 
+    PARTICIPANT_CHOICES = (
+        (PARTICIPANT_CREDIT, 'Credit'),
+        (PARTICIPANT_AUDIT, 'Audit'),
+        (PARTICIPANT_INSTRUCTOR, 'Instructor'),
+        (PARTICIPANT_TA, 'TA'),
+    )
+
     GRADE_NA = 0
     GRADE_S = 1
     GRADE_A = 2
@@ -138,12 +145,7 @@ class Participant(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=(
-        (PARTICIPANT_CREDIT, 'Student Credit'),
-        (PARTICIPANT_AUDIT, 'Student Audit'),
-        (PARTICIPANT_INSTRUCTOR, 'Instructor'),
-        (PARTICIPANT_TA, 'TA'),
-    ))
+    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
     state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
     grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
 
@@ -165,4 +167,3 @@ class Faq(models.Model):
 
     def __unicode__(self):
         return self.question
-

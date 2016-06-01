@@ -18,8 +18,10 @@ def index(request):
             p.course,
             p.state,
             p.grade,
+            p.participant_type,
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
+            models.Participant.PARTICIPANT_CHOICES[p.participant_type][1],
             p.state == models.Participant.STATE_REQUESTED,
             p.id
         ) for p in models.Participant.objects.filter(user=request.user)]
@@ -69,7 +71,12 @@ def participant_create(request):
     assert request.method == 'POST'
     course_id = request.POST['course_id']
     user_id = request.POST['user_id']
+    reg_type = request.POST['reg_type']
     assert int(user_id) == int(request.user.id)
+
+    participant_type = models.Participant.PARTICIPANT_CREDIT
+    if reg_type == 'audit':
+        participant_type = models.Participant.PARTICIPANT_AUDIT
 
     if not course_id:
         messages.error(request, 'Select the course you want to register for.')
@@ -83,7 +90,7 @@ def participant_create(request):
             models.Participant.objects.create(
                 user_id=user_id,
                 course_id=course_id,
-                participant_type=models.Participant.PARTICIPANT_CREDIT,
+                participant_type=participant_type,
                 state=models.Participant.STATE_REQUESTED,
                 grade=models.Participant.GRADE_NA
             )
