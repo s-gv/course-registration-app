@@ -123,13 +123,17 @@ class Participant(models.Model):
     STATE_INSTRUCTOR_DONE = 2
     STATE_FINAL_APPROVED = 3
     STATE_NA = 4
+    STATE_ADVISOR_REJECT =5
+    STATE_INSTRUCTOR_REJECT = 6
 
     STATE_CHOICES = (
         (STATE_REQUESTED, 'Requested'),
         (STATE_ADVISOR_DONE, 'Advisor approved'),
         (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
-        (STATE_FINAL_APPROVED, 'Final Approved'),
-        (STATE_NA, 'N/A')
+        (STATE_FINAL_APPROVED, 'Final approved'),
+        (STATE_NA, 'N/A'),
+        (STATE_ADVISOR_REJECT, 'Advisor rejected'),
+        (STATE_INSTRUCTOR_REJECT, 'Instructor rejected')
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -161,3 +165,4 @@ class Faq(models.Model):
 
     def __unicode__(self):
         return self.question
+

@@ -13,7 +13,11 @@ urlpatterns = [
     url(r'^student/profile/$', views.student.profile, name='student_profile'),
 
     url(r'^participant/advisor_act/$', views.faculty.participant_advisor_act, name='participant_advisor_act'),
+    url(r'^participant/advisor_rej/$', views.faculty.participant_advisor_rej, name='participant_advisor_rej'),
+
     url(r'^participant/instr_act/$', views.faculty.participant_instr_act, name='participant_instr_act'),
+    url(r'^participant/instr_rej/$', views.faculty.participant_instr_rej, name='participant_instr_rej'),
+
     url(r'^course_page/$', views.faculty.course_page, name='course_page'),
     url(r'^student_details/$', views.faculty.student_details, name='student_details'),
 
