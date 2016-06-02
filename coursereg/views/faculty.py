@@ -149,7 +149,7 @@ def participant_advisor_rej(request):
 		participant.save()
 		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
 		messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
-		participant.delete()
+		#participant.delete()
     else:
 		participant.state = models.Participant.STATE_ADV_DROP_REJECT
 		participant.save()
