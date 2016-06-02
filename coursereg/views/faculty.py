@@ -142,7 +142,7 @@ def participant_advisor_rej(request):
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     advisee     = models.User.objects.get(id=request.POST['advisee_id'])
     assert participant.user_id == advisee.id
-    if participant.state != models.Participant.STATE_REQUESTED:
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
 		participant.state = models.Participant.STATE_ADVISOR_REJECT

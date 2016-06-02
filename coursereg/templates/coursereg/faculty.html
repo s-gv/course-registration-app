@@ -16,6 +16,15 @@
                 margin-top:20px;
             }
         </style>
+          
+        <style type="text/css">
+            .foots {
+                font-family: fantasy;
+                color: black;
+                font-size: 25px;
+                
+            }
+        </style>
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -100,7 +109,7 @@
                                
 				 <div class="row">
 				 	<div class="col-md-1">{{ course.id }}</div>  
-                    <div class="col-md-4">{{ course }}</div>  
+                    <div class="col-md-4">{{ course }}</div>                     
  				 	<div class="col-md-4">{{ participant_state }}</div>
                      {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}	
                      
@@ -120,7 +129,7 @@
                                          <input type="hidden" name="participant_id" value="{{ participant_id }}">
                                          <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
                                          <input type="hidden" name="course_id" value="{{ course.id }}">
-                                         <button type="submit" class="btn btn-danger btn-circle btn-xs">Reject</button>
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
                                      </form>
                                  </div>
                      {% else %}
@@ -207,4 +216,6 @@
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
     </body>
+
+    
 </html>
