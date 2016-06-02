@@ -22,7 +22,7 @@ def index(request):
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
             models.Participant.PARTICIPANT_CHOICES[p.participant_type][1],
-            p.state == models.Participant.STATE_REQUESTED,
+            (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_ADVISOR_DONE) or (p.state == models.Participant.STATE_INSTRUCTOR_DONE) or (p.state == models.Participant.STATE_FINAL_APPROVED),
             p.id
         ) for p in models.Participant.objects.filter(user=request.user)]
     context = {
@@ -59,12 +59,19 @@ def participant_delete(request):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     assert participant.user_id == request.user.id
-    if participant.state != models.Participant.STATE_REQUESTED:
+    if (participant.state == models.Participant.STATE_NA):
         messages.error(request, 'Unable to unregister from the course. Please speak to the administrator.')
     else:
-        participant.delete()
-        messages.success(request, 'Unregistered from %s.' % participant.course)
+        #participant.delete()
+        if participant.state == models.Participant.STATE_REQUESTED:
+			participant.delete()
+			messages.success(request, 'Course dropped %s.' % participant.course)
+        else:
+            participant.state = models.Participant.STATE_DROP_REQUESTED
+            participant.save()
+            messages.success(request, 'Request raised for dropping the course %s.' % participant.course)
     return redirect('coursereg:index')
+
 
 @login_required
 def participant_create(request):

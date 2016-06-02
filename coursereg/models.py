@@ -132,7 +132,10 @@ class Participant(models.Model):
     STATE_NA = 4
     STATE_ADVISOR_REJECT =5
     STATE_INSTRUCTOR_REJECT = 6
-
+    STATE_DROP_REQUESTED = 7
+    STATE_ADV_DROP_DONE = 8
+    STATE_ADV_DROP_REJECT = 9
+    
     STATE_CHOICES = (
         (STATE_REQUESTED, 'Requested'),
         (STATE_ADVISOR_DONE, 'Advisor approved'),
@@ -140,7 +143,10 @@ class Participant(models.Model):
         (STATE_FINAL_APPROVED, 'Final approved'),
         (STATE_NA, 'N/A'),
         (STATE_ADVISOR_REJECT, 'Advisor rejected'),
-        (STATE_INSTRUCTOR_REJECT, 'Instructor rejected')
+        (STATE_INSTRUCTOR_REJECT, 'Instructor rejected'),
+	    (STATE_DROP_REQUESTED, 'Drop Requested'),
+        (STATE_ADV_DROP_DONE, 'Advisor approved drop'),
+        (STATE_ADV_DROP_REJECT, 'Advisor rejected drop'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

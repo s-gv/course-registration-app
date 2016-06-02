@@ -88,7 +88,7 @@
 				 	<div class="col-md-1">{{ course.id }}</div>  
                     <div class="col-md-4">{{ course }}</div>  
  				 	<div class="col-md-4">{{ participant_state }}</div>
-                     {% if participant_state == 'Requested' %}	
+                     {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}	
                      
                     <div class="col-md-1">
                                      <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
@@ -106,7 +106,7 @@
                                          <input type="hidden" name="participant_id" value="{{ participant_id }}">
                                          <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
                                          <input type="hidden" name="course_id" value="{{ course.id }}">
-                                         <button type="submit" class="btn btn-primary btn-xs">Reject</button>
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs">Reject</button>
                                      </form>
                                  </div>
                      {% else %}

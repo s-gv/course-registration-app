@@ -37,7 +37,7 @@ def faculty(request):
                 models.Participant.STATE_CHOICES[p.state][1],
                 ##models.Participant.GRADE_CHOICES[p.grade][1],
                 p.participant_type,
-                p.state == models.Participant.STATE_REQUESTED,
+                (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_DROP_REQUESTED),
                 p.id
             ) for p in models.Participant.objects.filter(user=advisee[0])]
         advisee_requests = advisee_requests + advisee_reqs
@@ -115,26 +115,24 @@ def student_details(request):
     }
     return render(request, 'coursereg/student_details.html', context)
 
-
-
-
-
-
-
-
 @login_required
 def participant_advisor_act(request):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     advisee     = models.User.objects.get(id=request.POST['advisee_id'])
     assert participant.user_id == advisee.id
-    if participant.state != models.Participant.STATE_REQUESTED:
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+    elif (participant.state == models.Participant.STATE_REQUESTED):
+		participant.state = models.Participant.STATE_ADVISOR_DONE
+		participant.save()
+		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+		messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
     else:
-        participant.state = models.Participant.STATE_ADVISOR_DONE
-        participant.save()
-        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-        messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
+		participant.state = models.Participant.STATE_ADV_DROP_DONE
+		participant.save()
+		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+		messages.success(request, 'Dropped the enrolment request of %s.' % req_info)
     return redirect('coursereg:index')
 
 @login_required
@@ -145,11 +143,17 @@ def participant_advisor_rej(request):
     assert participant.user_id == advisee.id
     if participant.state != models.Participant.STATE_REQUESTED:
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+    elif (participant.state == models.Participant.STATE_REQUESTED):
+		participant.state = models.Participant.STATE_ADVISOR_REJECT
+		participant.save()
+		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+		messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
+		participant.delete()
     else:
-        participant.state = models.Participant.STATE_ADVISOR_REJECT
-        participant.save()
-        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-        messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
+		participant.state = models.Participant.STATE_ADV_DROP_REJECT
+		participant.save()
+		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+		messages.success(request, 'Rejected the drop request of %s.' % req_info)
     return redirect('coursereg:index')
 
 
