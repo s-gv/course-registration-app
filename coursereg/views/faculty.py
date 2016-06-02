@@ -42,6 +42,7 @@ def faculty(request):
             ) for p in models.Participant.objects.filter(user=advisee[0])]
         advisee_requests = advisee_requests + advisee_reqs
     context = {
+	'user_email': request.user.email,
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
         'sr_no': request.user.sr_no,
@@ -262,3 +263,13 @@ def participant_instr_rej(request):
     }
 
     return render(request, 'coursereg/course.html', context)
+
+
+@login_required
+def faq(request):
+        context = {
+                'user_email': request.user.email,
+        'faqs': models.Faq.objects.filter(faq_for=models.Faq.FAQ_FACULTY),
+        }
+        return render(request, 'coursereg/faculty_faq.html', context)
+
