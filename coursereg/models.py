@@ -177,10 +177,12 @@ class Participant(models.Model):
 class Faq(models.Model):
     FAQ_STUDENT = 0
     FAQ_FACULTY = 1
+    FAQ_DCC = 2
 
     FAQ_CHOICES = (
         (FAQ_STUDENT, "Student"),
         (FAQ_FACULTY, "Faculty"),
+        (FAQ_DCC, "DCC")
     )
 
     faq_for = models.IntegerField(default=FAQ_STUDENT, choices=FAQ_CHOICES)
