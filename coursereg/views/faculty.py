@@ -60,18 +60,36 @@ def course_page(request):
     students = []
     instructors = []
     TAs = []
+    no_of_student_credit = 0
+    no_of_student_audit = 0
 
     for p in models.Participant.objects.filter(course=current_course):
-        if( ( p.participant_type == 0 or  p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED) :
+        if( ( p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED) :
+                no_of_student_credit = no_of_student_credit + 1
                 req = (p.user.id,
                     p.user.full_name,
                     p.user.program,
+                    no_of_student_credit,
                     p.user.department,
                     models.Participant.STATE_CHOICES[p.state][1],
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
                     p.id)
                 students.append(req)
+
+        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
+                no_of_student_audit = no_of_student_audit + 1
+                req = (p.user.id,
+                   p.user.full_name,
+                   p.user.program,
+                   no_of_student_audit,
+                   p.user.department,
+                   models.Participant.STATE_CHOICES[p.state][1],
+                   models.Participant.GRADE_CHOICES[p.grade][1],
+                   p.state == models.Participant.STATE_ADVISOR_DONE,
+                   p.id)
+                students.append(req)
+
         if( ( p.participant_type == 2) ):
                 req = (p.user.id,
                     p.user.full_name,
@@ -84,7 +102,6 @@ def course_page(request):
                     p.user.department,
                     p.id)
                 TAs.append(req)
-
 
     context = {
         'user_email': request.user.email,
