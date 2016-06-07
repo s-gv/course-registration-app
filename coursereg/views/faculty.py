@@ -335,8 +335,8 @@ def participant_instr_rej(request):
 @login_required
 def faq(request):
         context = {
-                'user_email': request.user.email,
-        'faqs': models.Faq.objects.filter(faq_for=models.Faq.FAQ_FACULTY),
+            'user_email': request.user.email,
+            'faqs': models.Faq.objects.filter(faq_for=models.Faq.FAQ_FACULTY),
         }
         return render(request, 'coursereg/faculty_faq.html', context)
 

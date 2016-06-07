@@ -50,6 +50,7 @@ def profile(request):
         'user_id': request.user.id,
         'adviser_full_name': request.user.adviser.full_name,
         'program': models.User.PROGRAM_CHOICES[request.user.program][1],
+        'department': request.user.department,
         'sr_no': request.user.sr_no,
     }
     return render(request, 'coursereg/student_profile.html', context)
