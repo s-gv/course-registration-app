@@ -39,12 +39,12 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="#">Bheemboy</a>
+                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
                     </div>
                     <div id="navbar" class="navbar-collapse collapse">
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
+                            <li><a href="{% url 'coursereg:index' %}">Home</a></li>
                             <li><a href="{% url 'coursereg:student_faq' %}">FAQ</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -87,29 +87,94 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">Registered Courses</h3>
                         </div>
-                        <div class="panel-body">
-			{% for course,state, grade, state_str, grade_str, deleteable, participant_id in participants %}
+                       
+			<!--{% for advisee_id, advisee_name, course, participant_state, participant_type, action_required, participant_id in advisee_requests %}
+				{%ifequal advisee_name1 advisee_name %}	
+                               
+				 <div class="row">
+				 	<div class="col-md-1">{{ course.id }}</div>  
+                    <div class="col-md-4">{{ course }}</div>                     
+ 				 	<div class="col-md-4">{{ participant_state }}</div>
+                     {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}	
+                     
+                    <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                         <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
+                                         <input type="hidden" name="course_id" value="{{ course.id }}">
+                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>
+                                     </form>
+                                 </div>
+                     
+                     <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                         <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
+                                         <input type="hidden" name="course_id" value="{{ course.id }}">
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
+                                     </form>
+                                 </div>
+                     {% else %}
+                     <div class="col-md-1"><b>NA</b></div>	                     
+                     {% endif %}
+				 </div>
+                        
+				 <hr>
+				{% endifequal %}
+				{% endfor %}	-->
+                     <div class="panel-body">
+			             {% for course,state, grade, state_str, grade_str, deleteable, participant_id in participants %}
                             <div class="row">
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
-                                <div class="col-md-9">{{ course }}</div>
-                                <div class="col-md-2">
+                                <div class="col-md-4">{{ course }}</div>
+
                                 {% if grade == 0 %}
-                                    {% if state == 0 %}
-                                    <span class="label label-default">{{ state_str }}</span>
-                                    {% elif state == 1 %}
+                                    {% if state == 0 or state == 7 or state == 13 %}
+                                <div class="col-md-2">
                                     <span class="label label-info">{{ state_str }}</span>
+                                 </div> 
+                                <div class="col-md-1">
+                                    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
+                                        {% csrf_token %}
+					                    <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
+                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                        <button type="submit" class="btn btn-primary btn-xs">Approve</button>
+                                    </form>
+				                </div>
+                    		    <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                         <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
+                                         <input type="hidden" name="course_id" value="{{ course.id }}">
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
+                                     </form>
+                                 </div> 
+                                    {% elif state == 1 %}
+                                 <div class="col-md-2">
+                                    <span class="label label-info">Already Approved</span>
+                                 </div> 
                                     {% elif state == 2 %}
-                                    <span class="label label-primary">{{ state_str }}</span>
+                                 <div class="col-md-2">
+                                    <span class="label label-info">Already Approved</span>
+                                 </div> 
                                     {% elif state == 3 %}
-                                    <span class="label label-success">{{ state_str }}</span>
-                                    {% else %}                                    <span class="label label-default">{{ state_str }}</span>
+                                 <div class="col-md-2">
+                                    <span class="label label-success">Registered</span>
+                                 </div> 
+                                    {% else %}                                    
+                                <div class="col-md-2">
+				                    <span class="label label-default">{{ state_str }}</span>
+                                 </div> 
                                     {% endif %}
                                 {% else %}
                                     <span class="label label-primary">{{ grade_str }} grade</span>
                                 {% endif %}
-                                </div>
+                            <!--    </div>
                                 <div class="col-md-1">
                                     {% if deleteable %}
                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
@@ -121,7 +186,7 @@
                                         </button>
                                     </form>
                                     {% endif %}
-                                </div>
+                                </div>-->
                             </div>
                             {% endfor %}
                         </div>
@@ -133,12 +198,7 @@
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>
-        <script type="text/javascript">
-            $("#course_select_box").chosen({
-                placeholder_text_single: "Choose a course...",
-                search_contains: true,
-            });
-        </script>
+        
     </body>
 </html>
 

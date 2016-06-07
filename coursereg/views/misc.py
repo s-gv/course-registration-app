@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from . import student, faculty, light_admin
+from . import student, faculty, light_admin, dcc
 from django.contrib.auth import update_session_auth_hash
 
 @login_required
@@ -18,6 +18,8 @@ def index(request):
         return student.index(request)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         return faculty.faculty(request)
+    elif request.user.user_type == models.User.USER_TYPE_DCC:
+        return dcc.dcc(request)
     elif request.user.user_type == 2:
         return light_admin.admin(request)
     else:

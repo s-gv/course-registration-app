@@ -42,7 +42,7 @@ def faculty(request):
             ) for p in models.Participant.objects.filter(user=advisee[0])]
         advisee_requests = advisee_requests + advisee_reqs
     context = {
-	'user_email': request.user.email,
+	    'user_email': request.user.email,
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
         'sr_no': request.user.sr_no,
@@ -66,6 +66,7 @@ def course_page(request):
                 req = (p.user.id,
                     p.user.full_name,
                     p.user.program,
+                    p.user.department,
                     models.Participant.STATE_CHOICES[p.state][1],
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
@@ -74,19 +75,23 @@ def course_page(request):
         if( ( p.participant_type == 2) ):
                 req = (p.user.id,
                     p.user.full_name,
+                    p.user.department,
                     p.id)
                 instructors.append(req)
         if( ( p.participant_type == 3) ):
                 req = (p.user.id,
                     p.user.full_name,
+                    p.user.department,
                     p.id)
                 TAs.append(req)
 
 
     context = {
+        'user_email': request.user.email,
         'course_id': current_course.id,
         'course_name': current_course,
         'course_credits': current_course.credits,
+        'course_department': current_course.department,
         'students': students,
         'instructors': instructors,
         'TAs': TAs,
@@ -96,6 +101,8 @@ def course_page(request):
 def student_details(request):
     assert request.method == 'POST'
     current_student_id = request.POST['student_id']
+    advisee     = models.User.objects.get(id=current_student_id)
+    student_name = advisee.full_name
     participants = [
         (
             p.course,
@@ -107,7 +114,8 @@ def student_details(request):
             p.id
         ) for p in models.Participant.objects.filter(user=current_student_id)]
     context = {
-        'student_name': models.User.objects.filter(pk=current_student_id),   
+	    'advisee_id': current_student_id,
+        'student_name': student_name,   
 	    'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
@@ -119,43 +127,96 @@ def student_details(request):
 @login_required
 def participant_advisor_act(request):
     assert request.method == 'POST'
-    participant = models.Participant.objects.get(id=request.POST['participant_id'])
-    advisee     = models.User.objects.get(id=request.POST['advisee_id'])
+    current_participant_id = request.POST['participant_id']
+    current_student_id = request.POST['advisee_id']
+    participant = models.Participant.objects.get(id=current_participant_id)
+    advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
-    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED):
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
 		participant.state = models.Participant.STATE_ADVISOR_DONE
 		participant.save()
 		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
 		messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
+    elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
+        participant.state = models.Participant.STATE_ADV_CANCEL_DONE
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted the cancellation request of %s.' % req_info)
     else:
 		participant.state = models.Participant.STATE_ADV_DROP_DONE
 		participant.save()
 		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
 		messages.success(request, 'Dropped the enrolment request of %s.' % req_info)
-    return redirect('coursereg:index')
+    ## Read the DB and re-render the advisee page.
+    student_name = advisee.full_name
+    participants = [
+        (
+            p.course,
+            p.state,
+            p.grade,
+            models.Participant.STATE_CHOICES[p.state][1],
+            models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
+        ) for p in models.Participant.objects.filter(user=current_student_id)]
+    context = {
+	    'advisee_id': current_student_id,
+        'student_name': student_name,   
+	    'user_email': request.user.email,
+        'user_id': request.user.id,
+        'participants': participants,
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),}
+    return render(request, 'coursereg/student_details.html', context)
 
 @login_required
 def participant_advisor_rej(request):
     assert request.method == 'POST'
-    participant = models.Participant.objects.get(id=request.POST['participant_id'])
-    advisee     = models.User.objects.get(id=request.POST['advisee_id'])
+    current_participant_id = request.POST['participant_id']
+    current_student_id = request.POST['advisee_id']
+    participant = models.Participant.objects.get(id=current_participant_id)
+    advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
-    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED):
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
 		participant.state = models.Participant.STATE_ADVISOR_REJECT
 		participant.save()
 		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
-		#participant.delete()
+		messages.error(request, 'Rejected the enrolment request of %s.' % req_info)
+    elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
+        participant.state = models.Participant.STATE_ADV_CANCEL_REJECT
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
     else:
 		participant.state = models.Participant.STATE_ADV_DROP_REJECT
 		participant.save()
 		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the drop request of %s.' % req_info)
-    return redirect('coursereg:index')
+		messages.error(request, 'Rejected the drop request of %s.' % req_info)
+    ## Read the DB and re-render the advisee page.
+    student_name = advisee.full_name
+    participants = [
+        (
+            p.course,
+            p.state,
+            p.grade,
+            models.Participant.STATE_CHOICES[p.state][1],
+            models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
+        ) for p in models.Participant.objects.filter(user=current_student_id)]
+    context = {
+	    'advisee_id': current_student_id,
+        'student_name': student_name,   
+	    'user_email': request.user.email,
+        'user_id': request.user.id,
+        'participants': participants,
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),}
+    return render(request, 'coursereg/student_details.html', context)
 
 
 @login_required
@@ -164,11 +225,11 @@ def participant_instr_act(request):
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     student     = models.User.objects.get(id=request.POST['student_id'])
     ## Collect the course page context and pass it back to the course page
-    current_course     = models.Course.objects.get(id=request.POST['course_id'])
+    current_course  = models.Course.objects.get(id=request.POST['course_id'])
 
     assert participant.user_id == student.id
     if participant.state != models.Participant.STATE_ADVISOR_DONE:
-        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+        messages.error(request, 'Unable to accept the enrolment request, please contact the admin.')
     else:
         participant.state = models.Participant.STATE_INSTRUCTOR_DONE
         req_info = str(student.full_name) + ' for ' + str(participant.course)
@@ -184,6 +245,7 @@ def participant_instr_act(request):
                 req = (p.user.id,
                     p.user.full_name,
                     p.user.program,
+                    p.user.department,
                     models.Participant.STATE_CHOICES[p.state][1],
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
@@ -192,11 +254,13 @@ def participant_instr_act(request):
         if ((p.participant_type == 2)):
             req = (p.user.id,
                    p.user.full_name,
+                   p.user.department,
                    p.id)
             instructors.append(req)
         if ((p.participant_type == 3)):
             req = (p.user.id,
                    p.user.full_name,
+                   p.user.department,
                    p.id)
             TAs.append(req)
 
@@ -226,7 +290,7 @@ def participant_instr_rej(request):
         participant.state = models.Participant.STATE_INSTRUCTOR_REJECT
         req_info = str(student.full_name) + ' for ' + str(participant.course)
         participant.save()
-        messages.success(request, 'Instructor Rejected the enrolment request of %s.' % req_info)
+        messages.error(request, 'Instructor Rejected the enrolment request of %s.' % req_info)
 
     ## Read the DB and re-render the course page.
     students = []
@@ -237,6 +301,7 @@ def participant_instr_rej(request):
                 req = (p.user.id,
                     p.user.full_name,
                     p.user.program,
+                    p.user.department,
                     models.Participant.STATE_CHOICES[p.state][1],
                     models.Participant.GRADE_CHOICES[p.grade][1],
                     p.state == models.Participant.STATE_ADVISOR_DONE,
@@ -245,11 +310,13 @@ def participant_instr_rej(request):
         if ((p.participant_type == 2)):
             req = (p.user.id,
                    p.user.full_name,
+                   p.user.department,
                    p.id)
             instructors.append(req)
         if ((p.participant_type == 3)):
             req = (p.user.id,
                    p.user.full_name,
+                   p.user.department,
                    p.id)
             TAs.append(req)
 

@@ -66,6 +66,10 @@ def participant_delete(request):
         if participant.state == models.Participant.STATE_REQUESTED:
 			participant.delete()
 			messages.success(request, 'Course dropped %s.' % participant.course)
+        elif (participant.state == models.Participant.STATE_ADVISOR_DONE) or (participant.state == models.Participant.STATE_INSTRUCTOR_DONE):
+            participant.state = models.Participant.STATE_CANCEL_REQUESTED
+            participant.save()
+            messages.success(request, 'Course cancellation request was send for %s.' % participant.course)
         else:
             participant.state = models.Participant.STATE_DROP_REQUESTED
             participant.save()

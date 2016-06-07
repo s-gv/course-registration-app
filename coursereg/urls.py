@@ -22,6 +22,11 @@ urlpatterns = [
 
     url(r'^course_page/$', views.faculty.course_page, name='course_page'),
     url(r'^student_details/$', views.faculty.student_details, name='student_details'),
+    url(r'^student_details_dcc/$', views.dcc.student_details_dcc, name='student_details_dcc'),
+    url(r'^participant/dcc_act/$', views.dcc.participant_dcc_act, name='participant_dcc_act'),
+    url(r'^participant/dcc_act_all/$', views.dcc.participant_dcc_act_all, name='participant_dcc_act_all'),
+    url(r'^participant/dcc_rej/$', views.dcc.participant_dcc_rej, name='participant_dcc_rej'),
+
 
     url(r'^fatal/$', views.misc.fatal_error, name='fatal'),
     url(r'^$', views.misc.index, name='index'),

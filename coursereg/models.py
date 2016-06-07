@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_FACULTY = 0
     USER_TYPE_STUDENT = 1
     USER_TYPE_OTHER = 2
+    USER_TYPE_DCC = 3
     #USER_TYPE_ADMIN = 3
 
     PROGRAM_OTHER = 0
@@ -50,9 +51,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         (USER_TYPE_FACULTY, "Faculty"),
         (USER_TYPE_STUDENT, "Student"),
         (USER_TYPE_OTHER, "Other"),
+        (USER_TYPE_DCC, "DCC"),
     ))
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
     program = models.IntegerField(default=PROGRAM_OTHER, choices=PROGRAM_CHOICES)
+    department = models.CharField(max_length=100, default='None')
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
 
@@ -135,18 +138,31 @@ class Participant(models.Model):
     STATE_DROP_REQUESTED = 7
     STATE_ADV_DROP_DONE = 8
     STATE_ADV_DROP_REJECT = 9
+    STATE_FINAL_DISAPPROVED= 10
+    STATE_DCC_DROP_DONE = 11
+    STATE_DCC_DROP_REJECT = 12
+    STATE_CANCEL_REQUESTED = 13
+    STATE_ADV_CANCEL_DONE = 14
+    STATE_ADV_CANCEL_REJECT = 15
+
     
     STATE_CHOICES = (
         (STATE_REQUESTED, 'Requested'),
         (STATE_ADVISOR_DONE, 'Advisor approved'),
         (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
-        (STATE_FINAL_APPROVED, 'Final approved'),
+        (STATE_FINAL_APPROVED, 'DCC approved'),
         (STATE_NA, 'N/A'),
         (STATE_ADVISOR_REJECT, 'Advisor rejected'),
         (STATE_INSTRUCTOR_REJECT, 'Instructor rejected'),
 	    (STATE_DROP_REQUESTED, 'Drop Requested'),
         (STATE_ADV_DROP_DONE, 'Advisor approved drop'),
         (STATE_ADV_DROP_REJECT, 'Advisor rejected drop'),
+        (STATE_FINAL_APPROVED, 'DCC disapproved'),
+        (STATE_DCC_DROP_DONE, 'DCC drop approved'),
+        (STATE_DCC_DROP_REJECT, 'DCC drop rejected'),
+        (STATE_CANCEL_REQUESTED, 'Cancel requested'),
+        (STATE_ADV_CANCEL_DONE, 'Advisor approved cancellation'),
+        (STATE_ADV_CANCEL_REJECT, 'Advisor rejected cancellation'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
