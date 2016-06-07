@@ -340,3 +340,12 @@ def faq(request):
         }
         return render(request, 'coursereg/faculty_faq.html', context)
 
+@login_required
+def profile(request):
+    context = {
+		'user_email': request.user.email,
+        'user_full_name': request.user.full_name,
+        'user_id': request.user.id,
+        'department': request.user.department,
+    }
+    return render(request, 'coursereg/faculty_profile.html', context)
