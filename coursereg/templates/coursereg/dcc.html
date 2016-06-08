@@ -119,7 +119,26 @@
              {% endfor %}
         {% endif %}
 
-  	
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h3>Other Actions</h3>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-1">
+    <form class="form-inline" method="POST" action="{% url 'coursereg:send_remainder' %}">
+        {% csrf_token %}
+        <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
+        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+        <button type="submit" class="btn btn-primary btn-xs">Send Remainder For Pending Actions</button>
+    </form>
+</div>
+
+
+
+
   </div> <!-- end tab-content -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>

@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^participant/dcc_act_all/$', views.dcc.participant_dcc_act_all, name='participant_dcc_act_all'),
     url(r'^participant/dcc_rej/$', views.dcc.participant_dcc_rej, name='participant_dcc_rej'),
     url(r'^participant/dcc_faq/$', views.dcc.faq, name='dcc_faq'),
+    url(r'^participant/send_remainder/$', views.dcc.send_remainder, name='send_remainder'),
 
     url(r'^fatal/$', views.misc.fatal_error, name='fatal'),
     url(r'^$', views.misc.index, name='index'),

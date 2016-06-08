@@ -9,9 +9,9 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
+import smtplib
 
 def dcc(request):
-
     students = []
     for u in models.User.objects.filter(department=request.user.department):
         if (u.user_type==1):
@@ -26,6 +26,49 @@ def dcc(request):
         'students' : students,
     }
     return render(request, 'coursereg/dcc.html', context)
+
+def send_remainder(request):
+    smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
+    dcc_email_id = 'dcc_chair@ece.iisc.ernet.in'
+    outstanding_participants = []
+    # Send remainder mails for all the outstanding requests pending adviser approval, notify both adviser and advisee.
+    adviser_list = {}
+    advisee_list = {}
+    for p in models.Participant.objects.all():
+        if(p.participant_type != models.Participant.PARTICIPANT_INSTRUCTOR):
+            if((p.state == models.Participant.STATE_REQUESTED  or p.state ==  models.Participant.STATE_DROP_REQUESTED)):
+                advisee =  p.user
+                adviser = advisee.adviser
+                adviser_list[adviser] = adviser.full_name
+                advisee_list[advisee] = advisee.full_name             
+    for adviser in adviser_list:
+                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Adviser Approval\nDear Prof. '+str(adviser.full_name)+',\n\nThere are course enrolment/drop requests from your advisees in the Bheemby portal pending your approval.\nKindly login to the Bheemboy portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
+                smtpObj.sendmail(dcc_email_id, str(adviser), mail_text)
+    for advisee in advisee_list:
+                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Adviser Approval\nDear '+str(advisee.full_name)+',\n\nYour Course enrolment/drop request is pending an approval from your adviser in the Bheemby portal.\nKindly follow up with your adviser. \n\n\nSincerely,\nDCC Chair.'
+                smtpObj.sendmail(dcc_email_id, str(advisee), mail_text)
+    # Send remainder mails for all the outstanding requests pending instructor approval, notify both intructor and student.
+    instructor_list = {}
+    student_list    = {}
+    for p in models.Participant.objects.all():
+        if(p.participant_type != models.Participant.PARTICIPANT_INSTRUCTOR):
+            if( p.state ==  models.Participant.STATE_ADVISOR_DONE ):
+                curr_course          = p.course              
+                student_list[p.user] = curr_course
+                instructors = []
+                for i in models.Participant.objects.all():
+                    if(i.participant_type == models.Participant.PARTICIPANT_INSTRUCTOR and i.course == curr_course):
+                        instructors.append(i.user)
+                for instructor in instructors:
+                    instructor_list[instructor] = curr_course
+    for instructor in instructor_list:
+                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Instructor Approval\nDear Prof. '+str(instructor.full_name)+',\n\nThere are course enrolment requests from students pending your approval in the Bheemboy portal.\nKindly login to the Bheemboy portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
+                smtpObj.sendmail( dcc_email_id, str(instructor), mail_text)
+    for student in student_list:
+                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Instructor Approval\nDear '+str(student.full_name)+',\n\nYour course enrolment request is pending an approval from the course instructor in the Bheemby portal.\nKindly follow up with the instructor. \n\n\nSincerely,\nDCC Chair.'
+                smtpObj.sendmail( dcc_email_id, str(student), mail_text)
+    return dcc(request)
+
 
 def student_details_dcc(request):
     assert request.method == 'POST'
