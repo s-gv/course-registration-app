@@ -257,17 +257,37 @@ def participant_instr_act(request):
     students = []
     instructors = []
     TAs = []
+
+    no_of_student_credit = 0
+    no_of_student_audit = 0
+
     for p in models.Participant.objects.filter(course=current_course):
-        if( ( p.participant_type == 0 or  p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED) :
-                req = (p.user.id,
-                    p.user.full_name,
-                    p.user.program,
-                    p.user.department,
-                    models.Participant.STATE_CHOICES[p.state][1],
-                    models.Participant.GRADE_CHOICES[p.grade][1],
-                    p.state == models.Participant.STATE_ADVISOR_DONE,
-                    p.id)
-                students.append(req)
+        if ((p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED):
+            no_of_student_credit = no_of_student_credit + 1
+            req = (p.user.id,
+                   p.user.full_name,
+                   p.user.program,
+                   no_of_student_credit,
+                   p.user.department,
+                   models.Participant.STATE_CHOICES[p.state][1],
+                   models.Participant.GRADE_CHOICES[p.grade][1],
+                   p.state == models.Participant.STATE_ADVISOR_DONE,
+                   p.id)
+            students.append(req)
+
+        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
+            no_of_student_audit = no_of_student_audit + 1
+            req = (p.user.id,
+                   p.user.full_name,
+                   p.user.program,
+                   no_of_student_audit,
+                   p.user.department,
+                   models.Participant.STATE_CHOICES[p.state][1],
+                   models.Participant.GRADE_CHOICES[p.grade][1],
+                   p.state == models.Participant.STATE_ADVISOR_DONE,
+                   p.id)
+            students.append(req)
+
         if ((p.participant_type == 2)):
             req = (p.user.id,
                    p.user.full_name,
@@ -282,15 +302,17 @@ def participant_instr_act(request):
             TAs.append(req)
 
     context = {
+        'user_email': request.user.email,
         'course_id': current_course.id,
         'course_name': current_course,
         'course_credits': current_course.credits,
+        'course_department': current_course.department,
         'students': students,
         'instructors': instructors,
         'TAs': TAs,
     }
-
     return render(request, 'coursereg/course.html', context)
+
 
 @login_required
 def participant_instr_rej(request):
@@ -313,23 +335,43 @@ def participant_instr_rej(request):
     students = []
     instructors = []
     TAs = []
+    no_of_student_credit = 0
+    no_of_student_audit = 0
+
     for p in models.Participant.objects.filter(course=current_course):
-        if( ( p.participant_type == 0 or  p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED ) :
-                req = (p.user.id,
-                    p.user.full_name,
-                    p.user.program,
-                    p.user.department,
-                    models.Participant.STATE_CHOICES[p.state][1],
-                    models.Participant.GRADE_CHOICES[p.grade][1],
-                    p.state == models.Participant.STATE_ADVISOR_DONE,
-                    p.id)
-                students.append(req)
+        if ((p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED):
+            no_of_student_credit = no_of_student_credit + 1
+            req = (p.user.id,
+                   p.user.full_name,
+                   p.user.program,
+                   no_of_student_credit,
+                   p.user.department,
+                   models.Participant.STATE_CHOICES[p.state][1],
+                   models.Participant.GRADE_CHOICES[p.grade][1],
+                   p.state == models.Participant.STATE_ADVISOR_DONE,
+                   p.id)
+            students.append(req)
+
+        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
+            no_of_student_audit = no_of_student_audit + 1
+            req = (p.user.id,
+                   p.user.full_name,
+                   p.user.program,
+                   no_of_student_audit,
+                   p.user.department,
+                   models.Participant.STATE_CHOICES[p.state][1],
+                   models.Participant.GRADE_CHOICES[p.grade][1],
+                   p.state == models.Participant.STATE_ADVISOR_DONE,
+                   p.id)
+            students.append(req)
+
         if ((p.participant_type == 2)):
             req = (p.user.id,
                    p.user.full_name,
                    p.user.department,
                    p.id)
             instructors.append(req)
+
         if ((p.participant_type == 3)):
             req = (p.user.id,
                    p.user.full_name,
@@ -338,14 +380,15 @@ def participant_instr_rej(request):
             TAs.append(req)
 
     context = {
+        'user_email': request.user.email,
         'course_id': current_course.id,
         'course_name': current_course,
         'course_credits': current_course.credits,
+        'course_department': current_course.department,
         'students': students,
         'instructors': instructors,
         'TAs': TAs,
     }
-
     return render(request, 'coursereg/course.html', context)
 
 
