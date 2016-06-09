@@ -25,7 +25,6 @@ def faculty(request):
             u.id,
             u.full_name,
         ) for u in models.User.objects.filter(adviser=request.user)]
-    print advisees
 
     advisee_requests = []
     for advisee in advisees:
@@ -41,6 +40,7 @@ def faculty(request):
                 p.id
             ) for p in models.Participant.objects.filter(user=advisee[0])]
         advisee_requests = advisee_requests + advisee_reqs
+
     context = {
 	    'user_email': request.user.email,
         'user_full_name': request.user.full_name,
@@ -53,6 +53,26 @@ def faculty(request):
     }
     return render(request, 'coursereg/faculty.html', context)
 
+def instructor(request):
+
+    participants = [
+        (
+            p.course,
+            models.Participant.STATE_CHOICES[p.state][1],
+            models.Participant.GRADE_CHOICES[p.grade][1],
+            p.state == models.Participant.STATE_REQUESTED,
+            p.id
+        ) for p in models.Participant.objects.filter(user=request.user)]
+
+    context = {
+        'user_email': request.user.email,
+        'user_full_name': request.user.full_name,
+        'user_id': request.user.id,
+        'sr_no': request.user.sr_no,
+        'participants': participants,
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now()),
+    }
+    return render(request, 'coursereg/faculty_instructor.html', context)
 
 def course_page(request):
     assert request.method == 'POST'

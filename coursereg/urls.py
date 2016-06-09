@@ -14,6 +14,7 @@ urlpatterns = [
 
     url(r'^faculty/faq/$', views.faculty.faq, name='faculty_faq'),
     url(r'^faculty/profile/$', views.faculty.profile, name='faculty_profile'),
+    url(r'^faculty/faculty_instructor$', views.faculty.instructor, name='faculty_instructor'),
 
     url(r'^participant/advisor_act/$', views.faculty.participant_advisor_act, name='participant_advisor_act'),
     url(r'^participant/advisor_rej/$', views.faculty.participant_advisor_rej, name='participant_advisor_rej'),

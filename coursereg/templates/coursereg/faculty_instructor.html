@@ -51,8 +51,8 @@
                     <div id="navbar" class="navbar-collapse collapse">
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a data-toggle="tab" href="#adviser">Advisees</a></li>
-	                        <li><a href="{% url 'coursereg:faculty_instructor' %}">Courses</a></li>
+                            <li><a href="{% url 'coursereg:index' %}">Advisees</a></li>
+	                        <li class="active"><a href="{% url 'coursereg:faculty_instructor' %}" >Courses</a></li>
                             <li><a href="{% url 'coursereg:faculty_faq' %}">FAQ</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -69,61 +69,40 @@
                     </div><!--/.nav-collapse -->
                 </div><!--/.container-fluid -->
             </nav>
-        <div class="row">
+            
+            <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
                         <h1>{{ user_full_name }}</h1>
                     </div>
                 </div>
-        </div>
-
- 	<div class="tab-content">
-   	   <div id="adviser" class="tab-pane fade in active">
-   	   <p>
-  		    <div class="row top-buffer-1">
-                 <div class="col-md-12">
-		              <div class="panel panel-default">
-		 	            <div class="panel-heading">
-                             <h3 class="panel-title">Advisees (Student Name)</h3>
-                 	    </div>
-			            <div class="panel-body">
-			                 {% for advisee_id, advisee_name in advisees %}
-                             <div class="row">
-                                 <div class="col-md-6"> 
-					                     <form class="form-inline" method="POST" action="{% url 'coursereg:student_details' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="student_id" value="{{ advisee_id }}">
-					                     <button type="submit" class="btn btn-link" align="center" >{{ advisee_name }}</button> 
-					                     </form>
-				                 </div>
-			                 </div>
-			                 {% endfor %}
-				
-	
-		                </div><!--end div class panel-body -->
-                      </div> <!-- end div class panel panel-default -->
-                </div> <!-- end div class col-md-12 -->         	     
- 	       </div> <!--end div class row top-buffer-1 -->
-
-	   </div> <!--end div class adviser -->
-
-        {% if messages %}
-             {% for message in messages %}
-                    <div class="row top-buffer-1">
-                        <div class="col-md-12">
-                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                            <div class="alert alert-danger" role="alert">{{ message }}</div>
-                            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-                            <div class="alert alert-success" role="alert">{{ message }}</div>
-                            {% endif %}
+            </div>
+            
+            <div class="row top-buffer-1">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Teaching Courses</h3>
                         </div>
-                    </div>
-             {% endfor %}
-        {% endif %}
-
-  </div> <!-- end tab-content -->
-
-        <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
+			            <div class="panel-body">                            
+                            {% for course, state, grade, deleteable, participant_id in participants %}
+                            <div class="row">
+                                <div class="col-md-6"> 
+                                    <form class="form-inline" method="POST" action="{% url 'coursereg:course_page' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="course_id" value="{{ course.id }}">
+                                         <button type="submit" class="btn btn-link">{{ course }}</button>
+                                    </form>
+                                    <!--div class="col-md-6"><a href="{% url 'coursereg:course_page' %}">{{ course }}</a></div-->
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div> <!--end div panel-body-->
+		          </div>
+		      </div>
+	       </div>
+            
+            <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
     </body>
 
