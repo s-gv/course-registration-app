@@ -135,15 +135,26 @@ class Participant(models.Model):
     STATE_NA = 4
     STATE_ADVISOR_REJECT =5
     STATE_INSTRUCTOR_REJECT = 6
-    STATE_DROP_REQUESTED = 7
+    STATE_DROP_REQUESTED = 7 # Drop choice is after DCC Approval 
     STATE_ADV_DROP_DONE = 8
     STATE_ADV_DROP_REJECT = 9
     STATE_FINAL_DISAPPROVED= 10
     STATE_DCC_DROP_DONE = 11
     STATE_DCC_DROP_REJECT = 12
-    STATE_CANCEL_REQUESTED = 13
+    STATE_CANCEL_REQUESTED = 13 # Cancel choice is before DCC Approval 
     STATE_ADV_CANCEL_DONE = 14
     STATE_ADV_CANCEL_REJECT = 15
+    STATE_AUDIT_REQUESTED = 16  # Credit to audit conversion
+    STATE_ADV_AUDIT_DONE = 17
+    STATE_ADV_AUDIT_REJECT = 18
+    STATE_DCC_AUDIT_DONE = 19
+    STATE_DCC_AUDIT_REJECT = 20
+    STATE_CREDIT_REQUESTED = 21 # Audit to credit conversion
+    STATE_ADV_CREDIT_DONE = 22
+    STATE_ADV_CREDIT_REJECT = 23
+    STATE_DCC_CREDIT_DONE = 24
+    STATE_DCC_CREDIT_REJECT = 25
+
 
     
     STATE_CHOICES = (
@@ -157,12 +168,23 @@ class Participant(models.Model):
 	    (STATE_DROP_REQUESTED, 'Drop Requested'),
         (STATE_ADV_DROP_DONE, 'Advisor approved drop'),
         (STATE_ADV_DROP_REJECT, 'Advisor rejected drop'),
-        (STATE_FINAL_APPROVED, 'DCC disapproved'),
+        (STATE_FINAL_DISAPPROVED, 'DCC disapproved'),  # DCC FINAL REJECT
         (STATE_DCC_DROP_DONE, 'DCC drop approved'),
         (STATE_DCC_DROP_REJECT, 'DCC drop rejected'),
         (STATE_CANCEL_REQUESTED, 'Cancel requested'),
         (STATE_ADV_CANCEL_DONE, 'Advisor approved cancellation'),
         (STATE_ADV_CANCEL_REJECT, 'Advisor rejected cancellation'),
+		(STATE_AUDIT_REQUESTED, 'Audit conversion requested'),  # Credit to audit conversion
+		(STATE_ADV_AUDIT_DONE, 'Advisor approved audit conversion'),
+		(STATE_ADV_AUDIT_REJECT,'Advisor rejected audit conversion'),  
+		(STATE_DCC_AUDIT_DONE,  'DCC approved audit conversion'),
+		(STATE_DCC_AUDIT_REJECT, 'DCC rejected audit conversion'), 
+		(STATE_CREDIT_REQUESTED, 'Credit conversion requested' ), # Audit to credit conversion
+		(STATE_ADV_CREDIT_DONE, 'Advisor approved credit conversion' ),
+		(STATE_ADV_CREDIT_REJECT, 'Advisor rejects credit conversion') ,
+		(STATE_DCC_CREDIT_DONE, 'DCC approved credit conversion' ),
+		(STATE_DCC_CREDIT_REJECT, 'DCC rejected credit conversion'), 
+
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

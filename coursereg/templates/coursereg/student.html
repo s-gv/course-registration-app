@@ -118,7 +118,7 @@
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
-                                <div class="col-md-8">{{ course }}</div>
+                                <div class="col-md-6">{{ course }}</div>  <!-- reduced to 6 to accommodate Audit/credi-->
                                 <div class="col-md-1">
                                     {% if ptype == 0 %}
                                     <span class="label label-primary">{{ ptype_str }}</span>
@@ -143,22 +143,39 @@
                                     <span class="label label-primary">{{ grade_str }} grade</span>
                                 {% endif %}
                                 </div>
-                                <div class="col-md-1">
+                                <div class="col-md-20">
                                     {% if deleteable %}
+                                   <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
+                                        {% csrf_token %}
+										<input type="hidden" name="participant_id" value="{{ participant_id }}">
                                     {% if state == 3 %}
-                                    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
-                                        {% csrf_token %}
-
-                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                        <button type="submit" class="btn btn-danger btn-circle btn-xs">
+                                        <!--button type="submit" class="btn btn-danger btn-circle btn-xs">
                                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Drop
-                                        </button>
-                                    </form>                                    
+                                        </button-->
+                                    <div class="col-md-20">
+												
+											<label class="radio-inline">
+											<input type="radio" name="modify_type" value="drop" checked>Drop
+											</label>
+											<label class="radio-inline">
+											{% if ptype == 0%}
+												<input type="radio" name="modify_type" value="audit">&nbsp &nbsp Audit
+											{% elif ptype == 1%}
+												<input type="radio" name="modify_type" value="credit">Credit
+											{% endif %}
+											</label>	
+											<!--/div-->
+											
+											<!--div class="col-md-5"-->
+											 &nbsp &nbsp &nbsp
+											<button type="submit" class="btn btn-primary btn-circle btn-xs" > 
+												ok</button>
+									</div>                                    
                                     {% else %}
-                                    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
+                                    <!--form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}"-->
                                         {% csrf_token %}
 
-                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                        <input type="hidden" name="modify_type" value="cancel">
                                         <button type="submit" class="btn btn-danger btn-circle btn-xs">
                                             <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Cancel
                                         </button>

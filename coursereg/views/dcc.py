@@ -124,14 +124,25 @@ def participant_dcc_act(request):
         participant.state = models.Participant.STATE_FINAL_APPROVED
         req_info = str(current_student.full_name) + ' for ' + str(participant.course)
         participant.save()
-        messages.success(request, 'DCC approved the drop request of %s.' % req_info)
-    elif participant.state != models.Participant.STATE_ADV_DROP_DONE:
-        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
-    else:
+        messages.success(request, 'DCC approved the request of %s.' % req_info)
+    elif participant.state == models.Participant.STATE_ADV_AUDIT_DONE:
+        participant.state = models.Participant.STATE_DCC_AUDIT_DONE
+        req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'DCC approved the audit request of %s.' % req_info)
+    elif participant.state == models.Participant.STATE_ADV_CREDIT_DONE:
+        participant.state = models.Participant.STATE_DCC_CREDIT_DONE
+        req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'DCC approved the credit request of %s.' % req_info)
+    elif participant.state == models.Participant.STATE_ADV_DROP_DONE:
         participant.state = models.Participant.STATE_DCC_DROP_DONE
         req_info = str(current_student.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.success(request, 'DCC approved the drop request of %s.' % req_info)
+    else:
+        messages.error(request, 'Unable to process request. Please contact admin')
+
 
     flag = 0
     no_course = 0
@@ -181,14 +192,24 @@ def participant_dcc_rej(request):
         req_info = str(current_student.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.error(request, 'DCC rejected the enrolment request of %s.' % req_info)
-    elif participant.state != models.Participant.STATE_ADV_DROP_DONE:
-        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
-    else:
+    elif participant.state == models.Participant.STATE_ADV_AUDIT_DONE:
+        participant.state = models.Participant.STATE_DCC_AUDIT_REJECT
+        req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'DCC rejected the audit request of %s.' % req_info)
+    elif participant.state == models.Participant.STATE_ADV_CREDIT_DONE:
+        participant.state = models.Participant.STATE_DCC_CREDIT_REJECT
+        req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'DCC rejected the credit request of %s.' % req_info)
+    elif participant.state == models.Participant.STATE_ADV_DROP_DONE:
         participant.state = models.Participant.STATE_DCC_DROP_REJECT
         req_info = str(current_student.full_name) + ' for ' + str(participant.course)
         participant.save()
-        messages.error(request, 'DCC rejected the drop request of %s.' % req_info)
-
+        messages.success(request, 'DCC rejected the drop request of %s.' % req_info)
+    else:
+        messages.error(request, 'Unable to process request. Please contact admin')
+	
     flag = 0
     no_course = 0
 

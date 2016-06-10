@@ -59,22 +59,31 @@ def profile(request):
 def participant_delete(request):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
+    modify_value = request.POST['modify_type']
     assert participant.user_id == request.user.id
     if (participant.state == models.Participant.STATE_NA):
         messages.error(request, 'Unable to unregister from the course. Please speak to the administrator.')
     else:
         #participant.delete()
-        if participant.state == models.Participant.STATE_REQUESTED:
+        if participant.state == models.Participant.STATE_REQUESTED and modify_value == 'cancel':
 			participant.delete()
-			messages.success(request, 'Course dropped %s.' % participant.course)
-        elif (participant.state == models.Participant.STATE_ADVISOR_DONE) or (participant.state == models.Participant.STATE_INSTRUCTOR_DONE):
+			messages.success(request, 'Cancelled registration of course %s.' % participant.course)
+        elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE) and modify_value == 'cancel':
             participant.state = models.Participant.STATE_CANCEL_REQUESTED
             participant.save()
-            messages.success(request, 'Course cancellation request was send for %s.' % participant.course)
-        else:
+            messages.success(request, 'Request raised for cancelling the registration for the course %s.' % participant.course)
+        elif participant.state == models.Participant.STATE_FINAL_APPROVED and modify_value == 'drop':
             participant.state = models.Participant.STATE_DROP_REQUESTED
             participant.save()
             messages.success(request, 'Request raised for dropping the course %s.' % participant.course)
+        elif participant.state == models.Participant.STATE_FINAL_APPROVED and modify_value == 'audit':
+            participant.state = models.Participant.STATE_AUDIT_REQUESTED
+            participant.save()
+            messages.success(request, 'Request raised for auditing the course %s.' % participant.course)
+        elif participant.state == models.Participant.STATE_FINAL_APPROVED and modify_value == 'credit':
+            participant.state = models.Participant.STATE_CREDIT_REQUESTED
+            participant.save()
+            messages.success(request, 'Request raised for crediting the course %s.' % participant.course)
     return redirect('coursereg:index')
 
 
