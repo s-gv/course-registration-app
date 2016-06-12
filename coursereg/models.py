@@ -24,6 +24,12 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True, **extra_fields)
 
+class Department(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_FACULTY = 0
     USER_TYPE_STUDENT = 1
@@ -55,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ))
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
     program = models.IntegerField(default=PROGRAM_OTHER, choices=PROGRAM_CHOICES)
-    department = models.CharField(max_length=100, default='None')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
 
@@ -92,7 +98,7 @@ class Course(models.Model):
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
     last_reg_date = models.DateField(verbose_name="Last Registration Date", default=timezone.now)
     credits = models.IntegerField(default=3)
-    department = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
@@ -135,13 +141,13 @@ class Participant(models.Model):
     STATE_NA = 4
     STATE_ADVISOR_REJECT =5
     STATE_INSTRUCTOR_REJECT = 6
-    STATE_DROP_REQUESTED = 7 # Drop choice is after DCC Approval 
+    STATE_DROP_REQUESTED = 7 # Drop choice is after DCC Approval
     STATE_ADV_DROP_DONE = 8
     STATE_ADV_DROP_REJECT = 9
     STATE_FINAL_DISAPPROVED= 10
     STATE_DCC_DROP_DONE = 11
     STATE_DCC_DROP_REJECT = 12
-    STATE_CANCEL_REQUESTED = 13 # Cancel choice is before DCC Approval 
+    STATE_CANCEL_REQUESTED = 13 # Cancel choice is before DCC Approval
     STATE_ADV_CANCEL_DONE = 14
     STATE_ADV_CANCEL_REJECT = 15
     STATE_AUDIT_REQUESTED = 16  # Credit to audit conversion
@@ -156,7 +162,7 @@ class Participant(models.Model):
     STATE_DCC_CREDIT_REJECT = 25
 
 
-    
+
     STATE_CHOICES = (
         (STATE_REQUESTED, 'Requested'),
         (STATE_ADVISOR_DONE, 'Advisor approved'),
@@ -176,14 +182,14 @@ class Participant(models.Model):
         (STATE_ADV_CANCEL_REJECT, 'Advisor rejected cancellation'),
 		(STATE_AUDIT_REQUESTED, 'Audit conversion requested'),  # Credit to audit conversion
 		(STATE_ADV_AUDIT_DONE, 'Advisor approved audit conversion'),
-		(STATE_ADV_AUDIT_REJECT,'Advisor rejected audit conversion'),  
+		(STATE_ADV_AUDIT_REJECT,'Advisor rejected audit conversion'),
 		(STATE_DCC_AUDIT_DONE,  'DCC approved audit conversion'),
-		(STATE_DCC_AUDIT_REJECT, 'DCC rejected audit conversion'), 
+		(STATE_DCC_AUDIT_REJECT, 'DCC rejected audit conversion'),
 		(STATE_CREDIT_REQUESTED, 'Credit conversion requested' ), # Audit to credit conversion
 		(STATE_ADV_CREDIT_DONE, 'Advisor approved credit conversion' ),
 		(STATE_ADV_CREDIT_REJECT, 'Advisor rejects credit conversion') ,
 		(STATE_DCC_CREDIT_DONE, 'DCC approved credit conversion' ),
-		(STATE_DCC_CREDIT_REJECT, 'DCC rejected credit conversion'), 
+		(STATE_DCC_CREDIT_REJECT, 'DCC rejected credit conversion'),
 
     )
 

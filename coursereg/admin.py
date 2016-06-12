@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant, Faq
+from .models import User, Course, Participant, Faq, Department
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
@@ -30,13 +30,13 @@ class CourseInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'user_type', 'adviser', 'program', 'sr_no', 'is_active')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'full_name', 'user_type', 'adviser', 'program', 'sr_no', 'date_joined')}
+            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'date_joined')}
         ),
     )
     form = UserChangeForm
@@ -51,16 +51,16 @@ class CustomUserAdmin(UserAdmin):
 
     def make_inactive(self, request, queryset):
         queryset.update(is_active=False)
-    make_inactive.short_description = "Activate selected users"
+    make_inactive.short_description = "Deactivate selected users"
 
     def make_active(self, request, queryset):
         queryset.update(is_active=True)
-    make_active.short_description = "Deactivate selected users"
+    make_active.short_description = "Activate selected users"
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')
-    ordering = ('-last_reg_date', 'department', 'num', 'title')
-    search_fields = ('title', 'num', 'department', 'last_reg_date')
+    ordering = ('-last_reg_date', 'department__name', 'num', 'title')
+    search_fields = ('title', 'num', 'last_reg_date')
     inlines = [ParticipantInline]
     actions = ['clone_courses_increment_year']
 
@@ -115,7 +115,12 @@ class FaqAdmin(admin.ModelAdmin):
     search_fields = ('question', 'answer')
     list_filter = ('faq_for',)
 
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    search_fields = ('name', )
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Faq, FaqAdmin)
+admin.site.register(Department, DepartmentAdmin)
