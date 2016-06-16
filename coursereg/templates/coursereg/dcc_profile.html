@@ -13,16 +13,10 @@
 
         <style>
             .top-buffer-1 {
-                margin-top:20px;
+                margin-top: 20px;
             }
-        </style>
-          
-        <style type="text/css">
-            .foots {
-                font-family: fantasy;
-                color: black;
-                font-size: 25px;
-                
+            .container {
+                margin-bottom: 50px;
             }
         </style>
 
@@ -45,13 +39,11 @@
                             <span class="icon-bar"></span>
                         </button>
                         <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
-			
                     </div>
-
                     <div id="navbar" class="navbar-collapse collapse">
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index'%}">Active Requests</a></li>
+                            <li><a href="{% url 'coursereg:index'%}">Active Requests</a></li>
 	                        <li><a href="{% url 'coursereg:dcc_approved' %}">Approved Requests</a></li>
                             <li><a href="{% url 'coursereg:dcc_faq' %}">FAQ</a></li>
                             <li class="dropdown">
@@ -61,7 +53,7 @@
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-  				                    <li><a href="{% url 'coursereg:dcc_profile' %}">Profile</a></li>
+                                    <li class="active"><a href="{% url 'coursereg:dcc_profile' %}">Profile</a></li>
                                     <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
                                 </ul>
                             </li>
@@ -69,46 +61,44 @@
                     </div><!--/.nav-collapse -->
                 </div><!--/.container-fluid -->
             </nav>
-        <div class="row">
+            <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
                         <h1>{{ user_full_name }}</h1>
                     </div>
+                    <p>Department: {{ department }}</p>
                 </div>
-        </div>
-
- 	<div class="tab-content">
-   	   <div id="adviser" class="tab-pane fade in active">
-   	   <p>
-  		    <div class="row top-buffer-1">
-                 <div class="col-md-12">
-		              <div class="panel panel-default">
-		 	            <div class="panel-heading">
-                             <h3 class="panel-title"> Student Name </h3>
-                 	    </div>
-			            <div class="panel-body">
-			                 {% for student_id, student_name in active_students %}
-                             <div class="row">
-                                 <div class="col-md-6"> 
-					                     <form class="form-inline" method="GET" action="{% url 'coursereg:student_details_dcc' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-					                     <button type="submit" class="btn btn-link" align="center" >{{ student_name }}</button> 
-					                     </form>
-				                 </div>
-			                 </div>
-			                 {% endfor %}
-				
-	
-		                </div><!--end div class panel-body -->
-                      </div> <!-- end div class panel panel-default -->
-                </div> <!-- end div class col-md-12 -->         	     
- 	       </div> <!--end div class row top-buffer-1 -->
-
-	   </div> <!--end div class adviser -->
-
-        {% if messages %}
-             {% for message in messages %}
+            </div>
+            <div class="row top-buffer-1">
+                <div class="col-md-4">
+                    <h3>Password</h3>
+                </div>
+            </div>
+            <div class="row top-buffer-1">
+                <div class="col-md-4">
+                    <form method="post" action="{% url 'coursereg:change_passwd' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'coursereg:dcc_profile' %}">
+                        <div class="form-group">
+                            <label for="inputPassword" class="sr-only">Current password</label>
+                            <input type="password" class="form-control" id="inputPassword" name="passwd" placeholder="Current password">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNewPassword" class="sr-only">New password</label>
+                            <input type="password" class="form-control" id="inputNewPassword" name="newpasswd" placeholder="New password">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNewPasswordAgain" class="sr-only">Verify password</label>
+                            <input type="password" class="form-control" id="inputNewPasswordAgain" name="newpasswd2" placeholder="New password again">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
                     <div class="row top-buffer-1">
                         <div class="col-md-12">
                             {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
@@ -118,34 +108,11 @@
                             {% endif %}
                         </div>
                     </div>
-             {% endfor %}
-        {% endif %}
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <h3>Other Actions</h3>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-1">
-    <form class="form-inline" method="POST" action="{% url 'coursereg:send_remainder' %}">
-        {% csrf_token %}
-        <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
-        <input type="hidden" name="participant_id" value="{{ participant_id }}">
-        <button type="submit" class="btn btn-primary btn-xs">Send Remainder For Pending Actions</button>
-    </form>
-</div>
-
-
-
-
-  </div> <!-- end tab-content -->
+                {% endfor %}
+            {% endif %}
+        </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
     </body>
-
-    
 </html>

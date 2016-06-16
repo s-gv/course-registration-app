@@ -13,6 +13,8 @@ import smtplib
 
 def dcc(request):
     students = []
+    active_students = []
+
     for u in models.User.objects.filter(department=request.user.department):
         if (u.user_type==1):
             req = (
@@ -21,11 +23,77 @@ def dcc(request):
             )
             students.append(req)
 
+
+    dcc_action = 0
+
+    for u in students:
+        participants = [
+            (
+                p.course,
+                p.state,
+                p.grade,
+                p.course_id,
+                models.Participant.STATE_CHOICES[p.state][1],
+                models.Participant.GRADE_CHOICES[p.grade][1],
+                p.id
+            ) for p in models.Participant.objects.filter(user=u[0])]
+
+        for p in participants:
+            if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
+                dcc_action = 1
+
+        if dcc_action == 1 :
+            active_students.append(u)
+
+        dcc_action = 0
+
     context = {
         'user_email': request.user.email,
-        'students' : students,
+        'active_students' : active_students,
     }
     return render(request, 'coursereg/dcc.html', context)
+
+def dcc_approved(request):
+    students = []
+    notactive_students = []
+
+    for u in models.User.objects.filter(department=request.user.department):
+        if (u.user_type==1):
+            req = (
+                u.id,
+                u.full_name,
+            )
+            students.append(req)
+
+
+    dcc_action = 0
+
+    for u in students:
+        participants = [
+            (
+                p.course,
+                p.state,
+                p.grade,
+                p.course_id,
+                models.Participant.STATE_CHOICES[p.state][1],
+                models.Participant.GRADE_CHOICES[p.grade][1],
+                p.id
+            ) for p in models.Participant.objects.filter(user=u[0])]
+
+        for p in participants:
+            if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
+                dcc_action = 1
+
+        if dcc_action == 0 :
+            notactive_students.append(u)
+
+        dcc_action = 0
+
+    context = {
+        'user_email': request.user.email,
+        'not_active_students': notactive_students,
+    }
+    return render(request, 'coursereg/dcc_approved.html', context)
 
 def send_remainder(request):
     smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
@@ -71,8 +139,8 @@ def send_remainder(request):
 
 
 def student_details_dcc(request):
-    assert request.method == 'POST'
-    current_student_id = request.POST['student_id']
+    assert request.method == 'GET'
+    current_student_id = request.GET['student_id']
     student = models.User.objects.get(id=current_student_id)
     student_name = student.full_name
     flag = 0
@@ -166,6 +234,9 @@ def participant_dcc_act(request):
     context = {
         'student_id': current_student.id,
         'student_name': student_name,
+        'adviser_full_name': current_student.adviser.full_name,
+        'program': current_student.program,
+        'sr_no': current_student.sr_no,
         'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
@@ -232,6 +303,9 @@ def participant_dcc_rej(request):
     context = {
         'student_id': current_student.id,
         'student_name': student_name,
+        'adviser_full_name': current_student.adviser.full_name,
+        'program': current_student.program,
+        'sr_no': current_student.sr_no,
         'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
@@ -276,6 +350,9 @@ def participant_dcc_act_all(request):
     context = {
         'student_id': current_student.id,
         'student_name': student_name,
+        'adviser_full_name': current_student.adviser.full_name,
+        'program': current_student.program,
+        'sr_no': current_student.sr_no,
         'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
@@ -293,3 +370,13 @@ def faq(request):
             'faqs': models.Faq.objects.filter(faq_for=models.Faq.FAQ_DCC),
         }
         return render(request, 'coursereg/dcc_faq.html', context)
+
+@login_required
+def profile(request):
+    context = {
+		'user_email': request.user.email,
+        'user_full_name': request.user.full_name,
+        'user_id': request.user.id,
+        'department': request.user.department,
+    }
+    return render(request, 'coursereg/dcc_profile.html', context)

@@ -51,8 +51,8 @@
                     <div id="navbar" class="navbar-collapse collapse">
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index'%}">Active Requests</a></li>
-	                        <li><a href="{% url 'coursereg:dcc_approved' %}">Approved Requests</a></li>
+                            <li><a href="{% url 'coursereg:index' %}">Active Requests</a></li>
+	                        <li class="active"><a href="{% url 'coursereg:dcc_approved' %}">Approved Requests</a></li>
                             <li><a href="{% url 'coursereg:dcc_faq' %}">FAQ</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -87,7 +87,7 @@
                              <h3 class="panel-title"> Student Name </h3>
                  	    </div>
 			            <div class="panel-body">
-			                 {% for student_id, student_name in active_students %}
+			                 {% for student_id, student_name in not_active_students %}
                              <div class="row">
                                  <div class="col-md-6"> 
 					                     <form class="form-inline" method="GET" action="{% url 'coursereg:student_details_dcc' %}">
@@ -120,26 +120,6 @@
                     </div>
              {% endfor %}
         {% endif %}
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <h3>Other Actions</h3>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-1">
-    <form class="form-inline" method="POST" action="{% url 'coursereg:send_remainder' %}">
-        {% csrf_token %}
-        <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
-        <input type="hidden" name="participant_id" value="{{ participant_id }}">
-        <button type="submit" class="btn btn-primary btn-xs">Send Remainder For Pending Actions</button>
-    </form>
-</div>
-
-
-
 
   </div> <!-- end tab-content -->
 
