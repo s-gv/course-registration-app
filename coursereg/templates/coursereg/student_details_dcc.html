@@ -46,7 +46,7 @@
                         <p class="navbar-text navbar-left"></p>
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="{% url 'coursereg:index'%}">Active Requests</a></li>
-	                        <li><a href="{% url 'coursereg:dcc_approved' %}">Approved Requests</a></li>
+	                        <li><a href="{% url 'coursereg:dcc_approved' %}">Inactive Requests</a></li>
                             <li><a href="{% url 'coursereg:dcc_faq' %}">FAQ</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -118,28 +118,7 @@
                                     {% elif state == 2 or state == 8 or state == 17 or state == 22 %}
                                  <div class="col-md-2">
                                     <span class="label label-success">{{ state_str}}</span>
-                                 </div>       
-                                <div class="col-md-1"><b> --------->> </b></div>
-                                 <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act' %}">
-                                         {% csrf_token %}                                         
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">         
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">
-                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>                                                       
-                                     </form>
-                                 </div>
-                                 <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_rej' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">
-                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
-                                     </form>
-                                 </div>    
-                                
-                                     
+                                 </div>                                                                            
                                     {% elif state == 3 or state == 11 or state == 14 %}
                                  <div class="col-md-2">
                                     <span class="label label-primary">{{ state_str }}</span>
@@ -160,23 +139,32 @@
                             </div>
                             {% endfor %}                                                  
                         </div>                       
-                    </div>
-                    {% if flag == 0 and no_course != 0 %}
-                        <div class="row top-buffer-1">
-                            <h1></h1>
-                            <span class="col-md-2" align="center" ><b>Approve all the courses </b></span>
-                            <div class="col-md-1"><b> --------->> </b></div>
-                             <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act_all' %}">
-                                    {% csrf_token %}       
-                                     <input type="hidden" name="student_id" value="{{ student_id }}">             
-                                     <button type="submit" class="btn btn-primary btn-xs"><b>Go!!</b></button>        
-                             </form>
-                         </div>
-                    {% endif%}
-                </div>
+                    </div>                    
+                </div>                
             </div>
+            
+{% if flag == 0 and no_course != 0 %}           
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h3>Actions</h3>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-1">
+    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act_all' %}">
+        {% csrf_token %}
+        <input type="hidden" name="student_id" value="{{ student_id }}">             
+        <button type="submit" class="btn btn-primary btn-xs" align="centre"><b>Approve all the courses!!</b></button> 
+    </form>
+</div>
+{% endif%}
+            
         </div> <!-- /container -->
 
+        
+        
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>

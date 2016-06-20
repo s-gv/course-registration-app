@@ -42,7 +42,7 @@ def faculty(request):
         advisee_requests = advisee_requests + advisee_reqs
 
     context = {
-	    'user_email': request.user.email,
+        'user_email': request.user.email,
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
         'sr_no': request.user.sr_no,
@@ -151,9 +151,9 @@ def student_details(request):
             p.id
         ) for p in models.Participant.objects.filter(user=current_student_id)]
     context = {
-	    'advisee_id': current_student_id,
+        'advisee_id': current_student_id,
         'student_name': student_name,   
-	    'user_email': request.user.email,
+        'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
@@ -170,32 +170,32 @@ def participant_advisor_act(request):
     advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
     if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
-		messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
-		participant.state = models.Participant.STATE_ADVISOR_DONE
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
+        participant.state = models.Participant.STATE_ADVISOR_DONE
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted the enrolment request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_DROP_REQUESTED):
-		participant.state = models.Participant.STATE_ADV_DROP_DONE
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Accepted the drop request of %s.' % req_info)
+        participant.state = models.Participant.STATE_ADV_DROP_DONE
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted the drop request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_AUDIT_REQUESTED):
-		participant.state = models.Participant.STATE_ADV_AUDIT_DONE
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Accepted the audit request of %s.' % req_info)
+        participant.state = models.Participant.STATE_ADV_AUDIT_DONE
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted the audit request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_CREDIT_REQUESTED):
-		participant.state = models.Participant.STATE_ADV_CREDIT_DONE
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Accepted the credit request of %s.' % req_info)
+        participant.state = models.Participant.STATE_ADV_CREDIT_DONE
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted the credit request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
-		#participant.state = models.Participant.STATE_ADV_CANCEL_DONE
-		participant.delete()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Accepted cancellation request of %s.' % req_info)
+        #participant.state = models.Participant.STATE_ADV_CANCEL_DONE
+        participant.delete()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Accepted cancellation request of %s.' % req_info)
     
     ## Read the DB and re-render the advisee page.
     student_name = advisee.full_name
@@ -210,9 +210,9 @@ def participant_advisor_act(request):
             p.id
         ) for p in models.Participant.objects.filter(user=current_student_id)]
     context = {
-	    'advisee_id': current_student_id,
+        'advisee_id': current_student_id,
         'student_name': student_name,   
-	    'user_email': request.user.email,
+        'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
@@ -228,31 +228,33 @@ def participant_advisor_rej(request):
     advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
     if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
-		messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
+        messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
-		participant.state = models.Participant.STATE_ADVISOR_REJECT
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
-		participant.delete()
+        participant.state = models.Participant.STATE_ADVISOR_REJECT
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Rejected the enrolment request of %s.' % req_info)
+        participant.delete()
     elif (participant.state == models.Participant.STATE_DROP_REQUESTED):
-		participant.state = models.Participant.STATE_FINAL_APPROVED
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the drop request of %s.' % req_info)
+        participant.state = models.Participant.STATE_FINAL_APPROVED
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Rejected the drop request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_AUDIT_REQUESTED):
-		participant.state = models.Participant.STATE_FINAL_APPROVED
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the audit request of %s.' % req_info)
+        participant.state = models.Participant.STATE_FINAL_APPROVED
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Rejected the audit request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_CREDIT_REQUESTED):
-		participant.state = models.Participant.STATE_FINAL_APPROVED
-		participant.save()
-		req_info = str(advisee.full_name) + ' for ' + str(participant.course)
-		messages.success(request, 'Rejected the credit request of %s.' % req_info)
+        participant.state = models.Participant.STATE_FINAL_APPROVED
+        participant.save()
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        messages.success(request, 'Rejected the credit request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
-		participant.state = models.Participant.STATE_ADVISOR_DONE
-		messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
+        participant.state = models.Participant.STATE_ADV_CANCEL_REJECT
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
     ## Read the DB and re-render the advisee page.
     student_name = advisee.full_name
     participants = [
@@ -266,9 +268,9 @@ def participant_advisor_rej(request):
             p.id
         ) for p in models.Participant.objects.filter(user=current_student_id)]
     context = {
-	    'advisee_id': current_student_id,
+        'advisee_id': current_student_id,
         'student_name': student_name,   
-	    'user_email': request.user.email,
+        'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
@@ -443,7 +445,7 @@ def faq(request):
 @login_required
 def profile(request):
     context = {
-		'user_email': request.user.email,
+        'user_email': request.user.email,
         'user_full_name': request.user.full_name,
         'user_id': request.user.id,
         'department': request.user.department,
