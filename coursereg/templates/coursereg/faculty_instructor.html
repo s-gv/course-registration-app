@@ -88,8 +88,7 @@
                             {% for course, state, grade, deleteable, participant_id in participants %}
                             <div class="row">
                                 <div class="col-md-6"> 
-                                    <form class="form-inline" method="POST" action="{% url 'coursereg:course_page' %}">
-                                         {% csrf_token %}
+                                    <form class="form-inline" method="GET" action="{% url 'coursereg:course_page' %}">
                                          <input type="hidden" name="course_id" value="{{ course.id }}">
                                          <button type="submit" class="btn btn-link">{{ course }}</button>
                                     </form>

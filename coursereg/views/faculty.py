@@ -75,8 +75,8 @@ def instructor(request):
     return render(request, 'coursereg/faculty_instructor.html', context)
 
 def course_page(request):
-    assert request.method == 'POST'
-    current_course = models.Course.objects.get(id=request.POST['course_id'])
+    assert request.method == 'GET'
+    current_course = models.Course.objects.get(id=request.GET['course_id'])
     students = []
     instructors = []
     TAs = []
@@ -136,9 +136,9 @@ def course_page(request):
     return render(request, 'coursereg/course.html', context)
 
 def student_details(request):
-    assert request.method == 'POST'
-    current_student_id = request.POST['student_id']
-    advisee     = models.User.objects.get(id=current_student_id)
+    assert request.method == 'GET'
+    current_student_id = request.GET['student_id']
+    advisee = models.User.objects.get(id=current_student_id)
     student_name = advisee.full_name
     participants = [
         (
@@ -158,6 +158,7 @@ def student_details(request):
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
                                                 last_reg_date__lte=timezone.now()+timedelta(days=100)),
+        'remarks': advisee.dcc_remarks,
     }
     return render(request, 'coursereg/student_details.html', context)
 

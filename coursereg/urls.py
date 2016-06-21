@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^student_details/$', views.faculty.student_details, name='student_details'),
     url(r'^student_details_dcc/$', views.dcc.student_details_dcc, name='student_details_dcc'),
     url(r'^participant/dcc_act_all/$', views.dcc.participant_dcc_act_all, name='participant_dcc_act_all'),
+    url(r'^participant/meet_dcc/$', views.dcc.participant_meet_dcc, name='participant_meet_dcc'),
     url(r'^participant/dcc_faq/$', views.dcc.faq, name='dcc_faq'),
     url(r'^participant/dcc_approved/$', views.dcc.dcc_approved, name='dcc_approved'),
     url(r'^dcc/profile/$', views.dcc.profile, name='dcc_profile'),
