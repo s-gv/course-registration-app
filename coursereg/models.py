@@ -64,6 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
+    dcc_remarks = models.CharField(max_length=5000, default=' ')
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
