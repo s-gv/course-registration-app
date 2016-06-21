@@ -209,6 +209,9 @@ def participant_dcc_act_all(request):
             p.id
         ) for p in models.Participant.objects.filter(user_id=current_student.id)]
 
+    current_student.dcc_remarks = ' '
+    current_student.save()
+
     context = {
         'student_id': current_student.id,
         'student_name': student_name,
