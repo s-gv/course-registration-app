@@ -70,8 +70,12 @@ def participant_delete(request):
 			participant.delete()
 			messages.success(request, 'Cancelled registration of course %s.' % participant.course)
         elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE) and modify_value == 'cancel':
-            participant.state = models.Participant.STATE_CANCEL_REQUESTED
-            participant.save()
+            if (participant.state == models.Participant.STATE_ADVISOR_DONE):
+                participant.state = models.Participant.STATE_CANCEL_REQUESTED
+                participant.save()
+            else:
+                participant.state = models.Participant.STATE_CANCEL_REQUESTED_1
+                participant.save()
             messages.success(request, 'Request raised for cancelling the registration for the course %s.' % participant.course)
         elif participant.state == models.Participant.STATE_FINAL_APPROVED and modify_value == 'drop':
             participant.state = models.Participant.STATE_DROP_REQUESTED

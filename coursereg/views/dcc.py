@@ -158,7 +158,7 @@ def student_details_dcc(request):
 
     for p in participants:
         no_course = no_course + 1
-        if p[4] != 'Instructor approved':
+        if (p[4] != 'Instructor approved' and p[4] != 'Instructor rejected'):
             flag = flag + 1
 
     context = {
@@ -190,9 +190,7 @@ def participant_dcc_act_all(request):
     no_course = 0
 
     for p in participant:
-        if p.state != models.Participant.STATE_INSTRUCTOR_DONE:
-            messages.error(request, 'Unable to accept the enrolment request, please contact the admin.')
-        else:
+        if p.state == models.Participant.STATE_INSTRUCTOR_DONE:
             p.state = models.Participant.STATE_FINAL_APPROVED
             req_info = str(student_name) + ' for ' + str(p.course)
             p.save()
