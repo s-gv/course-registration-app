@@ -91,8 +91,7 @@
 			                 {% for advisee_id, advisee_name in advisees %}
                              <div class="row">
                                  <div class="col-md-6">
-					                     <form class="form-inline" method="POST" action="{% url 'coursereg:student_details' %}">
-                                         {% csrf_token %}
+					                     <form class="form-inline" method="GET" action="{% url 'coursereg:student_details' %}">
                                          <input type="hidden" name="student_id" value="{{ advisee_id }}">
 					                     <button type="submit" class="btn btn-link" align="center" >{{ advisee_name }}</button>
 					                     </form>

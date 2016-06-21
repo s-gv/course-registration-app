@@ -75,8 +75,8 @@ def instructor(request):
     return render(request, 'coursereg/faculty_instructor.html', context)
 
 def course_page(request):
-    assert request.method == 'POST'
-    current_course = models.Course.objects.get(id=request.POST['course_id'])
+    assert request.method == 'GET'
+    current_course = models.Course.objects.get(id=request.GET['course_id'])
     students = []
     instructors = []
     TAs = []
@@ -136,9 +136,9 @@ def course_page(request):
     return render(request, 'coursereg/course.html', context)
 
 def student_details(request):
-    assert request.method == 'POST'
-    current_student_id = request.POST['student_id']
-    advisee     = models.User.objects.get(id=current_student_id)
+    assert request.method == 'GET'
+    current_student_id = request.GET['student_id']
+    advisee = models.User.objects.get(id=current_student_id)
     student_name = advisee.full_name
     participants = [
         (
@@ -158,6 +158,7 @@ def student_details(request):
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
                                                 last_reg_date__lte=timezone.now()+timedelta(days=100)),
+        'remarks': advisee.dcc_remarks,
     }
     return render(request, 'coursereg/student_details.html', context)
 
@@ -169,7 +170,7 @@ def participant_advisor_act(request):
     participant = models.Participant.objects.get(id=current_participant_id)
     advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
-    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED_1):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
         participant.state = models.Participant.STATE_ADVISOR_DONE
@@ -191,7 +192,7 @@ def participant_advisor_act(request):
         participant.save()
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         messages.success(request, 'Accepted the credit request of %s.' % req_info)
-    elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
+    elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED) or (participant.state == models.Participant.STATE_CANCEL_REQUESTED_1):
         #participant.state = models.Participant.STATE_ADV_CANCEL_DONE
         participant.delete()
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
@@ -216,7 +217,9 @@ def participant_advisor_act(request):
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),}
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
+        'remarks': advisee.dcc_remarks,
+    }
     return render(request, 'coursereg/student_details.html', context)
 
 @login_required
@@ -227,7 +230,7 @@ def participant_advisor_rej(request):
     participant = models.Participant.objects.get(id=current_participant_id)
     advisee     = models.User.objects.get(id=current_student_id)
     assert participant.user_id == advisee.id
-    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED):
+    if (participant.state != models.Participant.STATE_REQUESTED) and (participant.state != models.Participant.STATE_DROP_REQUESTED) and (participant.state != models.Participant.STATE_AUDIT_REQUESTED) and (participant.state != models.Participant.STATE_CREDIT_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED) and (participant.state != models.Participant.STATE_CANCEL_REQUESTED_1):
         messages.error(request, 'Unable Accept the enrolment request, please contact the admin.')
     elif (participant.state == models.Participant.STATE_REQUESTED):
         participant.state = models.Participant.STATE_ADVISOR_REJECT
@@ -251,7 +254,12 @@ def participant_advisor_rej(request):
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         messages.success(request, 'Rejected the credit request of %s.' % req_info)
     elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED):
-        participant.state = models.Participant.STATE_ADV_CANCEL_REJECT
+        participant.state = models.Participant.STATE_ADVISOR_DONE
+        req_info = str(advisee.full_name) + ' for ' + str(participant.course)
+        participant.save()
+        messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
+    elif (participant.state == models.Participant.STATE_CANCEL_REQUESTED_1):
+        participant.state = models.Participant.STATE_INSTRUCTOR_DONE
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
@@ -274,7 +282,9 @@ def participant_advisor_rej(request):
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),}
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
+        'remarks': advisee.dcc_remarks,
+    }
     return render(request, 'coursereg/student_details.html', context)
 
 

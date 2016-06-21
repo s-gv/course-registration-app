@@ -134,7 +134,7 @@
                                 <div class="col-md-4">{{ course }}</div>
 
                                 {% if grade == 0 %}
-                                    {% if state == 0 or state == 7 or state == 13 or state == 16 or state == 21%}
+                                    {% if state == 0 or state == 7 or state == 13 or state == 16 or state == 21 or state == 26%}
                                 <div class="col-md-2">
                                     <span class="label label-info">{{ state_str }}</span>
                                  </div>
@@ -194,6 +194,16 @@
                     </div>
                 </div>
             </div>
+            
+            {%if remarks != ' '%}
+            <div class="row">
+                <div class="col-md-12">
+                    <label>Remarks from DCC:</label>
+                            <div class="alert alert-danger">{{ remarks }}</div>
+                </div>
+            </div>
+            {%endif%}
+            
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>

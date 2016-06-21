@@ -161,6 +161,7 @@ class Participant(models.Model):
     STATE_ADV_CREDIT_REJECT = 23
     STATE_DCC_CREDIT_DONE = 24
     STATE_DCC_CREDIT_REJECT = 25
+    STATE_CANCEL_REQUESTED_1 = 26
 
 
 
@@ -191,7 +192,7 @@ class Participant(models.Model):
 		(STATE_ADV_CREDIT_REJECT, 'Advisor rejects credit conversion') ,
 		(STATE_DCC_CREDIT_DONE, 'DCC approved credit conversion' ),
 		(STATE_DCC_CREDIT_REJECT, 'DCC rejected credit conversion'),
-
+        (STATE_CANCEL_REQUESTED_1, 'Cancel requested'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

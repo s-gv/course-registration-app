@@ -203,6 +203,15 @@
                     </div>
                 </div>
             </div>
+            
+            {%if remarks != ' '%}
+            <div class="row">
+                <div class="col-md-12">
+                    <label>Remarks from DCC:</label>
+                            <div class="alert alert-danger">{{ remarks }}</div>
+                </div>
+            </div>
+            {%endif%}
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>

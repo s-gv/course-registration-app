@@ -152,13 +152,30 @@
     </div>
 </div>
 
-<div class="col-md-1">
+<div class="col-md-3">
     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act_all' %}">
         {% csrf_token %}
         <input type="hidden" name="student_id" value="{{ student_id }}">
         <button type="submit" class="btn btn-primary btn-xs" align="centre"><b>Approve all the courses!!</b></button>
     </form>
 </div>
+    
+<div class="col-md-4"><b>Your Remarks:</b>
+    {%if remarks != ' '%}
+            <h1></h1>
+      {{ remarks }}
+            <h1></h1>
+            <b>New Remarks:</b>
+    {%endif%}
+    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_meet_dcc' %}">
+        {% csrf_token %}
+        <input type="hidden" name="student_id" value="{{ student_id }}">
+        <textarea name="myTextBox" id="remarks" cols="50" rows="5"></textarea>  
+        <h1></h1>
+        <button type="submit" class="btn btn-danger btn-xs" align="centre"><b>Meet DCC!!</b></button> 
+    </form>
+</div>
+
 {% endif%}
 
         </div> <!-- /container -->
