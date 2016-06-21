@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-        <title>bheemboy</title>
+        <title>Coursereg</title>
 
         {% load staticfiles %}
         <!-- Bootstrap -->
@@ -16,8 +16,14 @@
             .top-buffer-1 {
                 margin-top: 20px;
             }
-            .container {
+            #maincontainer {
                 margin-bottom: 50px;
+            }
+            .btn-circle {
+                border-radius: 50% !important;
+            }
+            .craudit {
+                margin-right: 10px;
             }
         </style>
 
@@ -29,38 +35,38 @@
         <![endif]-->
     </head>
     <body>
-        <div class="container">
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
-                    </div>
-                    <div id="navbar" class="navbar-collapse collapse">
-                        <p class="navbar-text navbar-left"></p>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
-                            <li><a href="{% url 'coursereg:student_faq' %}">FAQ</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                                    {{ user_email }}
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="{% url 'coursereg:student_profile' %}">Profile</a></li>
-                                    <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div><!--/.container-fluid -->
-            </nav>
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'coursereg:index' %}">Coursereg</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <p class="navbar-text navbar-left"></p>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
+                        <li><a href="{% url 'coursereg:student_faq' %}">FAQ</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                {{ user_email }}
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'coursereg:student_profile' %}">Profile</a></li>
+                                <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container -->
+        </nav>
+        <div class="container" id="maincontainer">
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
@@ -107,7 +113,7 @@
                 {% endfor %}
             {% endif %}
             <div class="row top-buffer-1">
-                <div class="col-md-12">
+                <div class="col-xs-12 col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Registered Courses</h3>
@@ -118,70 +124,78 @@
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
-                                <div class="col-md-6">{{ course }}</div>  <!-- reduced to 6 to accommodate Audit/credi-->
-                                <div class="col-md-1">
-                                    {% if ptype == 0 %}
-                                    <span class="label label-primary">{{ ptype_str }}</span>
-                                    {% else %}
-                                    <span class="label label-default">{{ ptype_str }}</span>
-                                    {% endif %}
+                                <div class="col-xs-10 col-md-11">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-md-8">
+                                            {{ course }}
+                                        </div>
+                                        <div class="col-xs-12 col-md-3">
+                                            {% if ptype == 0 %}
+                                            <span class="craudit label label-primary">{{ ptype_str }}</span>
+                                            {% else %}
+                                            <span class="craudit label label-default">{{ ptype_str }}</span>
+                                            {% endif %}
+                                            {% if grade == 0 %}
+                                                {% if state == 0 %}
+                                                <span class="label label-default">{{ state_str }}</span>
+                                                {% elif state == 1 %}
+                                                <span class="label label-info">{{ state_str }}</span>
+                                                {% elif state == 2 %}
+                                                <span class="label label-primary">{{ state_str }}</span>
+                                                {% elif state == 3 %}
+                                                <span class="label label-success">{{ state_str }}</span>
+                                                {% else %}
+                                                <span class="label label-default">{{ state_str }}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="label label-primary">{{ grade_str }} grade</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                {% if grade == 0 %}
-                                    {% if state == 0 %}
-                                    <span class="label label-default">{{ state_str }}</span>
-                                    {% elif state == 1 %}
-                                    <span class="label label-info">{{ state_str }}</span>
-                                    {% elif state == 2 %}
-                                    <span class="label label-primary">{{ state_str }}</span>
-                                    {% elif state == 3 %}
-                                    <span class="label label-success">{{ state_str }}</span>
-                                    {% else %}
-                                    <span class="label label-default">{{ state_str }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="label label-primary">{{ grade_str }} grade</span>
-                                {% endif %}
-                                </div>
-                                <div class="col-md-20">
-                                    {% if deleteable %}
-                                   <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
-                                        {% csrf_token %}
-										<input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                    {% if state == 3 %}
-                                        <!--button type="submit" class="btn btn-danger btn-circle btn-xs">
-                                            <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Drop
-                                        </button-->
-                                    <div class="col-md-20">
-												
-											<label class="radio-inline">
-											<input type="radio" name="modify_type" value="drop" checked>Drop
-											</label>
-											<label class="radio-inline">
-											{% if ptype == 0%}
-												<input type="radio" name="modify_type" value="audit">&nbsp &nbsp Audit
-											{% elif ptype == 1%}
-												<input type="radio" name="modify_type" value="credit">Credit
-											{% endif %}
-											</label>	
-											<!--/div-->
-											
-											<!--div class="col-md-5"-->
-											 &nbsp &nbsp &nbsp
-											<button type="submit" class="btn btn-primary btn-circle btn-xs" > 
-												ok</button>
-									</div>                                    
-                                    {% else %}
-                                    <!--form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}"-->
-                                        {% csrf_token %}
-
-                                        <input type="hidden" name="modify_type" value="cancel">
-                                        <button type="submit" class="btn btn-danger btn-circle btn-xs">
-                                            <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Cancel
+                                <div class="col-xs-2 col-md-1">
+                                    <div class="dropdown pull-right">
+                                        <button class="btn btn-xs btn-circle dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="glyphicon glyphicon-option-vertical"></span>
                                         </button>
-                                    </form>
-                                    {% endif %}
-                                    {% endif %}
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            {% if ptype == 0 %}
+                                            <li>
+                                                <a href="javascript:;" onclick="firstElementChild.submit();">
+                                                    Switch to audit
+                                                    <form action="{% url 'coursereg:participant_delete' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                                        <input type="hidden" name="modify_type" value="audit">
+                                                    </form>
+                                                </a>
+                                            </li>
+                                            {% elif ptype == 1 %}
+                                            <li>
+                                                <a href="javascript:;" onclick="firstElementChild.submit();">
+                                                    Switch to credit
+                                                    <form action="{% url 'coursereg:participant_delete' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                                        <input type="hidden" name="modify_type" value="credit">
+                                                    </form>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            {% if deleteable %}
+                                            <li>
+                                                <a href="javascript:;" onclick="firstElementChild.submit();">
+                                                    Cancel registration
+                                                    <form action="{% url 'coursereg:participant_delete' %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                                        <input type="hidden" name="modify_type" value="cancel">
+                                                    </form>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                             {% endfor %}

@@ -4,7 +4,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-        <title>bheemboy</title>
+        <title>Coursereg</title>
 
         {% load staticfiles %}
         <!-- Bootstrap -->
@@ -24,39 +24,39 @@
         <![endif]-->
     </head>
     <body>
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'coursereg:index' %}">Coursereg</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <p class="navbar-text navbar-left"></p>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{% url 'coursereg:index' %}">Advisees</a></li>
+                        <li class="active"><a href="{% url 'coursereg:faculty_instructor' %}" >Courses</a></li>
+                        <li><a href="{% url 'coursereg:faculty_faq' %}">FAQ</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                {{ user_email }}
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'coursereg:faculty_profile' %}">Profile</a></li>
+                                <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container -->
+        </nav>
         <div class="container">
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
-                    </div>
-                    <div id="navbar" class="navbar-collapse collapse">
-                        <p class="navbar-text navbar-left"></p>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="{% url 'coursereg:index' %}">Advisees</a></li>
-	                        <li class="active"><a href="{% url 'coursereg:faculty_instructor' %}" >Courses</a></li>
-                            <li><a href="{% url 'coursereg:faculty_faq' %}">FAQ</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                                    {{ user_email }}
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="{% url 'coursereg:faculty_profile' %}">Profile</a></li>
-                                    <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div><!--/.container-fluid -->
-            </nav>
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
@@ -83,7 +83,7 @@
                                  <hr>
                                  <div class="col-md-4">{{ Instructor_name }}</div>
                                  <div class="col-md-2">{{ department }}</div>
-                                 <div class="col-md-2">Instructor</div>                                 
+                                 <div class="col-md-2">Instructor</div>
                                  {% if action_required %}
                                  <div class="col-md-1">
                                      <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_act' %}">
@@ -136,7 +136,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            
+
             <div class="row top-buffer-1">
                  <div class="col-md-12">
                      <div class="panel panel-default">
@@ -144,80 +144,19 @@
                              <h3 class="panel-title">Student Enrolment Requests </h3>
                          </div>
                          <div class="panel-body">
-                             <div class="row">                                 
+                             <div class="row">
                                  <div class="col-md-1"><b>No.</b></div>
                                  <div class="col-md-4"><b>Student Name</b></div>
                                  <div class="col-md-2"><b>Department</b></div>
                                  <div class="col-md-2"><b>Program</b></div>
                                  <div class="col-md-1"><b>Request State</b></div>
-                                 <div class="col-md-2"><b>Action</b></div> 
-                                 <div class="col-md-1"><b></b></div> 
-                             </div>
-                             {% for student_id, student_name, program, no, department, participant_state, grade, action_required, participant_id in students %} 
-                             {% if participant_state = 'Advisor approved' %}
-                             <div class="row">
-                                 <hr>            
-                                 <div class="col-md-1">{{ no }}</div>
-                                 <div class="col-md-4">{{ student_name }}</div>
-                                 <div class="col-md-2">{{ department }}</div> 
-                                 {% if program == 0 %}
-                                 <div class="col-md-2">Other</div>
-                                 {% elif program == 1 %}
-                                 <div class="col-md-2">M.Tech</div>
-                                 {% elif program == 2 %}
-                                 <div class="col-md-2">M.Sc</div>
-                                 {% elif program == 3 %}
-                                 <div class="col-md-2">Ph.D</div>
-                                 {% elif program == 4 %}
-                                 <div class="col-md-2">M.E.</div>                                                
-                                 {% endif %}
-                                 <div class="col-md-1">{{ participant_state }}</div>                                
-                                 <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_act' %}">
-                                         {% csrf_token %}                                         
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">                                         
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">
-                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>                                                       
-                                     </form>
-                                 </div>
-                                 <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_rej' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">
-                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
-                                     </form>
-                                 </div>
-                                
-                             </div>
-                             {% endif %}
-                             {% endfor %}
-                         </div>
-                     </div>
-                 </div>
-             </div>
-            
-            
-            <div class="row top-buffer-1">
-                 <div class="col-md-12">
-                     <div class="panel panel-default">
-                         <div class="panel-heading">
-                             <h3 class="panel-title">Enrolled Students </h3>
-                         </div>
-                         <div class="panel-body">
-                             <div class="row">                               
-                                 <div class="col-md-1"><b>No.</b></div>
-                                 <div class="col-md-4"><b>Student Name</b></div>                                 
-                                 <div class="col-md-2"><b>Department</b></div>
-                                 <div class="col-md-2"><b>Program</b></div>
-                                 <div class="col-md-1"><b>Request State</b></div>                                 
+                                 <div class="col-md-2"><b>Action</b></div>
+                                 <div class="col-md-1"><b></b></div>
                              </div>
                              {% for student_id, student_name, program, no, department, participant_state, grade, action_required, participant_id in students %}
-                             {% if participant_state == 'Instructor approved' or participant_state == 'DCC approved'%}
+                             {% if participant_state = 'Advisor approved' %}
                              <div class="row">
-                                 <hr>                                 
+                                 <hr>
                                  <div class="col-md-1">{{ no }}</div>
                                  <div class="col-md-4">{{ student_name }}</div>
                                  <div class="col-md-2">{{ department }}</div>
@@ -230,7 +169,68 @@
                                  {% elif program == 3 %}
                                  <div class="col-md-2">Ph.D</div>
                                  {% elif program == 4 %}
-                                 <div class="col-md-2">M.E.</div>                                                                  
+                                 <div class="col-md-2">M.E.</div>
+                                 {% endif %}
+                                 <div class="col-md-1">{{ participant_state }}</div>
+                                 <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_act' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                         <input type="hidden" name="student_id" value="{{ student_id }}">
+                                         <input type="hidden" name="course_id" value="{{ course_id }}">
+                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>
+                                     </form>
+                                 </div>
+                                 <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_rej' %}">
+                                         {% csrf_token %}
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                         <input type="hidden" name="student_id" value="{{ student_id }}">
+                                         <input type="hidden" name="course_id" value="{{ course_id }}">
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
+                                     </form>
+                                 </div>
+
+                             </div>
+                             {% endif %}
+                             {% endfor %}
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+
+            <div class="row top-buffer-1">
+                 <div class="col-md-12">
+                     <div class="panel panel-default">
+                         <div class="panel-heading">
+                             <h3 class="panel-title">Enrolled Students </h3>
+                         </div>
+                         <div class="panel-body">
+                             <div class="row">
+                                 <div class="col-md-1"><b>No.</b></div>
+                                 <div class="col-md-4"><b>Student Name</b></div>
+                                 <div class="col-md-2"><b>Department</b></div>
+                                 <div class="col-md-2"><b>Program</b></div>
+                                 <div class="col-md-1"><b>Request State</b></div>
+                             </div>
+                             {% for student_id, student_name, program, no, department, participant_state, grade, action_required, participant_id in students %}
+                             {% if participant_state == 'Instructor approved' or participant_state == 'DCC approved'%}
+                             <div class="row">
+                                 <hr>
+                                 <div class="col-md-1">{{ no }}</div>
+                                 <div class="col-md-4">{{ student_name }}</div>
+                                 <div class="col-md-2">{{ department }}</div>
+                                 {% if program == 0 %}
+                                 <div class="col-md-2">Other</div>
+                                 {% elif program == 1 %}
+                                 <div class="col-md-2">M.Tech</div>
+                                 {% elif program == 2 %}
+                                 <div class="col-md-2">M.Sc</div>
+                                 {% elif program == 3 %}
+                                 <div class="col-md-2">Ph.D</div>
+                                 {% elif program == 4 %}
+                                 <div class="col-md-2">M.E.</div>
                                  {% endif %}
                                  <div class="col-md-1">{{ participant_state }}</div>
                                  {% if action_required %}
@@ -239,7 +239,7 @@
                                          {% csrf_token %}
                                          <input type="hidden" name="participant_id" value="{{ participant_id }}">
                                          <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">                                         
+                                         <input type="hidden" name="course_id" value="{{ course_id }}">
                                      </form>
                                  </div>
                                  {% endif %}
@@ -250,8 +250,8 @@
                      </div>
                  </div>
              </div>
-            
-            
+
+
         </div> <!-- /container -->
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>

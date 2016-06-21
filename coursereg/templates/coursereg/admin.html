@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-        <title>bheemboy</title>
+        <title>Coursereg</title>
 
         {% load staticfiles %}
         <!-- Bootstrap -->
@@ -35,7 +35,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
+                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Coursereg</a>
                     </div>
                     <div id="navbar" class="navbar-collapse collapse">
                         <ul class="nav navbar-nav navbar-right">
@@ -62,7 +62,7 @@
                          Full Name*: <input type="text" name="full_name"><br><br>
                          Password*: <input type="text" name="password"><br><br>
                          Email*: &nbsp &nbsp <input type="text" name="email"><br><br>
-                         Is_SuperUser: <input type="radio" name="is_superuser" value = "True"> Yes <input type="radio" name="is_superuser" value = "False"> No<br><br> 
+                         Is_SuperUser: <input type="radio" name="is_superuser" value = "True"> Yes <input type="radio" name="is_superuser" value = "False"> No<br><br>
                          UserType: &nbsp &nbsp <input type="text" name="user_type"> (0 Faculty; 1 student; 2 admin)<br> <br>
                          Program: &nbsp &nbsp <input type="text" name="program"> (0 Faculty; 1 Phd; 2 MSc; 3 MTech )<br><br>
                          Date joined: <input type="date" name="date_joined"><br><br>
@@ -71,7 +71,7 @@
                          Is_active: <input type="radio" name="is_active" value = "True"> Yes <input type="radio" name="is_active" value = "False"> No <br><br>
                          adviser_id: <input type="text" name="adviser_id"><br><br>
                          <input type="hidden" name="user_id" value="{{ user_id }}"> <br> <br>
-                        <button type="submit" class="btn btn-primary">Add User</button>	&nbsp &nbsp &nbsp &nbsp	
+                        <button type="submit" class="btn btn-primary">Add User</button>	&nbsp &nbsp &nbsp &nbsp
                         <button type="submit" class="btn btn-primary">Cancel</button><br><br>
                     </form>
                 </div>

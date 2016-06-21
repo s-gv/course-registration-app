@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-        <title>bheemboy</title>
+        <title>Coursereg</title>
 
         {% load staticfiles %}
         <!-- Bootstrap -->
@@ -16,7 +16,7 @@
             .top-buffer-1 {
                 margin-top: 20px;
             }
-            .container {
+            #maincontainer {
                 margin-bottom: 50px;
             }
         </style>
@@ -29,39 +29,39 @@
         <![endif]-->
     </head>
     <body>
-        <div class="container">
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="{% url 'coursereg:index' %}">Bheemboy</a>
-                    </div>
-                    <div id="navbar" class="navbar-collapse collapse">
-                        <p class="navbar-text navbar-left"></p>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li class="active"><a href="{% url 'coursereg:index' %}">Advisees</a></li>
-	                        <li><a href="{% url 'coursereg:faculty_instructor' %}" >Courses</a></li>
-                            <li><a href="{% url 'coursereg:faculty_faq' %}">FAQ</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                                    {{ user_email }}
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="{% url 'coursereg:faculty_profile' %}">Profile</a></li>
-                                    <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div><!--/.container-fluid -->
-            </nav>
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'coursereg:index' %}">Coursereg</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <p class="navbar-text navbar-left"></p>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="{% url 'coursereg:index' %}">Advisees</a></li>
+                        <li><a href="{% url 'coursereg:faculty_instructor' %}" >Courses</a></li>
+                        <li><a href="{% url 'coursereg:faculty_faq' %}">FAQ</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                {{ user_email }}
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'coursereg:faculty_profile' %}">Profile</a></li>
+                                <li><a href="{% url 'coursereg:signout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container -->
+        </nav>
+        <div class="container" id="maincontainer">
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
@@ -88,16 +88,16 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">Registered Courses</h3>
                         </div>
-                       
+
 			<!--{% for advisee_id, advisee_name, course, participant_state, participant_type, action_required, participant_id in advisee_requests %}
-				{%ifequal advisee_name1 advisee_name %}	
-                               
+				{%ifequal advisee_name1 advisee_name %}
+
 				 <div class="row">
-				 	<div class="col-md-1">{{ course.id }}</div>  
-                    <div class="col-md-4">{{ course }}</div>                     
+				 	<div class="col-md-1">{{ course.id }}</div>
+                    <div class="col-md-4">{{ course }}</div>
  				 	<div class="col-md-4">{{ participant_state }}</div>
-                     {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}	
-                     
+                     {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}
+
                     <div class="col-md-1">
                                      <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
                                          {% csrf_token %}
@@ -107,7 +107,7 @@
                                          <button type="submit" class="btn btn-primary btn-xs">Accept</button>
                                      </form>
                                  </div>
-                     
+
                      <div class="col-md-1">
                                      <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}">
                                          {% csrf_token %}
@@ -118,10 +118,10 @@
                                      </form>
                                  </div>
                      {% else %}
-                     <div class="col-md-1"><b>NA</b></div>	                     
+                     <div class="col-md-1"><b>NA</b></div>
                      {% endif %}
 				 </div>
-                        
+
 				 <hr>
 				{% endifequal %}
 				{% endfor %}	-->
@@ -137,7 +137,7 @@
                                     {% if state == 0 or state == 7 or state == 13 or state == 16 or state == 21%}
                                 <div class="col-md-2">
                                     <span class="label label-info">{{ state_str }}</span>
-                                 </div> 
+                                 </div>
                                 <div class="col-md-1">
                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
                                         {% csrf_token %}
@@ -154,23 +154,23 @@
                                          <input type="hidden" name="course_id" value="{{ course.id }}">
                                          <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
                                      </form>
-                                 </div> 
+                                 </div>
                                     {% elif state == 1 %}
                                  <div class="col-md-2">
                                     <span class="label label-info">Already Approved</span>
-                                 </div> 
+                                 </div>
                                     {% elif state == 2 %}
                                  <div class="col-md-2">
                                     <span class="label label-info">Already Approved</span>
-                                 </div> 
+                                 </div>
                                     {% elif state == 3 %}
                                  <div class="col-md-2">
                                     <span class="label label-success">Registered</span>
-                                 </div> 
-                                    {% else %}                                    
+                                 </div>
+                                    {% else %}
                                 <div class="col-md-2">
 				                    <span class="label label-default">{{ state_str }}</span>
-                                 </div> 
+                                 </div>
                                     {% endif %}
                                 {% else %}
                                     <span class="label label-primary">{{ grade_str }} grade</span>
@@ -199,7 +199,6 @@
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>
-        
+
     </body>
 </html>
-
