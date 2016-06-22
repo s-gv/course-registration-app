@@ -1,17 +1,22 @@
 [
     {
-        "faq_for": 0,
+        "faq_for": "student",
         "question": "How does this course registration platform work?",
         "answer": "Discuss with your adviser and apply for courses you want to take. Your request will be approved first by your adviser and then by the course instructor. Finally, the department will review all the courses you have taken."
     },
     {
-        "faq_for": 0,
+        "faq_for": "student",
         "question": "The course I want to register for is not listed. What do I do?",
         "answer": "Please inform the administrator of the missing course."
     },
     {
-        "faq_for": 0,
-        "question": "How do I remove a course that my adviser has already approved?",
-        "answer": "Please contact the administrator to assist you."
+        "faq_for": "faculty",
+        "question": "My course is not on this system. How do I add my course?",
+        "answer": "Please ask the administrator to add the course."
+    },
+    {
+        "faq_for": "dcc",
+        "question": "Can the advisor see remarks that I make?",
+        "answer": "Yes, both the student and the advisor can see your remarks."
     }
 ]
