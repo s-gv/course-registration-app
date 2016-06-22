@@ -31,9 +31,8 @@ urlpatterns = [
     url(r'^participant/dcc_approved/$', views.dcc.dcc_approved, name='dcc_approved'),
     url(r'^dcc/profile/$', views.dcc.profile, name='dcc_profile'),
     url(r'^participant/send_remainder/$', views.dcc.send_remainder, name='send_remainder'),
-
     url(r'^fatal/$', views.misc.fatal_error, name='fatal'),
     url(r'^$', views.misc.index, name='index'),
-
     url(r'^user/new/$', views.light_admin.adduser, name='adduser'),
+    url(r'^.*$', views.misc.default_landing, name='default_landing'), #A default url pattern to keep the people groping for vulnerabilities at bay.. if we do not have default landing page django shows up all the valid url patterns in the application showing possible things an adversary could try.
 ]
