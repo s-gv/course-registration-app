@@ -29,3 +29,9 @@ def index(request):
 def fatal_error(request):
     context = {}
     return render(request, 'coursereg/fatal.html', context)
+
+
+def default_landing(request):
+    context = {}
+    return render(request, 'coursereg/default_landing.html', context)
+
