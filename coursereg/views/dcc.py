@@ -97,7 +97,7 @@ def dcc_approved(request):
 
 def send_remainder(request):
     smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
-    dcc_email_id = 'dcc_chair@ece.iisc.ernet.in'
+    dcc_email_id = 'dcc@ece.iisc.ernet.in'
     outstanding_participants = []
     # Send remainder mails for all the outstanding requests pending adviser approval, notify both adviser and advisee.
     adviser_list = {}
@@ -110,10 +110,12 @@ def send_remainder(request):
                 adviser_list[adviser] = adviser.full_name
                 advisee_list[advisee] = advisee.full_name             
     for adviser in adviser_list:
-                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Adviser Approval\nDear Prof. '+str(adviser.full_name)+',\n\nThere are course enrolment/drop requests from your advisees in the Bheemby portal pending your approval.\nKindly login to the Bheemboy portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
+                mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Adviser Approval\nDear Prof. '+str(adviser.full_name)+',\n\nThere are course enrolment/drop requests from your advisees in the Course Registration portal pending your approval.\nKindly login to the Course Registration portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
+                #adviser = 'bhargava.js@ece.iisc.ernet.in'
+                print adviser
                 smtpObj.sendmail(dcc_email_id, str(adviser), mail_text)
     for advisee in advisee_list:
-                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Adviser Approval\nDear '+str(advisee.full_name)+',\n\nYour Course enrolment/drop request is pending an approval from your adviser in the Bheemby portal.\nKindly follow up with your adviser. \n\n\nSincerely,\nDCC Chair.'
+                mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Adviser Approval\nDear '+str(advisee.full_name)+',\n\nYour Course enrolment/drop request is pending an approval from your adviser in the Course Registration portal.\nKindly follow up with your adviser. \n\n\nSincerely,\nDCC Chair.'
                 smtpObj.sendmail(dcc_email_id, str(advisee), mail_text)
     # Send remainder mails for all the outstanding requests pending instructor approval, notify both intructor and student.
     instructor_list = {}
@@ -130,10 +132,10 @@ def send_remainder(request):
                 for instructor in instructors:
                     instructor_list[instructor] = curr_course
     for instructor in instructor_list:
-                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Instructor Approval\nDear Prof. '+str(instructor.full_name)+',\n\nThere are course enrolment requests from students pending your approval in the Bheemboy portal.\nKindly login to the Bheemboy portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
+                mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Instructor Approval\nDear Prof. '+str(instructor.full_name)+',\n\nThere are course enrolment requests from students pending your approval in the Course Registration portal.\nKindly login to the Course Registration portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
                 smtpObj.sendmail( dcc_email_id, str(instructor), mail_text)
     for student in student_list:
-                mail_text =  'Subject: Bheemboy Remainder:Pending Tasks - Instructor Approval\nDear '+str(student.full_name)+',\n\nYour course enrolment request is pending an approval from the course instructor in the Bheemby portal.\nKindly follow up with the instructor. \n\n\nSincerely,\nDCC Chair.'
+                mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Instructor Approval\nDear '+str(student.full_name)+',\n\nYour course enrolment request is pending an approval from the course instructor in the Course Registration portal.\nKindly follow up with the instructor. \n\n\nSincerely,\nDCC Chair.'
                 smtpObj.sendmail( dcc_email_id, str(student), mail_text)
     return dcc(request)
 
@@ -241,6 +243,12 @@ def participant_meet_dcc(request):
     remarks = request.POST['myTextBox']
     current_student.dcc_remarks = remarks
     current_student.save()
+
+    smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
+    dcc_email_id = 'dcc@ece.iisc.ernet.in'
+    mail_text =  'Subject: Course Registration Update:Meet DCC for Approval\nDear '+str(current_student.full_name)+',\n\nYour course plan for this term is pending an approval from the DCC.\n Kindly meet the DCC for follow up.\n\n DCC Remarks:\n'+str(remarks)+'\n\n\nSincerely,\nDCC Chair.'
+    smtpObj.sendmail( dcc_email_id, str(current_student), mail_text)
+
 
     participants = [
         (
