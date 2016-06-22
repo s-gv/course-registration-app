@@ -10,6 +10,11 @@
         "answer": "Please inform the administrator of the missing course."
     },
     {
+        "faq_for": "student",
+        "question": "How do I drop a course?",
+        "answer": "Click on the actions menu at the right of each row in the courses panel and drop the course."
+    },
+    {
         "faq_for": "faculty",
         "question": "My course is not on this system. How do I add my course?",
         "answer": "Please ask the administrator to add the course."
