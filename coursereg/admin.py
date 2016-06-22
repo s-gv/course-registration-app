@@ -23,14 +23,13 @@ class CourseInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     raw_id_fields = ('course',)
-    #readonly_fields=('course', 'participant_type')
     fields = ('course', 'participant_type', 'state', 'grade')
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active', 'dcc_remarks')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (

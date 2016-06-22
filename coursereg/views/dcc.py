@@ -114,7 +114,7 @@ def send_remainder(request):
                 advisee =  p.user
                 adviser = advisee.adviser
                 adviser_list[adviser] = adviser.full_name
-                advisee_list[advisee] = advisee.full_name             
+                advisee_list[advisee] = advisee.full_name
     for adviser in adviser_list:
                 mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Adviser Approval\nDear Prof. '+str(adviser.full_name)+',\n\nThere are course enrolment/drop requests from your advisees in the Course Registration portal pending your approval.\nKindly login to the Course Registration portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
                 #adviser = 'bhargava.js@ece.iisc.ernet.in'
@@ -129,7 +129,7 @@ def send_remainder(request):
     for p in models.Participant.objects.all():
         if(p.participant_type != models.Participant.PARTICIPANT_INSTRUCTOR):
             if( p.state ==  models.Participant.STATE_ADVISOR_DONE ):
-                curr_course          = p.course              
+                curr_course          = p.course
                 student_list[p.user] = curr_course
                 instructors = []
                 for i in models.Participant.objects.all():
@@ -215,7 +215,7 @@ def participant_dcc_act_all(request):
             p.id
         ) for p in models.Participant.objects.filter(user_id=current_student.id)]
 
-    current_student.dcc_remarks = ' '
+    current_student.dcc_remarks = ''
     current_student.save()
 
     context = {
@@ -250,10 +250,13 @@ def participant_meet_dcc(request):
     current_student.dcc_remarks = remarks
     current_student.save()
 
-    smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
-    dcc_email_id = 'dcc@ece.iisc.ernet.in'
-    mail_text =  'Subject: Course Registration Update:Meet DCC for Approval\nDear '+str(current_student.full_name)+',\n\nYour course plan for this term is pending an approval from the DCC.\n Kindly meet the DCC for follow up.\n\n DCC Remarks:\n'+str(remarks)+'\n\n\nSincerely,\nDCC Chair.'
-    smtpObj.sendmail( dcc_email_id, str(current_student), mail_text)
+    try:
+        smtpObj = smtplib.SMTP('www.ece.iisc.ernet.in', 25)
+        dcc_email_id = 'dcc@ece.iisc.ernet.in'
+        mail_text =  'Subject: Course Registration Update:Meet DCC for Approval\nDear '+str(current_student.full_name)+',\n\nYour course plan for this term is pending an approval from the DCC.\n Kindly meet the DCC for follow up.\n\n DCC Remarks:\n'+str(remarks)+'\n\n\nSincerely,\nDCC Chair.'
+        smtpObj.sendmail( dcc_email_id, str(current_student), mail_text)
+    except:
+        messages.error(request, 'Unable to send e-mail. But the remarks will be visible on this website.')
 
 
     participants = [
