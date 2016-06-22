@@ -212,47 +212,18 @@ def participant_dcc_act_all(request):
     ## Collect the course page context and pass it back to the course page
     participant = models.Participant.objects.filter(user_id=current_student.id)
     student_name = current_student.full_name
-
     flag = 1
     no_course = 0
-
     for p in participant:
         if p.state == models.Participant.STATE_INSTRUCTOR_DONE:
             p.state = models.Participant.STATE_FINAL_APPROVED
             req_info = str(student_name) + ' for ' + str(p.course)
             p.save()
-            messages.success(request, 'DCC Accepted the enrolment request of %s.' % req_info)
-
-    participants = [
-        (
-            p.course,
-            p.state,
-            p.grade,
-            p.course_id,
-            models.Participant.STATE_CHOICES[p.state][1],
-            models.Participant.GRADE_CHOICES[p.grade][1],
-            p.id
-        ) for p in models.Participant.objects.filter(user_id=current_student.id)]
-
+            messages.success(request, 'DCC has Accepted the enrolment request of %s..' % req_info)
     current_student.dcc_remarks = ''
     current_student.save()
-
-    context = {
-        'student_id': current_student.id,
-        'student_name': student_name,
-        'adviser_full_name': current_student.adviser.full_name,
-        'program': current_student.program,
-        'sr_no': current_student.sr_no,
-        'user_email': request.user.email,
-        'user_id': request.user.id,
-        'participants': participants,
-        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now() + timedelta(days=100)),
-        'flag': flag,
-        'no_course': no_course,
-        'remarks': current_student.dcc_remarks
-    }
-    return render(request, 'coursereg/student_details_dcc.html', context)
+    url = '/student_details_dcc/?student_id='+str(current_student.id)
+    return redirect(url)
 
 @login_required
 def participant_meet_dcc(request):
