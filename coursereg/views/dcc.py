@@ -117,8 +117,6 @@ def send_remainder(request):
                 advisee_list[advisee] = advisee.full_name
     for adviser in adviser_list:
                 mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Adviser Approval\nDear Prof. '+str(adviser.full_name)+',\n\nThere are course enrolment/drop requests from your advisees in the Course Registration portal pending your approval.\nKindly login to the Course Registration portal and Accept/Reject these requests. \n\n\nSincerely,\nDCC Chair.'
-                #adviser = 'bhargava.js@ece.iisc.ernet.in'
-                print adviser
                 smtpObj.sendmail(dcc_email_id, str(adviser), mail_text)
     for advisee in advisee_list:
                 mail_text =  'Subject: Course Registration Remainder:Pending Tasks - Adviser Approval\nDear '+str(advisee.full_name)+',\n\nYour Course enrolment/drop request is pending an approval from your adviser in the Course Registration portal.\nKindly follow up with your adviser. \n\n\nSincerely,\nDCC Chair.'
