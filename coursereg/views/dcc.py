@@ -18,8 +18,9 @@ def dcc(request):
     for u in models.User.objects.filter(department=request.user.department):
         if (u.user_type==1):
             req = (
-                u.id,
                 u.full_name,
+                u.id,
+                u.email,
             )
             students.append(req)
 
@@ -36,7 +37,7 @@ def dcc(request):
                 models.Participant.STATE_CHOICES[p.state][1],
                 models.Participant.GRADE_CHOICES[p.grade][1],
                 p.id
-            ) for p in models.Participant.objects.filter(user=u[0])]
+            ) for p in models.Participant.objects.filter(user=u[1])]
 
         for p in participants:
             if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
@@ -46,6 +47,8 @@ def dcc(request):
             active_students.append(u)
 
         dcc_action = 0
+
+    active_students.sort()
 
     context = {
         'user_email': request.user.email,
@@ -60,8 +63,9 @@ def dcc_approved(request):
     for u in models.User.objects.filter(department=request.user.department):
         if (u.user_type==1):
             req = (
-                u.id,
                 u.full_name,
+                u.id,
+                u.email,
             )
             students.append(req)
 
@@ -78,7 +82,7 @@ def dcc_approved(request):
                 models.Participant.STATE_CHOICES[p.state][1],
                 models.Participant.GRADE_CHOICES[p.grade][1],
                 p.id
-            ) for p in models.Participant.objects.filter(user=u[0])]
+            ) for p in models.Participant.objects.filter(user=u[1])]
 
         for p in participants:
             if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
@@ -88,6 +92,8 @@ def dcc_approved(request):
             notactive_students.append(u)
 
         dcc_action = 0
+
+    notactive_students.sort()
 
     context = {
         'user_email': request.user.email,

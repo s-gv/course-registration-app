@@ -88,12 +88,12 @@
                              <h3 class="panel-title"> Student Name </h3>
                  	    </div>
 			            <div class="panel-body">
-			                 {% for student_id, student_name in not_active_students %}
+			                 {% for student_name, student_id, student_email in not_active_students %}
                              <div class="row">
                                  <div class="col-md-6">
 					                     <form class="form-inline" method="GET" action="{% url 'coursereg:student_details_dcc' %}">
                                          <input type="hidden" name="student_id" value="{{ student_id }}">
-					                     <button type="submit" class="btn btn-link" align="center" >{{ student_name }}</button>
+					                     <button type="submit" class="btn btn-link" align="center" >{{ student_name }} ({{ student_email}})</button>
 					                     </form>
 				                 </div>
 			                 </div>
