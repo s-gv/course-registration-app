@@ -135,6 +135,7 @@ def course_page(request):
     }
     return render(request, 'coursereg/course.html', context)
 
+@login_required
 def student_details(request):
     assert request.method == 'GET'
     current_student_id = request.GET['student_id']
@@ -197,30 +198,8 @@ def participant_advisor_act(request):
         participant.delete()
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         messages.success(request, 'Accepted cancellation request of %s.' % req_info)
-    
-    ## Read the DB and re-render the advisee page.
-    student_name = advisee.full_name
-    participants = [
-        (
-            p.course,
-            p.state,
-            p.grade,
-            models.Participant.STATE_CHOICES[p.state][1],
-            models.Participant.GRADE_CHOICES[p.grade][1],
-            p.state == models.Participant.STATE_REQUESTED,
-            p.id
-        ) for p in models.Participant.objects.filter(user=current_student_id)]
-    context = {
-        'advisee_id': current_student_id,
-        'student_name': student_name,   
-        'user_email': request.user.email,
-        'user_id': request.user.id,
-        'participants': participants,
-        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
-        'remarks': advisee.dcc_remarks,
-    }
-    return render(request, 'coursereg/student_details.html', context)
+    url = '/student_details/?student_id='+ str(current_student_id)
+    return redirect(url)
 
 @login_required
 def participant_advisor_rej(request):
@@ -263,29 +242,8 @@ def participant_advisor_rej(request):
         req_info = str(advisee.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.success(request, 'Rejected the cancellation request of %s.' % req_info)
-    ## Read the DB and re-render the advisee page.
-    student_name = advisee.full_name
-    participants = [
-        (
-            p.course,
-            p.state,
-            p.grade,
-            models.Participant.STATE_CHOICES[p.state][1],
-            models.Participant.GRADE_CHOICES[p.grade][1],
-            p.state == models.Participant.STATE_REQUESTED,
-            p.id
-        ) for p in models.Participant.objects.filter(user=current_student_id)]
-    context = {
-        'advisee_id': current_student_id,
-        'student_name': student_name,   
-        'user_email': request.user.email,
-        'user_id': request.user.id,
-        'participants': participants,
-        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
-        'remarks': advisee.dcc_remarks,
-    }
-    return render(request, 'coursereg/student_details.html', context)
+    url = '/student_details/?student_id='+ str(current_student_id)
+    return redirect(url)
 
 
 @login_required
@@ -294,7 +252,8 @@ def participant_instr_act(request):
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     student     = models.User.objects.get(id=request.POST['student_id'])
     ## Collect the course page context and pass it back to the course page
-    current_course  = models.Course.objects.get(id=request.POST['course_id'])
+    course_id=request.POST['course_id']
+    current_course  = models.Course.objects.get(id=course_id)
 
     assert participant.user_id == student.id
     if participant.state != models.Participant.STATE_ADVISOR_DONE:
@@ -304,66 +263,8 @@ def participant_instr_act(request):
         req_info = str(student.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.success(request, 'Instructor Accepted the enrolment request of %s.' % req_info)
-
-    ## Read the DB and re-render the course page.
-    students = []
-    instructors = []
-    TAs = []
-
-    no_of_student_credit = 0
-    no_of_student_audit = 0
-
-    for p in models.Participant.objects.filter(course=current_course):
-        if ((p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED):
-            no_of_student_credit = no_of_student_credit + 1
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.program,
-                   no_of_student_credit,
-                   p.user.department,
-                   models.Participant.STATE_CHOICES[p.state][1],
-                   models.Participant.GRADE_CHOICES[p.grade][1],
-                   p.state == models.Participant.STATE_ADVISOR_DONE,
-                   p.id)
-            students.append(req)
-
-        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
-            no_of_student_audit = no_of_student_audit + 1
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.program,
-                   no_of_student_audit,
-                   p.user.department,
-                   models.Participant.STATE_CHOICES[p.state][1],
-                   models.Participant.GRADE_CHOICES[p.grade][1],
-                   p.state == models.Participant.STATE_ADVISOR_DONE,
-                   p.id)
-            students.append(req)
-
-        if ((p.participant_type == 2)):
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.department,
-                   p.id)
-            instructors.append(req)
-        if ((p.participant_type == 3)):
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.department,
-                   p.id)
-            TAs.append(req)
-
-    context = {
-        'user_email': request.user.email,
-        'course_id': current_course.id,
-        'course_name': current_course,
-        'course_credits': current_course.credits,
-        'course_department': current_course.department,
-        'students': students,
-        'instructors': instructors,
-        'TAs': TAs,
-    }
-    return render(request, 'coursereg/course.html', context)
+    url = '/course_page/?course_id='+ str(course_id)
+    return redirect(url)
 
 
 @login_required
@@ -372,7 +273,8 @@ def participant_instr_rej(request):
     participant = models.Participant.objects.get(id=request.POST['participant_id'])
     student     = models.User.objects.get(id=request.POST['student_id'])
     ## Collect the course page context and pass it back to the course page
-    current_course     = models.Course.objects.get(id=request.POST['course_id'])
+    course_id=request.POST['course_id']
+    current_course  = models.Course.objects.get(id=course_id)
 
     assert participant.user_id == student.id
     if participant.state != models.Participant.STATE_ADVISOR_DONE:
@@ -382,66 +284,8 @@ def participant_instr_rej(request):
         req_info = str(student.full_name) + ' for ' + str(participant.course)
         participant.save()
         messages.error(request, 'Instructor Rejected the enrolment request of %s.' % req_info)
-
-    ## Read the DB and re-render the course page.
-    students = []
-    instructors = []
-    TAs = []
-    no_of_student_credit = 0
-    no_of_student_audit = 0
-
-    for p in models.Participant.objects.filter(course=current_course):
-        if ((p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED):
-            no_of_student_credit = no_of_student_credit + 1
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.program,
-                   no_of_student_credit,
-                   p.user.department,
-                   models.Participant.STATE_CHOICES[p.state][1],
-                   models.Participant.GRADE_CHOICES[p.grade][1],
-                   p.state == models.Participant.STATE_ADVISOR_DONE,
-                   p.id)
-            students.append(req)
-
-        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
-            no_of_student_audit = no_of_student_audit + 1
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.program,
-                   no_of_student_audit,
-                   p.user.department,
-                   models.Participant.STATE_CHOICES[p.state][1],
-                   models.Participant.GRADE_CHOICES[p.grade][1],
-                   p.state == models.Participant.STATE_ADVISOR_DONE,
-                   p.id)
-            students.append(req)
-
-        if ((p.participant_type == 2)):
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.department,
-                   p.id)
-            instructors.append(req)
-
-        if ((p.participant_type == 3)):
-            req = (p.user.id,
-                   p.user.full_name,
-                   p.user.department,
-                   p.id)
-            TAs.append(req)
-
-    context = {
-        'user_email': request.user.email,
-        'course_id': current_course.id,
-        'course_name': current_course,
-        'course_credits': current_course.credits,
-        'course_department': current_course.department,
-        'students': students,
-        'instructors': instructors,
-        'TAs': TAs,
-    }
-    return render(request, 'coursereg/course.html', context)
+    url = '/course_page/?course_id='+ str(course_id)
+    return redirect(url)
 
 
 @login_required
