@@ -41,7 +41,7 @@ def dcc(request):
                 ) for p in models.Participant.objects.filter(user=u[1])]
     
             for p in participants:
-                if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
+                if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop') or (p[4] == 'Advisor approved audit conversion') or (p[4] == 'Advisor approved credit conversion'):
                     dcc_action = 1
             if dcc_action == 1 :
                 active_students.append(u)
@@ -87,7 +87,7 @@ def dcc_approved(request):
                 ) for p in models.Participant.objects.filter(user=u[1])]
     
             for p in participants:
-                if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop'):
+                if (p[4] == 'Instructor approved') or (p[4] == 'Advisor approved drop') or (p[4] == 'Advisor approved audit conversion') or (p[4] == 'Advisor approved credit conversion'):
                     dcc_action = 1
             if dcc_action == 0 :
                 notactive_students.append(u)
@@ -207,7 +207,7 @@ def student_details_dcc(request):
 
            for p in participants:
                no_course = no_course + 1
-               if (p[4] != 'Instructor approved' and p[4] != 'Instructor rejected'):
+               if (p[4] != 'Instructor approved' and p[4] != 'Instructor rejected' and p[4] != 'Advisor approved audit conversion' and p[4] != 'Advisor approved credit conversion' and p[4] != 'Advisor approved drop'):
                    flag = flag + 1
 
            context = {
@@ -255,7 +255,24 @@ def participant_dcc_act_all(request):
                     p.state = models.Participant.STATE_FINAL_APPROVED
                     req_info = str(student_name) + ' for ' + str(p.course)
                     p.save()
-                    messages.success(request, 'DCC has Accepted the enrolment request of %s..' % req_info)
+                    messages.success(request, 'DCC has accepted the enrolment request of %s..' % req_info)
+                elif p.state == models.Participant.STATE_ADV_DROP_DONE:
+					p.state = models.Participant.STATE_DCC_DROP_DONE
+					p.save()
+					req_info = str(student_name) + ' for ' + str(p.course)
+					messages.success(request, 'DCC has accepted the drop request of %s..' % req_info)
+                elif p.state == models.Participant.STATE_ADV_AUDIT_DONE:
+					p.state = models.Participant.STATE_FINAL_APPROVED
+					p.participant_type = 1 #audit
+					p.save()
+					req_info = str(student_name) + ' for ' + str(p.course)
+					messages.success(request, 'DCC has accepted the audit request of %s..' % req_info)
+                elif p.state == models.Participant.STATE_ADV_CREDIT_DONE:
+					p.state = models.Participant.STATE_FINAL_APPROVED
+					p.participant_type = 0 #credit 
+					p.save()
+					req_info = str(student_name) + ' for ' + str(p.course)
+					messages.success(request, 'DCC has accepted the credit request of %s..' % req_info)
             current_student.dcc_remarks = ''
             current_student.save()
             url = '/student_details_dcc/?student_id='+str(current_student.id)
