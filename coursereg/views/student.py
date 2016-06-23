@@ -22,7 +22,7 @@ def index(request):
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
             models.Participant.PARTICIPANT_CHOICES[p.participant_type][1],
-            (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_ADVISOR_DONE) or (p.state == models.Participant.STATE_INSTRUCTOR_DONE) or (p.state == models.Participant.STATE_FINAL_APPROVED),
+            (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_ADVISOR_DONE) or (p.state == models.Participant.STATE_INSTRUCTOR_DONE),
             p.id
         ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]
     context = {

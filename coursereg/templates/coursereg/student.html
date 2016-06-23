@@ -161,6 +161,7 @@
                                         <span class="glyphicon glyphicon-option-vertical"></span>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+										{% if not deleteable %}
                                         {% if ptype == 0 %}
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
@@ -184,10 +185,20 @@
                                             </a>
                                         </li>
                                         {% endif %}
-                                        {% if deleteable %}
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
-                                                Cancel registration
+                                                Drop registration
+                                                <form action="{% url 'coursereg:participant_delete' %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                                    <input type="hidden" name="modify_type" value="drop">
+                                                </form>
+                                            </a>
+                                        </li>
+                                        {%else%}
+                                        <li>
+                                            <a href="javascript:;" onclick="firstElementChild.submit();">
+                                                cancel registration
                                                 <form action="{% url 'coursereg:participant_delete' %}" method="POST">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="participant_id" value="{{ participant_id }}">
