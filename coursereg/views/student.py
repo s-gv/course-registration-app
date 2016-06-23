@@ -22,7 +22,7 @@ def index(request):
             models.Participant.STATE_CHOICES[p.state][1],
             models.Participant.GRADE_CHOICES[p.grade][1],
             models.Participant.PARTICIPANT_CHOICES[p.participant_type][1],
-            (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_ADVISOR_DONE) or (p.state == models.Participant.STATE_INSTRUCTOR_DONE),
+            (p.state == models.Participant.STATE_REQUESTED) or (p.state == models.Participant.STATE_ADVISOR_DONE) or (p.state == models.Participant.STATE_INSTRUCTOR_DONE) or (p.state == models.Participant.STATE_ADVISOR_REJECT) or (p.state == models.Participant.STATE_INSTRUCTOR_REJECT),
             p.id
         ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]
     context = {
@@ -69,8 +69,8 @@ def participant_delete(request):
         if participant.state == models.Participant.STATE_REQUESTED and modify_value == 'cancel':
 			participant.delete()
 			messages.success(request, 'Cancelled registration of course %s.' % participant.course)
-        elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE) and modify_value == 'cancel':
-            if (participant.state == models.Participant.STATE_ADVISOR_DONE):
+        elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_REJECT) and modify_value == 'cancel':
+            if (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_REJECT):
                 participant.state = models.Participant.STATE_CANCEL_REQUESTED
                 participant.save()
             else:
