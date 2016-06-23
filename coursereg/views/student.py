@@ -66,10 +66,10 @@ def participant_delete(request):
         messages.error(request, 'Unable to unregister from the course. Please speak to the administrator.')
     else:
         #participant.delete()
-        if participant.state == models.Participant.STATE_REQUESTED and modify_value == 'cancel':
+        if (participant.state == models.Participant.STATE_REQUESTED or participant.state == models.Participant.STATE_INSTRUCTOR_REJECT) and modify_value == 'cancel':
 			participant.delete()
 			messages.success(request, 'Cancelled registration of course %s.' % participant.course)
-        elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_REJECT) and modify_value == 'cancel':
+        elif (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_DONE) and modify_value == 'cancel':
             if (participant.state == models.Participant.STATE_ADVISOR_DONE or participant.state == models.Participant.STATE_INSTRUCTOR_REJECT):
                 participant.state = models.Participant.STATE_CANCEL_REQUESTED
                 participant.save()
