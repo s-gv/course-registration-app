@@ -89,6 +89,10 @@ def participant_delete(request):
             participant.state = models.Participant.STATE_CREDIT_REQUESTED
             participant.save()
             messages.success(request, 'Request raised for crediting the course %s.' % participant.course)
+        elif (participant.state == models.Participant.STATE_CREDIT_REQUESTED or participant.state == models.Participant.STATE_AUDIT_REQUESTED or participant.state == models.Participant.STATE_DROP_REQUESTED) and modify_value == 'revert':
+            participant.state = models.Participant.STATE_FINAL_APPROVED
+            participant.save()
+            messages.success(request, 'Cancelled the change request of the course %s.' % participant.course)
     return redirect('coursereg:index')
 
 

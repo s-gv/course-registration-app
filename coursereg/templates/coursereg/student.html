@@ -162,7 +162,9 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 										{% if not deleteable %}
-                                        {% if ptype == 0 %}
+										{% if state == 3 %} <!-- STATE_FINAL_APPROVED -->
+                                        {% if ptype == 0 %} <!-- Credit -->
+                                        
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
                                                 Switch to audit
@@ -173,7 +175,7 @@
                                                 </form>
                                             </a>
                                         </li>
-                                        {% elif ptype == 1 %}
+                                        {% elif ptype == 1 %} <!-- Audit -->
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
                                                 Switch to credit
@@ -187,7 +189,7 @@
                                         {% endif %}
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
-                                                Drop registration
+                                                Drop registration 
                                                 <form action="{% url 'coursereg:participant_delete' %}" method="POST">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="participant_id" value="{{ participant_id }}">
@@ -195,6 +197,18 @@
                                                 </form>
                                             </a>
                                         </li>
+                                        {%else%} <!-- state !=3 -->
+                                        <li>
+                                            <a href="javascript:;" onclick="firstElementChild.submit();">
+                                                Revert 
+                                                <form action="{% url 'coursereg:participant_delete' %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="participant_id" value="{{ participant_id }}">
+                                                    <input type="hidden" name="modify_type" value="revert">
+                                                </form>
+                                            </a>
+                                        </li>
+                                        {% endif %}
                                         {%else%}
                                         <li>
                                             <a href="javascript:;" onclick="firstElementChild.submit();">
