@@ -486,10 +486,23 @@ def faq(request):
 
 @login_required
 def profile(request):
-    context = {
-        'user_email': request.user.email,
-        'user_full_name': request.user.full_name,
-        'user_id': request.user.id,
-        'department': request.user.department,
-    }
-    return render(request, 'coursereg/faculty_profile.html', context)
+    ## Check if the request is indeed coming from a faculty user
+    user = request.user
+    try:
+        assert (user.user_type == models.User.USER_TYPE_FACULTY)
+        context = {
+            'user_email': request.user.email,
+            'user_full_name': request.user.full_name,
+            'user_id': request.user.id,
+            'department': request.user.department,
+        }
+        return render(request, 'coursereg/faculty_profile.html', context)
+    
+    except:
+        messages.error(request,
+                       'You listed as faculty in the portal. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        log = logging.getLogger(__name__)
+        log.warn(
+            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(
+                request.user) + "\n" + str(request.META) + '\n\n')
+        return redirect('coursereg:index')

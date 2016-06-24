@@ -297,8 +297,7 @@ def participant_dcc_act_all(request):
             ## Collect the course page context and pass it back to the course page
             participant = models.Participant.objects.filter(user_id=current_student.id)
             student_name = current_student.full_name
-            flag = 1
-            no_course = 0
+
             for p in participant:
                 if p.state == models.Participant.STATE_INSTRUCTOR_DONE:
                     p.state = models.Participant.STATE_FINAL_APPROVED
