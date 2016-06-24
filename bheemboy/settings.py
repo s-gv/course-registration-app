@@ -124,3 +124,56 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'coursereg.User'
 
 LOGIN_URL = '/signin/'
+
+
+
+
+
+## Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'logging.NullHandler',
+        },
+        'logfile': {
+            'level':'WARN',
+            'class':'logging.handlers.RotatingFileHandler',
+            #'filename': SITE_ROOT + "/logfile",
+            'filename': "./logfile",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['logfile'],
+            'propagate': True,
+            'level':'WARN',
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'coursereg': {
+            'handlers': ['console', 'logfile'],
+            'propogate': True,           
+            'level': 'WARN',
+        },
+    }
+}

@@ -9,6 +9,7 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
+import logging
 
 def faculty(request):
     participants = [
@@ -77,63 +78,77 @@ def instructor(request):
 def course_page(request):
     assert request.method == 'GET'
     current_course = models.Course.objects.get(id=request.GET['course_id'])
-    students = []
-    instructors = []
-    TAs = []
-    no_of_student_credit = 0
-    no_of_student_audit = 0
-
+    user = request.user
+    isuser_instructor = False
     for p in models.Participant.objects.filter(course=current_course):
-        if( ( p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED) :
-                no_of_student_credit = no_of_student_credit + 1
-                req = (p.user.id,
-                    p.user.full_name,
-                    p.user.program,
-                    no_of_student_credit,
-                    p.user.department,
-                    models.Participant.STATE_CHOICES[p.state][1],
-                    models.Participant.GRADE_CHOICES[p.grade][1],
-                    p.state == models.Participant.STATE_ADVISOR_DONE,
-                    p.id)
-                students.append(req)
-
-        if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
-                no_of_student_audit = no_of_student_audit + 1
-                req = (p.user.id,
-                   p.user.full_name,
-                   p.user.program,
-                   no_of_student_audit,
-                   p.user.department,
-                   models.Participant.STATE_CHOICES[p.state][1],
-                   models.Participant.GRADE_CHOICES[p.grade][1],
-                   p.state == models.Participant.STATE_ADVISOR_DONE,
-                   p.id)
-                students.append(req)
-
         if( ( p.participant_type == 2) ):
-                req = (p.user.id,
-                    p.user.full_name,
-                    p.user.department,
-                    p.id)
-                instructors.append(req)
-        if( ( p.participant_type == 3) ):
-                req = (p.user.id,
-                    p.user.full_name,
-                    p.user.department,
-                    p.id)
-                TAs.append(req)
+            if(p.user.id == user.id):
+                isuser_instructor = True
+    try:
+        assert(isuser_instructor)
+        students = []
+        instructors = []
+        TAs = []
+        no_of_student_credit = 0
+        no_of_student_audit = 0
+    
+        for p in models.Participant.objects.filter(course=current_course):
+            if( ( p.participant_type == 0) and p.state != models.Participant.STATE_REQUESTED) :
+                    no_of_student_credit = no_of_student_credit + 1
+                    req = (p.user.id,
+                        p.user.full_name,
+                        p.user.program,
+                        no_of_student_credit,
+                        p.user.department,
+                        models.Participant.STATE_CHOICES[p.state][1],
+                        models.Participant.GRADE_CHOICES[p.grade][1],
+                        p.state == models.Participant.STATE_ADVISOR_DONE,
+                        p.id)
+                    students.append(req)
+    
+            if ((p.participant_type == 1) and p.state != models.Participant.STATE_REQUESTED):
+                    no_of_student_audit = no_of_student_audit + 1
+                    req = (p.user.id,
+                       p.user.full_name,
+                       p.user.program,
+                       no_of_student_audit,
+                       p.user.department,
+                       models.Participant.STATE_CHOICES[p.state][1],
+                       models.Participant.GRADE_CHOICES[p.grade][1],
+                       p.state == models.Participant.STATE_ADVISOR_DONE,
+                       p.id)
+                    students.append(req)
+    
+            if( ( p.participant_type == 2) ):
+                    req = (p.user.id,
+                        p.user.full_name,
+                        p.user.department,
+                        p.id)
+                    instructors.append(req)
+            if( ( p.participant_type == 3) ):
+                    req = (p.user.id,
+                        p.user.full_name,
+                        p.user.department,
+                        p.id)
+                    TAs.append(req)
+    
+        context = {
+            'user_email': request.user.email,
+            'course_id': current_course.id,
+            'course_name': current_course,
+            'course_credits': current_course.credits,
+            'course_department': current_course.department,
+            'students': students,
+            'instructors': instructors,
+            'TAs': TAs,
+        }
+        return render(request, 'coursereg/course.html', context)
+    except:
+        messages.error(request, 'You are not the instructor for this course. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
+        return redirect('coursereg:index')
 
-    context = {
-        'user_email': request.user.email,
-        'course_id': current_course.id,
-        'course_name': current_course,
-        'course_credits': current_course.credits,
-        'course_department': current_course.department,
-        'students': students,
-        'instructors': instructors,
-        'TAs': TAs,
-    }
-    return render(request, 'coursereg/course.html', context)
 
 @login_required
 def student_details(request):

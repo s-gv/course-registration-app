@@ -10,6 +10,7 @@ from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
 import smtplib
+import logging
 
 @login_required
 def dcc(request):
@@ -54,6 +55,8 @@ def dcc(request):
         return render(request, 'coursereg/dcc.html', context)
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')     
         
 @login_required
@@ -100,6 +103,8 @@ def dcc_approved(request):
         return render(request, 'coursereg/dcc_approved.html', context)
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')     
         
 @login_required
@@ -175,6 +180,8 @@ def send_remainder(request):
 
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')      
 
 
@@ -231,6 +238,8 @@ def student_details_dcc(request):
             return redirect('coursereg:index')
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')
 
 @login_required
@@ -282,6 +291,8 @@ def participant_dcc_act_all(request):
             return redirect('coursereg:index')
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')
 
 @login_required
@@ -314,6 +325,8 @@ def participant_meet_dcc(request):
             return redirect('coursereg:index')
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')
 
 
@@ -351,5 +364,7 @@ def profile(request):
         return render(request, 'coursereg/dcc_profile.html', context)
     except:
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        log = logging.getLogger(__name__)
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
         return redirect('coursereg:index')
         
