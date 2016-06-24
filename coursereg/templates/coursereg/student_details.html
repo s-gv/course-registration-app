@@ -82,6 +82,16 @@
                     </div>
                 {% endfor %}
             {% endif %}
+            
+            
+            {% if remarks %}
+            <div class="row">
+                <div class="col-md-13">
+                    <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="row top-buffer-1">
                 <div class="col-md-12>">
                     <div class="panel panel-default">
@@ -151,16 +161,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            {% if remarks %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
-                </div>
-            </div>
-            {% endif %}
-            
+            </div>                        
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>

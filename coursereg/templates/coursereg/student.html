@@ -95,6 +95,15 @@
             </div><!--/.container -->
         </nav>
         <div class="container" id="maincontainer">
+            
+            {% if remarks %}
+            <div class="row">
+                <div class="col-md-13">
+                    <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="row">
                 <div class="col-md-12">
                     <div class="page-header">
@@ -242,14 +251,6 @@
                     </ul>
                 </div>
             </div>
-
-            {% if remarks %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
-                </div>
-            </div>
-            {% endif %}
         </div> <!-- /container -->
 
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
