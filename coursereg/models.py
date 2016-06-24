@@ -169,7 +169,7 @@ class Participant(models.Model):
         (STATE_REQUESTED, 'Requested'),
         (STATE_ADVISOR_DONE, 'Advisor approved'),
         (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
-        (STATE_FINAL_APPROVED, 'DCC approved'),
+        (STATE_FINAL_APPROVED, 'Registered'),
         (STATE_NA, 'N/A'),
         (STATE_ADVISOR_REJECT, 'Advisor rejected'),
         (STATE_INSTRUCTOR_REJECT, 'Instructor rejected'),
