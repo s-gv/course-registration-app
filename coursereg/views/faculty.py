@@ -63,12 +63,9 @@ def faculty(request):
         }
         return render(request, 'coursereg/faculty.html', context)
     except:
-        messages.error(request,
-                       'You listed as faculty in the portal. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You listed as faculty in the portal. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -96,12 +93,9 @@ def instructor(request):
         }
         return render(request, 'coursereg/faculty_instructor.html', context)
     except:
-        messages.error(request,
-                       'You listed as faculty in the portal. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request, 'You listed as faculty in the portal. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -215,7 +209,7 @@ def course_page(request):
         return render(request, 'coursereg/course.html', context)
 
     except:
-        messages.error(request,'You are not the instructor for this course. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You are not the instructor for this course. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
         log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
@@ -254,12 +248,9 @@ def student_details(request):
         }
         return render(request, 'coursereg/student_details.html', context)
     except:
-        messages.error(request,
-                       'You are not the adviser of the requested student. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You are not the adviser of the requested student. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -312,12 +303,9 @@ def participant_advisor_act(request):
         url = '/student_details/?student_id=' + str(current_student_id)
         return redirect(url)
     except:
-        messages.error(request,
-                       'You are not the adviser of the requested participant student. Please avoid attempts to use the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You are not the adviser of the requested participant student. Please avoid attempts to use the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -376,12 +364,9 @@ def participant_advisor_rej(request):
         url = '/student_details/?student_id=' + str(current_student_id)
         return redirect(url)
     except:
-        messages.error(request,
-                       'You are not the adviser of the requested participant student. Please avoid attempts to use the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You are not the adviser of the requested participant student. Please avoid attempts to use the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE AN ADVISER by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -416,11 +401,10 @@ def participant_instr_act(request):
         return redirect(url)
     except:
         messages.error(request,
-                       'You are not the instructor for this course. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+                       'You are not the instructor for this course. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
         log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -455,12 +439,9 @@ def participant_instr_rej(request):
         url = '/course_page/?course_id=' + str(course_id)
         return redirect(url)
     except:
-        messages.error(request,
-                       'You are not the instructor for this course. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You are not the instructor for this course. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A COURSE INSTRUCTOR by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 
@@ -476,12 +457,9 @@ def faq(request):
         }
         return render(request, 'coursereg/faculty_faq.html', context)
     except:
-        messages.error(request,
-                       'You listed as faculty in the portal. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You listed as faculty in the portal. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
 
 @login_required
@@ -497,12 +475,9 @@ def profile(request):
             'department': request.user.department,
         }
         return render(request, 'coursereg/faculty_profile.html', context)
-    
+
     except:
-        messages.error(request,
-                       'You listed as faculty in the portal. Please avoid attempts to use  the system it in unauthorized ways. This attempt has been logged.')
+        messages.error(request,'You listed as faculty in the portal. Please avoid attempts to use  the system in unauthorized ways. This attempt has been logged.')
         log = logging.getLogger(__name__)
-        log.warn(
-            "\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(
-                request.user) + "\n" + str(request.META) + '\n\n')
+        log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE A FACULTY by:" + str(request.user) + "\n" + str(request.META) + '\n\n')
         return redirect('coursereg:index')
