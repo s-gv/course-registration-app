@@ -104,7 +104,7 @@
                         </div>
 
                      <div class="panel-body">
-			             {% for course, state, grade, course_id, state_str, grade_str, participant_id, flag, no_course in participants %}
+			             {% for course, state, grade, course_id, state_str, grade_str, participant_id, flag, flag1, no_course in participants %}
                             <div class="row">
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
@@ -115,10 +115,22 @@
                                 <div class="col-md-2">
                                     <span class="label label-info">{{ state_str }}</span>
                                 </div>
-                                    {% elif state == 2 or state == 8 or state == 17 or state == 22 %}
+                                    {% elif state == 2 or state == 17 or state == 22 %}
                                  <div class="col-md-2">
                                     <span class="label label-success">{{ state_str}}</span>
-                                 </div>
+                                 </div>                                    
+                                  {% elif state == 8 %}
+                                 <div class="col-md-2">
+                                    <span class="label label-success">{{ state_str}}</span>
+                                 </div>      
+                                 <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act' %}">
+                                         {% csrf_token %}                                         
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">         
+                                         <input type="hidden" name="student_id" value="{{ student_id }}">          
+                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>
+                                     </form>
+                                 </div>         
                                     {% elif state == 3 or state == 11 or state == 14 %}
                                  <div class="col-md-2">
                                     <span class="label label-primary">{{ state_str }}</span>
@@ -152,29 +164,24 @@
     </div>
 </div>
 
-<div class="col-md-3">
-    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_act_all' %}">
+<div class="col-md-4">
+
+    <form style="display: inline" method="POST" action="{% url 'coursereg:participant_meet_dcc' %}">
         {% csrf_token %}
         <input type="hidden" name="student_id" value="{{ student_id }}">
-        <button type="submit" class="btn btn-primary btn-xs" align="centre"><b>Approve all the courses</b></button>
-    </form>
-</div>
-    
-<div class="col-md-4"><b>DCC's  Remarks:</b>
-    {%if remarks != ' '%}
-            <h1></h1>
-      {{ remarks }}
-            <h1></h1>
-            <b>New Remarks:</b>
-    {%endif%}
-    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_meet_dcc' %}">
-        {% csrf_token %}
-        <input type="hidden" name="student_id" value="{{ student_id }}">
-        <!--textarea name="myTextBox" id="remarks" cols="50" rows="5" ></textarea-->  
-        <input name="myTextBox" type="text" id="remarks" cols="50" rows="5" placeholder={{ remarks }}   />
+        <textarea name="myTextBox" id="remarks" cols="50" rows="5" > {{remarks}}</textarea>  
         <h1></h1>
         <button type="submit" class="btn btn-danger btn-xs" align="centre"><b>Meet DCC</b></button> 
     </form>
+        
+    {% if flag1 != 1 %}
+    <form style="display: inline" method="POST" action="{% url 'coursereg:participant_dcc_act_all' %}">
+        {% csrf_token %}
+        <input type="hidden" name="student_id" value="{{ student_id }}">
+        <button type="submit" id= "newbuttons" class="btn btn-primary btn-xs" align="centre"><b>Approve all the courses</b></button>
+    </form>
+    {% endif %}
+    
 </div>
 
 {% endif%}

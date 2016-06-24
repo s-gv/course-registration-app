@@ -137,7 +137,7 @@
                 {% endfor %}
             {% endif %}
 
-            <div class="row top-buffer-1">
+            <<div class="row top-buffer-1">
                  <div class="col-md-12">
                      <div class="panel panel-default">
                          <div class="panel-heading">
@@ -146,32 +146,38 @@
                          <div class="panel-body">
                              <div class="row">
                                  <div class="col-md-1"><b>No.</b></div>
-                                 <div class="col-md-4"><b>Student Name</b></div>
+                                 <div class="col-md-3"><b>Student Name</b></div>
                                  <div class="col-md-2"><b>Department</b></div>
-                                 <div class="col-md-2"><b>Program</b></div>
+                                 <div class="col-md-1"><b>Program</b></div>
+                                 <div class="col-md-2"><b>Participation Type</b></div>
                                  <div class="col-md-1"><b>Request State</b></div>
                                  <div class="col-md-2"><b>Action</b></div>
                                  <div class="col-md-1"><b></b></div>
                              </div>
-                             {% for student_id, student_name, program, no, department, participant_state, grade, action_required, participant_id in students %}
-                             {% if participant_state = 'Advisor approved' %}
+                             {% for student_id, student_name, program, p_type, no, department, participant_state, grade, participant_id in students %}                           
                              <div class="row">
                                  <hr>
                                  <div class="col-md-1">{{ no }}</div>
-                                 <div class="col-md-4">{{ student_name }}</div>
+                                 <div class="col-md-3">{{ student_name }}</div>
                                  <div class="col-md-2">{{ department }}</div>
                                  {% if program == 0 %}
-                                 <div class="col-md-2">Other</div>
+                                 <div class="col-md-1">Other</div>
                                  {% elif program == 1 %}
-                                 <div class="col-md-2">M.Tech</div>
+                                 <div class="col-md-1">M.Tech</div>
                                  {% elif program == 2 %}
-                                 <div class="col-md-2">M.Sc</div>
+                                 <div class="col-md-1">M.Sc</div>
                                  {% elif program == 3 %}
-                                 <div class="col-md-2">Ph.D</div>
+                                 <div class="col-md-1">Ph.D</div>
                                  {% elif program == 4 %}
-                                 <div class="col-md-2">M.E.</div>
+                                 <div class="col-md-1">M.E.</div>
+                                 {% endif %}
+                                 {% if p_type == 0 %}
+                                 <div class="col-md-2">Credit</div>
+                                 {% else %}
+                                 <div class="col-md-2">Audit</div>
                                  {% endif %}
                                  <div class="col-md-1">{{ participant_state }}</div>
+                                 {% if participant_state == 'Advisor approved' %}
                                  <div class="col-md-1">
                                      <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_act' %}">
                                          {% csrf_token %}
@@ -190,9 +196,8 @@
                                          <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
                                      </form>
                                  </div>
-
-                             </div>
-                             {% endif %}
+                                 {% endif %}
+                             </div>                             
                              {% endfor %}
                          </div>
                      </div>
@@ -204,53 +209,127 @@
                  <div class="col-md-12">
                      <div class="panel panel-default">
                          <div class="panel-heading">
-                             <h3 class="panel-title">Enrolled Students </h3>
+                             <h3 class="panel-title">Crediting Students </h3>
                          </div>
                          <div class="panel-body">
                              <div class="row">
                                  <div class="col-md-1"><b>No.</b></div>
-                                 <div class="col-md-4"><b>Student Name</b></div>
+                                 <div class="col-md-3"><b>Student Name</b></div>
                                  <div class="col-md-2"><b>Department</b></div>
-                                 <div class="col-md-2"><b>Program</b></div>
+                                 <div class="col-md-1"><b>Program</b></div>
+                                 <div class="col-md-2"><b>Participation Type</b></div>
                                  <div class="col-md-1"><b>Request State</b></div>
                              </div>
-                             {% for student_id, student_name, program, no, department, participant_state, grade, action_required, participant_id in students %}
-                             {% if participant_state == 'Instructor approved' or participant_state == 'DCC approved'%}
+                             {% for student_id, student_name, program, p_type, no, department, participant_state, grade, participant_id in crediting_students %}
                              <div class="row">
                                  <hr>
                                  <div class="col-md-1">{{ no }}</div>
-                                 <div class="col-md-4">{{ student_name }}</div>
+                                 <div class="col-md-3">{{ student_name }}</div>
                                  <div class="col-md-2">{{ department }}</div>
                                  {% if program == 0 %}
-                                 <div class="col-md-2">Other</div>
+                                 <div class="col-md-1">Other</div>
                                  {% elif program == 1 %}
-                                 <div class="col-md-2">M.Tech</div>
+                                 <div class="col-md-1">M.Tech</div>
                                  {% elif program == 2 %}
-                                 <div class="col-md-2">M.Sc</div>
+                                 <div class="col-md-1">M.Sc</div>
                                  {% elif program == 3 %}
-                                 <div class="col-md-2">Ph.D</div>
+                                 <div class="col-md-1">Ph.D</div>
                                  {% elif program == 4 %}
-                                 <div class="col-md-2">M.E.</div>
+                                 <div class="col-md-1">M.E.</div>
                                  {% endif %}
-                                 <div class="col-md-1">{{ participant_state }}</div>
-                                 {% if action_required %}
-                                 <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_instr_act' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                         <input type="hidden" name="student_id" value="{{ student_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course_id }}">
-                                     </form>
-                                 </div>
-                                 {% endif %}
+                                 <div class="col-md-2">Credit</div>
+                                 <div class="col-md-1">{{ participant_state }}</div>                                 
                              </div>
-                             {% endif %}
                              {% endfor %}
                          </div>
                      </div>
                  </div>
              </div>
-
+            
+            <div class="row top-buffer-1">
+                 <div class="col-md-12">
+                     <div class="panel panel-default">
+                         <div class="panel-heading">
+                             <h3 class="panel-title">Auditing Students </h3>
+                         </div>
+                         <div class="panel-body">
+                             <div class="row">
+                                 <div class="col-md-1"><b>No.</b></div>
+                                 <div class="col-md-3"><b>Student Name</b></div>
+                                 <div class="col-md-2"><b>Department</b></div>
+                                 <div class="col-md-1"><b>Program</b></div>
+                                 <div class="col-md-2"><b>Participation Type</b></div>
+                                 <div class="col-md-1"><b>Request State</b></div>
+                             </div>
+                             {% for student_id, student_name, program, p_type, no, department, participant_state, grade, participant_id in auditing_students %}
+                             <div class="row">
+                                 <hr>
+                                 <div class="col-md-1">{{ no }}</div>
+                                 <div class="col-md-3">{{ student_name }}</div>
+                                 <div class="col-md-2">{{ department }}</div>
+                                 {% if program == 0 %}
+                                 <div class="col-md-1">Other</div>
+                                 {% elif program == 1 %}
+                                 <div class="col-md-1">M.Tech</div>
+                                 {% elif program == 2 %}
+                                 <div class="col-md-1">M.Sc</div>
+                                 {% elif program == 3 %}
+                                 <div class="col-md-1">Ph.D</div>
+                                 {% elif program == 4 %}
+                                 <div class="col-md-1">M.E.</div>
+                                 {% endif %}
+                                 <div class="col-md-2">Audit</div>
+                                 <div class="col-md-1">{{ participant_state }}</div>                                 
+                             </div>
+                             {% endfor %}
+                         </div>
+                     </div>
+                 </div>
+             </div>
+            
+            <div class="row top-buffer-1">
+                 <div class="col-md-12">
+                     <div class="panel panel-default">
+                         <div class="panel-heading">
+                             <h3 class="panel-title">Dropped Students </h3>
+                         </div>
+                         <div class="panel-body">
+                             <div class="row">
+                                 <div class="col-md-1"><b>No.</b></div>
+                                 <div class="col-md-3"><b>Student Name</b></div>
+                                 <div class="col-md-2"><b>Department</b></div>
+                                 <div class="col-md-1"><b>Program</b></div>
+                                 <div class="col-md-2"><b>Participation Type</b></div>
+                                 <div class="col-md-1"><b>Request State</b></div>
+                             </div>
+                             {% for student_id, student_name, program, p_type, no, department, participant_state, grade, participant_id in dropped_students %}                             
+                             <div class="row">
+                                 <hr>
+                                 <div class="col-md-1">{{ no }}</div>
+                                 <div class="col-md-3">{{ student_name }}</div>
+                                 <div class="col-md-2">{{ department }}</div>
+                                 {% if program == 0 %}
+                                 <div class="col-md-1">Other</div>
+                                 {% elif program == 1 %}
+                                 <div class="col-md-1">M.Tech</div>
+                                 {% elif program == 2 %}
+                                 <div class="col-md-1">M.Sc</div>
+                                 {% elif program == 3 %}
+                                 <div class="col-md-1">Ph.D</div>
+                                 {% elif program == 4 %}
+                                 <div class="col-md-1">M.E.</div>
+                                 {% endif %}
+                                 {% if p_type == 0 %}
+                                 <div class="col-md-2">Credit</div>
+                                 {% else %}
+                                 <div class="col-md-2">Audit</div>
+                                 {% endif %}
+                                 <div class="col-md-1">{{ participant_state }}</div>
+                             </div>                             
+                             {% endfor %}
+                         </div>
+                     </div>
+                 </div>
 
         </div> <!-- /container -->
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>

@@ -200,6 +200,7 @@ def student_details_dcc(request):
            assert (user.department == student.department)
            student_name = student.full_name
            flag = 0
+           flag1 = 0
            no_course = 0
            participants = [
                (
@@ -216,6 +217,8 @@ def student_details_dcc(request):
                no_course = no_course + 1
                if (p[4] != 'Instructor approved' and p[4] != 'Instructor rejected' and p[4] != 'Advisor approved audit conversion' and p[4] != 'Advisor approved credit conversion' and p[4] != 'Advisor approved drop'):
                    flag = flag + 1
+               elif p[4] == 'Advisor approved drop':
+                   flag1 = 1
 
            context = {
                'student_id': current_student_id,
@@ -229,6 +232,7 @@ def student_details_dcc(request):
                'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
                                                        last_reg_date__lte=timezone.now()+timedelta(days=100)),
                'flag': flag,
+               'flag1': flag1,
                'no_course': no_course,
                'remarks': student.dcc_remarks,
            }
@@ -240,6 +244,42 @@ def student_details_dcc(request):
         messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
         log = logging.getLogger(__name__)
         log.warn("\n**************************************\nSUSPICIOUS_ACTIVITY::ATTEMPT TO MASQUERADE THE DCC by:"+str(request.user)+"\n"+str(request.META)+'\n\n')
+        return redirect('coursereg:index')
+
+@login_required
+def participant_dcc_act(request):
+    assert request.method == 'POST'
+
+    # Check if the requestor is DCC himself.
+    user = request.user
+    try:
+        assert (user.user_type == models.User.USER_TYPE_DCC)
+        participant = models.Participant.objects.get(id=request.POST['participant_id'])
+        current_student    = models.User.objects.get(id=request.POST['student_id'])
+        # Check if the student is in the same department as the DCC.
+        try:
+            assert (user.department == current_student.department)
+            student_name = current_student.full_name
+
+            assert participant.user_id == current_student.id
+            if participant.state == models.Participant.STATE_ADV_DROP_DONE:
+                participant.state = models.Participant.STATE_DCC_DROP_DONE
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.success(request, 'DCC approved the drop request of %s.' % req_info)
+            else:
+                messages.error(request, 'Unable to accept the drop request, please contact the admin.')
+
+            current_student.dcc_remarks = ''
+            current_student.save()
+
+            url = '/student_details_dcc/?student_id=' + str(current_student.id)
+            return redirect(url)
+        except:
+            messages.error(request, 'The DCC and the student are not from the same department. Possible data entry issue or bug. Please contact the admin.')
+            return redirect('coursereg:index')
+    except:
+        messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
         return redirect('coursereg:index')
 
 @login_required

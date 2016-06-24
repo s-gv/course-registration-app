@@ -88,51 +88,21 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">Registered Courses</h3>
                         </div>
-
-			<!--{% for advisee_id, advisee_name, course, participant_state, participant_type, action_required, participant_id in advisee_requests %}
-				{%ifequal advisee_name1 advisee_name %}
-
-				 <div class="row">
-				 	<div class="col-md-1">{{ course.id }}</div>
-                    <div class="col-md-4">{{ course }}</div>
- 				 	<div class="col-md-4">{{ participant_state }}</div>
-                     {% if participant_state == 'Requested' or  participant_state == 'Drop Requested'%}
-
-                    <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_act' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                         <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course.id }}">
-                                         <button type="submit" class="btn btn-primary btn-xs">Accept</button>
-                                     </form>
-                                 </div>
-
-                     <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}">
-                                         {% csrf_token %}
-                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                         <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
-                                         <input type="hidden" name="course_id" value="{{ course.id }}">
-                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
-                                     </form>
-                                 </div>
-                     {% else %}
-                     <div class="col-md-1"><b>NA</b></div>
-                     {% endif %}
-				 </div>
-
-				 <hr>
-				{% endifequal %}
-				{% endfor %}	-->
+			
                      <div class="panel-body">
-			             {% for course,state, grade, state_str, grade_str, deleteable, participant_id in participants %}
+			             {% for course, p_type, state, grade, state_str, grade_str, deleteable, participant_id in participants %}
                             <div class="row">
                                 {% if forloop.counter0 != 0 %}
                                 <hr>
                                 {% endif %}
                                 <div class="col-md-4">{{ course }}</div>
-
+                                
+                                {% if p_type == 0 %}
+                                 <div class="col-md-2">Credit</div>
+                                 {% else %}
+                                 <div class="col-md-2">Audit</div>
+                                 {% endif %}
+                                
                                 {% if grade == 0 %}
                                     {% if state == 0 or state == 7 or state == 13 or state == 16 or state == 21 or state == 26%}
                                 <div class="col-md-2">
@@ -175,19 +145,7 @@
                                 {% else %}
                                     <span class="label label-primary">{{ grade_str }} grade</span>
                                 {% endif %}
-                            <!--    </div>
-                                <div class="col-md-1">
-                                    {% if deleteable %}
-                                    <form class="form-inline" method="POST" action="{% url 'coursereg:participant_delete' %}">
-                                        {% csrf_token %}
-
-                                        <input type="hidden" name="participant_id" value="{{ participant_id }}">
-                                        <button type="submit" class="btn btn-danger btn-circle btn-xs">
-                                            <i class="glyphicon glyphicon-remove" aria-hidden="true"></i> Cancel
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                </div>-->
+                            
                             </div>
                             {% endfor %}
                         </div>
@@ -195,14 +153,13 @@
                 </div>
             </div>
             
-            {%if remarks != ' '%}
+            {% if remarks %}
             <div class="row">
                 <div class="col-md-12">
-                    <label>Remarks from DCC:</label>
-                            <div class="alert alert-danger">{{ remarks }}</div>
+                    <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
                 </div>
             </div>
-            {%endif%}
+            {% endif %}
             
         </div> <!-- /container -->
 
