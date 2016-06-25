@@ -11,18 +11,16 @@ from django.contrib.auth import update_session_auth_hash
 
 def get_desc(participant):
     if participant.state  == models.Participant.STATE_DROP:
-        return 'Dropped out of this course'
+        return 'Dropped this course'
     if not participant.is_adviser_approved:
         return 'Awaiting adviser review'
-    if participant.instructor_state == models.Participant.INSTRUCTOR_PENDING:
-        return 'Adviser has approved your application. Awaiting instructor review'
-    elif participant.instructor_state == models.Participant.INSTRUCTOR_REJECTED:
-        return 'Course instructor has rejected your application'
-    elif participant.instructor_state == models.Participant.INSTRUCTOR_APPROVED:
-        if participant.grade != models.Participant.GRADE_NA:
-            return participant.grade + ' grade'
-        else:
-            return 'Enrolled in course'
+    if not participant.is_instructor_approved:
+        return 'Adviser has approved. Awaiting instructor review'
+    if participant.grade == models.Participant.GRADE_NA:
+        return 'Enrolled in course'
+    else:
+        return models.Participant.GRADE_CHOICES[participant.grade][1] + ' grade'
+    return 'Unknown state'
 
 @login_required
 def index(request):
@@ -30,8 +28,14 @@ def index(request):
         messages.error(request, 'Adviser not assigned. Contact the administrator.')
         return redirect('coursereg:fatal')
 
-    participants = [(p.id, p.state, p.course, get_desc(p), not p.is_adviser_approved)
-        for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]
+    participants = [(
+        p.id,
+        p.state == models.Participant.STATE_CREDIT,
+        p.state == models.Participant.STATE_AUDIT,
+        p.state == models.Participant.STATE_DROP,
+        p.course, get_desc(p),
+        not p.is_adviser_approved
+    ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]
 
     context = {
         'user_type': 'student',
@@ -39,6 +43,8 @@ def index(request):
 		'user_email': request.user.email,
         'user_id': request.user.id,
         'participants': participants,
+        'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
+            for n in models.Notification.objects.filter(user=request.user, is_student_acknowledged=False).order_by('-created_at')],
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
                                                 last_reg_date__lte=timezone.now()+timedelta(days=100))
     }

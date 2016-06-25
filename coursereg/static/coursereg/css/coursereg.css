@@ -6,6 +6,11 @@
     margin-bottom: 50px;
 }
 
+#dismiss {
+    margin-top: 10px;
+    margin-left: 40px;
+}
+
 .btn-circle {
   width: 20px;
   height: 20px;

@@ -4,5 +4,5 @@
 *.tmp*
 *.rar
 *.zip
-logfile
+logfile*
 

@@ -12,7 +12,7 @@ class ParticipantInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
+    fields = ('user', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -23,7 +23,7 @@ class CourseInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
+    fields = ('course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):
@@ -61,7 +61,7 @@ class CustomUserAdmin(UserAdmin):
     clear_dcc_review.short_description = "Clear DCC review"
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('num', 'title', 'department', 'last_reg_date')
+    list_display = ('num', 'title', 'department', 'last_reg_date', 'last_drop_date')
     ordering = ('-last_reg_date', 'department__name', 'num', 'title')
     search_fields = ('title', 'num', 'last_reg_date')
     inlines = [ParticipantInline]
@@ -93,17 +93,17 @@ class CourseAdmin(admin.ModelAdmin):
                         state=participant.state,
                         grade=participant.grade,
                         is_adviser_approved=participant.is_adviser_approved,
-                        instructor_state=participant.instructor_state
+                        is_instructor_approved=participant.is_instructor_approved
                     )
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
+    list_display = ('user', 'course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
     ordering = ('-course__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'state', 'course__last_reg_date', 'is_adviser_approved', 'instructor_state')
+    list_filter = ('participant_type', 'state', 'course__last_reg_date', 'is_adviser_approved', 'is_instructor_approved')
 
 class FaqAdmin(admin.ModelAdmin):
     list_display = ('question', 'faq_for')
@@ -119,10 +119,10 @@ class DegreeAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'origin', 'message', 'is_acknowledged', 'created_at')
+    list_display = ('user', 'origin', 'message', 'is_student_acknowledged', 'is_adviser_acknowledged', 'created_at')
     ordering = ('-created_at', 'user__full_name')
     search_fields = ('user', 'origin', 'message')
-    list_filter = ('origin', 'is_acknowledged', 'created_at')
+    list_filter = ('origin', 'is_student_acknowledged', 'is_adviser_acknowledged', 'created_at')
     raw_id_fields = ('user', )
     readonly_fields = ('created_at',)
 

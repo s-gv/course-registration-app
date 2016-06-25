@@ -36,7 +36,7 @@ def create(request):
                 state=state,
                 grade=models.Participant.GRADE_NA,
                 is_adviser_approved=False,
-                instructor_state=models.Participant.INSTRUCTOR_PENDING
+                is_instructor_approved=False
             )
             messages.success(request, 'Successfully applied for %s.' % course)
 

@@ -89,7 +89,8 @@ class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     origin = models.IntegerField(default=ORIGIN_DCC, choices=ORIGIN_CHOICES)
     message = models.TextField()
-    is_acknowledged = models.BooleanField(default=False)
+    is_student_acknowledged = models.BooleanField(default=False)
+    is_adviser_acknowledged = models.BooleanField(default=False)
     created_at = models.DateField(auto_now_add=True)
 
 
@@ -110,6 +111,7 @@ class Course(models.Model):
     title = models.CharField(max_length=200)
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
     last_reg_date = models.DateField(verbose_name="Last Registration Date", default=timezone.now)
+    last_drop_date = models.DateField(verbose_name="Last Drop Date", default=timezone.now)
     credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
@@ -139,18 +141,6 @@ class Participant(models.Model):
         (STATE_DROP, 'Drop'),
     )
 
-    INSTRUCTOR_PENDING = 0
-    INSTRUCTOR_APPROVED = 1
-    INSTRUCTOR_REJECTED = 2
-    INSTRUCTOR_NA = 3
-
-    INSTRUCTOR_STATE_CHOICES = (
-        (INSTRUCTOR_PENDING, 'Pending'),
-        (INSTRUCTOR_APPROVED, 'Approved'),
-        (INSTRUCTOR_REJECTED, 'Rejected'),
-        (INSTRUCTOR_NA, 'N/A'),
-    )
-
     GRADE_NA = 0
     GRADE_S = 1
     GRADE_A = 2
@@ -175,7 +165,7 @@ class Participant(models.Model):
     state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
     grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
     is_adviser_approved = models.BooleanField(default=False)
-    instructor_state = models.IntegerField(default=INSTRUCTOR_NA, choices=INSTRUCTOR_STATE_CHOICES)
+    is_instructor_approved = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)

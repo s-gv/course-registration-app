@@ -23,10 +23,28 @@
             </div>
         </div>
     </div>
-    {% if remarks %}
+    {% if notifications %}
+
     <div class="row">
         <div class="col-md-12">
-            <div class="alert alert-warning"><strong>DCC remarks:</strong> {{ remarks }}</div>
+            <div class="alert alert-warning">
+                <ul>
+                {% for date, origin, message in notifications %}
+                <li>
+                    <strong>
+                        {{ date }}: {{ origin }} -
+                    </strong>
+                    {{ message }}
+                </li>
+                {% endfor %}
+                </ul>
+                <div id="dismiss">
+                    <form action="{% url 'coursereg:notifications_dismiss' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-xs">Dismiss</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -57,17 +75,17 @@
         </div>
     </div>
     {% if messages %}
-        {% for message in messages %}
-            <div class="row top-buffer-1">
-                <div class="col-md-12">
-                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                    <div class="alert alert-danger" role="alert">{{ message }}</div>
-                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-                    <div class="alert alert-success" role="alert">{{ message }}</div>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
     {% endif %}
     <div class="row top-buffer-1">
         <div class="panel panel-default">
@@ -75,21 +93,27 @@
                 <h3 class="panel-title">Registered Courses</h3>
             </div>
             <ul class="list-group">
-                {% for participant_id, state, course, desc, deleteable in participants %}
+                {% for participant_id, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
                 <li class="list-group-item">
-                    {% if state == 1 %}
+                    {% if is_credit %}
                     <div title="Credit" class="credit-bg pull-left">C</div>
-                    {% else %}
+                    {% elif is_audit  %}
                     <div title="Audit" class="audit-bg pull-left">A</div>
+                    {% elif is_drop %}
+                    <div title="Dropped" class="audit-bg pull-left">D</div>
                     {% endif %}
+
                     <div title="Remove" class="pull-right" style="width:30px; margin-top: 8px;">
+                        {% if deleteable %}
                         <form action="{% url 'coursereg:participants_delete' participant_id %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-xs btn-circle">
                                 <small><span class="glyphicon glyphicon-remove"></span></small>
                             </button>
                         </form>
+                        {% endif %}
                     </div>
+
                     <div class="row courserow">
                         <div class="col-md-5">
                             {{ course }}

@@ -56,7 +56,7 @@ def profile(request):
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
         context['user_type'] = 'student'
         context['adviser_full_name'] = request.user.adviser.full_name
-        context['degree'] = models.User.DEGREE_CHOICES[request.user.degree][1]
+        context['degree'] = request.user.degree
         context['department'] = request.user.department
         context['sr_no'] = request.user.sr_no
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
