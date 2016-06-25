@@ -1,0 +1,45 @@
+.top-buffer-1 {
+    margin-top: 20px;
+}
+
+#maincontainer {
+    margin-bottom: 50px;
+}
+
+.btn-circle {
+    border-radius: 50% !important;
+}
+
+.credit-bg {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    -moz-border-radius: 18px;
+    -webkit-border-radius: 18px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 36px;
+    text-align: center;
+    background:  #4caf50;
+}
+
+.audit-bg {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    -moz-border-radius: 18px;
+    -webkit-border-radius: 18px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 36px;
+    text-align: center;
+    background: #ccc;
+}
+
+.courserow {
+    margin-top: 8px;
+    margin-left: 36px;
+    margin-right: 20px;
+}

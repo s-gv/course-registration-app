@@ -1,0 +1,65 @@
+{% extends "coursereg/base.html" %}
+
+{% block body %}
+{% include "coursereg/nav.html" %}
+<div class="container" id="maincontainer">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>{{ user_full_name }}</h1>
+            </div>
+            {% if user_type == 'student' %}
+            <p>Adviser: {{ adviser_full_name }}</p>
+            <p>Program: {{ program }}</p>
+            <p>Department: {{ department }}</p>
+            <p>Sr No: {{ sr_no }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row top-buffer-1">
+        <div class="col-md-4">
+            <h3>Password</h3>
+        </div>
+    </div>
+    <div class="row top-buffer-1">
+        <div class="col-md-4">
+            <form method="post" action="{% url 'coursereg:change_passwd' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'coursereg:profile' %}">
+                <div class="form-group">
+                    <label for="inputPassword" class="sr-only">Current password</label>
+                    <input type="password" class="form-control" id="inputPassword" name="passwd" placeholder="Current password">
+                </div>
+                <div class="form-group">
+                    <label for="inputNewPassword" class="sr-only">New password</label>
+                    <input type="password" class="form-control" id="inputNewPassword" name="newpasswd" placeholder="New password">
+                </div>
+                <div class="form-group">
+                    <label for="inputNewPasswordAgain" class="sr-only">Verify password</label>
+                    <input type="password" class="form-control" id="inputNewPasswordAgain" name="newpasswd2" placeholder="New password again">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="row top-buffer-1">
+                <div class="col-md-12">
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                    <div class="alert alert-warning" role="alert">{{ message }}</div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                    <div class="alert alert-success" role="alert">{{ message }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div> <!-- /container -->
+{% endblock %}

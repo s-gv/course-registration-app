@@ -1,5 +1,7 @@
-from . import faculty
 from . import user
-from . import light_admin
-from . import misc
+from . import common
+from . import participants
+
+from . import faculty
 from . import student
+from . import dcc

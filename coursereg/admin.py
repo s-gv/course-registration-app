@@ -12,7 +12,7 @@ class ParticipantInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'state')
+    fields = ('user', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -23,13 +23,13 @@ class CourseInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'state', 'grade')
+    fields = ('course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active', 'dcc_remarks')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active', 'dcc_remarks', 'is_dcc_review_pending')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
@@ -40,13 +40,13 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'date_joined', 'is_active')
-    list_filter = ('is_active', 'user_type', 'program')
+    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'is_active', 'is_dcc_review_pending')
+    list_filter = ('is_active', 'user_type', 'program', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
     ordering = ('-date_joined',)
     inlines = [CourseInline]
-    actions = ['make_inactive', 'make_active']
+    actions = ['make_inactive', 'make_active', 'clear_dcc_review']
 
     def make_inactive(self, request, queryset):
         queryset.update(is_active=False)
@@ -55,6 +55,10 @@ class CustomUserAdmin(UserAdmin):
     def make_active(self, request, queryset):
         queryset.update(is_active=True)
     make_active.short_description = "Activate selected users"
+
+    def clear_dcc_review(self, request, queryset):
+        queryset.update(is_dcc_review_pending=False)
+    clear_dcc_review.short_description = "Clear DCC review"
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date')
@@ -87,27 +91,19 @@ class CourseAdmin(admin.ModelAdmin):
                         course=new_course,
                         participant_type=participant.participant_type,
                         state=participant.state,
-                        grade=participant.grade
+                        grade=participant.grade,
+                        is_adviser_approved=participant.is_adviser_approved,
+                        instructor_state=participant.instructor_state
                     )
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'state', 'grade')
+    list_display = ('user', 'course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'instructor_state')
     ordering = ('-course__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'state', 'course__last_reg_date')
-    actions = ['final_approve']
-
-    def final_approve(self, request, queryset):
-        for participant in queryset:
-            ptype = participant.participant_type
-            if ptype == Participant.PARTICIPANT_CREDIT or ptype == Participant.PARTICIPANT_AUDIT:
-                participant.state = Participant.STATE_FINAL_APPROVED
-                participant.save()
-
-    final_approve.short_description = "Final approve selected students"
+    list_filter = ('participant_type', 'state', 'course__last_reg_date', 'is_adviser_approved', 'instructor_state')
 
 class FaqAdmin(admin.ModelAdmin):
     list_display = ('question', 'faq_for')

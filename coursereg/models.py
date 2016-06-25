@@ -31,11 +31,17 @@ class Department(models.Model):
         return self.name
 
 class User(AbstractBaseUser, PermissionsMixin):
-    USER_TYPE_FACULTY = 0
-    USER_TYPE_STUDENT = 1
-    USER_TYPE_OTHER = 2
-    USER_TYPE_DCC = 3
-    #USER_TYPE_ADMIN = 3
+    USER_TYPE_STUDENT = 0
+    USER_TYPE_FACULTY = 1
+    USER_TYPE_DCC = 2
+    USER_TYPE_OTHER = 3
+
+    USER_CHOICES = (
+        (USER_TYPE_STUDENT, "Student"),
+        (USER_TYPE_FACULTY, "Faculty"),
+        (USER_TYPE_DCC, "DCC"),
+        (USER_TYPE_OTHER, "Other"),
+    )
 
     PROGRAM_OTHER = 0
     PROGRAM_MTECH = 1
@@ -53,18 +59,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=254, unique=True)
     full_name = models.CharField(max_length=250)
-    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=(
-        (USER_TYPE_FACULTY, "Faculty"),
-        (USER_TYPE_STUDENT, "Student"),
-        (USER_TYPE_OTHER, "Other"),
-        (USER_TYPE_DCC, "DCC"),
-    ))
+    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=USER_CHOICES)
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
     program = models.IntegerField(default=PROGRAM_OTHER, choices=PROGRAM_CHOICES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
     dcc_remarks = models.TextField(default='', blank=True)
+    is_dcc_review_pending = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -105,16 +107,38 @@ class Course(models.Model):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
 
 class Participant(models.Model):
-    PARTICIPANT_CREDIT = 0
-    PARTICIPANT_AUDIT = 1
-    PARTICIPANT_INSTRUCTOR = 2
-    PARTICIPANT_TA = 3
+    PARTICIPANT_STUDENT = 0
+    PARTICIPANT_INSTRUCTOR = 1
+    PARTICIPANT_TA = 2
 
     PARTICIPANT_CHOICES = (
-        (PARTICIPANT_CREDIT, 'Credit'),
-        (PARTICIPANT_AUDIT, 'Audit'),
+        (PARTICIPANT_STUDENT, 'Student'),
         (PARTICIPANT_INSTRUCTOR, 'Instructor'),
         (PARTICIPANT_TA, 'TA'),
+    )
+
+    STATE_NA = 0
+    STATE_CREDIT = 1
+    STATE_AUDIT = 2
+    STATE_DROP = 3
+
+    STATE_CHOICES = (
+        (STATE_NA, 'N/A'),
+        (STATE_CREDIT, 'Credit'),
+        (STATE_AUDIT, 'Audit'),
+        (STATE_DROP, 'Drop'),
+    )
+
+    INSTRUCTOR_PENDING = 0
+    INSTRUCTOR_APPROVED = 1
+    INSTRUCTOR_REJECTED = 2
+    INSTRUCTOR_NA = 3
+
+    INSTRUCTOR_STATE_CHOICES = (
+        (INSTRUCTOR_PENDING, 'Pending'),
+        (INSTRUCTOR_APPROVED, 'Approved'),
+        (INSTRUCTOR_REJECTED, 'Rejected'),
+        (INSTRUCTOR_NA, 'N/A'),
     )
 
     GRADE_NA = 0
@@ -135,71 +159,13 @@ class Participant(models.Model):
         (GRADE_F, 'F'),
     )
 
-    STATE_REQUESTED = 0
-    STATE_ADVISOR_DONE = 1
-    STATE_INSTRUCTOR_DONE = 2
-    STATE_FINAL_APPROVED = 3
-    STATE_NA = 4
-    STATE_ADVISOR_REJECT =5
-    STATE_INSTRUCTOR_REJECT = 6
-    STATE_DROP_REQUESTED = 7 # Drop choice is after DCC Approval
-    STATE_ADV_DROP_DONE = 8
-    STATE_ADV_DROP_REJECT = 9
-    STATE_FINAL_DISAPPROVED= 10   # NOT USED?
-    STATE_DCC_DROP_DONE = 11
-    STATE_DCC_DROP_REJECT = 12  # NOT USED ?
-    STATE_CANCEL_REQUESTED = 13 # Cancel choice is before DCC Approval
-    STATE_ADV_CANCEL_DONE = 14
-    STATE_ADV_CANCEL_REJECT = 15
-    STATE_AUDIT_REQUESTED = 16  # Credit to audit conversion
-    STATE_ADV_AUDIT_DONE = 17
-    STATE_ADV_AUDIT_REJECT = 18
-    STATE_DCC_AUDIT_DONE = 19   # NOT USED?
-    STATE_DCC_AUDIT_REJECT = 20 # NOT USED?
-    STATE_CREDIT_REQUESTED = 21 # Audit to credit conversion
-    STATE_ADV_CREDIT_DONE = 22
-    STATE_ADV_CREDIT_REJECT = 23
-    STATE_DCC_CREDIT_DONE = 24 # NOT USED?
-    STATE_DCC_CREDIT_REJECT = 25 # NOT USED?
-    STATE_CANCEL_REQUESTED_1 = 26
-
-
-
-    STATE_CHOICES = (
-        (STATE_REQUESTED, 'Requested'),
-        (STATE_ADVISOR_DONE, 'Advisor approved'),
-        (STATE_INSTRUCTOR_DONE, 'Instructor approved'),
-        (STATE_FINAL_APPROVED, 'Registered'),
-        (STATE_NA, 'N/A'),
-        (STATE_ADVISOR_REJECT, 'Advisor rejected'),
-        (STATE_INSTRUCTOR_REJECT, 'Instructor rejected'),
-	    (STATE_DROP_REQUESTED, 'Drop Requested'),
-        (STATE_ADV_DROP_DONE, 'Advisor approved drop'),
-        (STATE_ADV_DROP_REJECT, 'Advisor rejected drop'),
-        (STATE_FINAL_DISAPPROVED, 'DCC disapproved'),  # DCC FINAL REJECT
-        (STATE_DCC_DROP_DONE, 'DCC drop approved'),
-        (STATE_DCC_DROP_REJECT, 'DCC drop rejected'),
-        (STATE_CANCEL_REQUESTED, 'Cancel requested'),
-        (STATE_ADV_CANCEL_DONE, 'Advisor approved cancellation'),
-        (STATE_ADV_CANCEL_REJECT, 'Advisor rejected cancellation'),
-		(STATE_AUDIT_REQUESTED, 'Audit conversion requested'),  # Credit to audit conversion
-		(STATE_ADV_AUDIT_DONE, 'Advisor approved audit conversion'),
-		(STATE_ADV_AUDIT_REJECT,'Advisor rejected audit conversion'),
-		(STATE_DCC_AUDIT_DONE,  'DCC approved audit conversion'),
-		(STATE_DCC_AUDIT_REJECT, 'DCC rejected audit conversion'),
-		(STATE_CREDIT_REQUESTED, 'Credit conversion requested' ), # Audit to credit conversion
-		(STATE_ADV_CREDIT_DONE, 'Advisor approved credit conversion' ),
-		(STATE_ADV_CREDIT_REJECT, 'Advisor rejects credit conversion') ,
-		(STATE_DCC_CREDIT_DONE, 'DCC approved credit conversion' ),
-		(STATE_DCC_CREDIT_REJECT, 'DCC rejected credit conversion'),
-        (STATE_CANCEL_REQUESTED_1, 'Cancel requested'),
-    )
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
     state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
     grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
+    is_adviser_approved = models.BooleanField(default=False)
+    instructor_state = models.IntegerField(default=INSTRUCTOR_NA, choices=INSTRUCTOR_STATE_CHOICES)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)

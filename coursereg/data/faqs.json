@@ -12,7 +12,7 @@
     {
         "faq_for": "student",
         "question": "How do I drop a course?",
-        "answer": "Click on the actions menu at the right of each row in the courses panel and drop the course."
+        "answer": "Ask your ad to log in to this website and drop the course you no longer wish to continue."
     },
     {
         "faq_for": "faculty",
@@ -21,7 +21,7 @@
     },
     {
         "faq_for": "dcc",
-        "question": "Can the advisor see remarks that I make?",
-        "answer": "Yes, both the student and the advisor can see your remarks."
+        "question": "Can the adviser see remarks that I make?",
+        "answer": "Yes, both the student and the adviser can see your remarks."
     }
 ]

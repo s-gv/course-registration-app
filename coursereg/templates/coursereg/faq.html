@@ -1,0 +1,32 @@
+{% extends "coursereg/base.html" %}
+
+{% block body %}
+{% include "coursereg/nav.html" %}
+<div class="container" id="maincontainer">
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <div class="jumbotron">
+                <div class="page-header"><h1>Questions?</h1></div>
+                <div class="panel-group" id="accordion">
+                    {% for faq in faqs %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter0 }}">
+                                    {{ faq.question }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse{{ forloop.counter0 }}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                {{ faq.answer }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
