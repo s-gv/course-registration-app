@@ -119,10 +119,10 @@ class DegreeAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'origin', 'message', 'is_student_acknowledged', 'is_adviser_acknowledged', 'created_at')
+    list_display = ('user', 'origin', 'message', 'is_student_acknowledged', 'is_adviser_acknowledged', 'is_dcc_acknowledged', 'created_at')
     ordering = ('-created_at', 'user__full_name')
     search_fields = ('user', 'origin', 'message')
-    list_filter = ('origin', 'is_student_acknowledged', 'is_adviser_acknowledged', 'created_at')
+    list_filter = ('origin', 'is_student_acknowledged', 'is_adviser_acknowledged', 'is_dcc_acknowledged', 'created_at')
     raw_id_fields = ('user', )
     readonly_fields = ('created_at',)
 

@@ -91,6 +91,7 @@ class Notification(models.Model):
     message = models.TextField()
     is_student_acknowledged = models.BooleanField(default=False)
     is_adviser_acknowledged = models.BooleanField(default=False)
+    is_dcc_acknowledged = models.BooleanField(default=False)
     created_at = models.DateField(auto_now_add=True)
 
 
