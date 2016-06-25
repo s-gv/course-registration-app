@@ -1,6 +1,12 @@
 .top-buffer-1 {
     margin-top: 20px;
 }
+.top-buffer-2 {
+    margin-top: 40px;
+}
+.top-buffer-4 {
+    margin-top: 80px;
+}
 
 #maincontainer {
     margin-bottom: 50px;

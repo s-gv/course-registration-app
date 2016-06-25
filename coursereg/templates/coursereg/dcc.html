@@ -1,0 +1,31 @@
+{% extends "coursereg/base.html" %}
+
+{% block body %}
+{% include "coursereg/nav.html" %}
+<div class="container" id="maincontainer">
+    <div class="page-header">
+        <h2>Review pending</h2>
+    </div>
+    {% if pending_students %}
+        {% for name, email, id in pending_students %}
+        <div class="row">
+            <div class="col-md-12">
+                {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_students_read' id %}">{{ name }}</a> ({{ email }})
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h2><small>No students pending review</small></h2>
+    {% endif %}
+    <div class="page-header">
+        <h2>All active students</h2>
+    </div>
+    {% for name, email, id in all_active_students %}
+    <div class="row">
+        <div class="col-md-12">
+            {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_students_read' id %}">{{ name }}</a> ({{ email }})
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

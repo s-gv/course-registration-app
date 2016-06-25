@@ -51,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=254, unique=True)
     full_name = models.CharField(max_length=250)
-    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=USER_TYPE_CHOICES)
+    user_type = models.IntegerField(default=USER_TYPE_OTHER, choices=USER_TYPE_CHOICES)
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
     degree = models.ForeignKey(Degree, on_delete=models.CASCADE, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)

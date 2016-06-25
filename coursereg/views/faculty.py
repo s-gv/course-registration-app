@@ -11,5 +11,6 @@ from coursereg import models
 from django.contrib.auth import update_session_auth_hash
 import logging
 
+@login_required
 def index(request):
     pass

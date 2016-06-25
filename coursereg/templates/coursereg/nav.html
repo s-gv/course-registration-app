@@ -12,7 +12,7 @@
         <div id="navbar" class="navbar-collapse collapse">
             <p class="navbar-text navbar-left"></p>
             <ul class="nav navbar-nav navbar-right">
-                {% if user_type == 'student' %}
+                {% if user_type == 'student' or user_type == 'dcc' %}
                     {% if nav_active == 'home' %}
                     <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
                     {% else %}

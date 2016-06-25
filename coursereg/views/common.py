@@ -28,6 +28,7 @@ def fatal_error(request):
     context = {}
     return render(request, 'coursereg/fatal.html', context)
 
+@login_required
 def faq(request):
     context = {
         'nav_active': 'faq',
@@ -47,6 +48,7 @@ def faq(request):
 
     return render(request, 'coursereg/faq.html', context)
 
+@login_required
 def profile(request):
     context = {
         'nav_active': 'profile',
