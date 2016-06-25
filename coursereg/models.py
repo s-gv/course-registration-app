@@ -30,42 +30,33 @@ class Department(models.Model):
     def __unicode__(self):
         return self.name
 
+class Degree(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_STUDENT = 0
     USER_TYPE_FACULTY = 1
     USER_TYPE_DCC = 2
     USER_TYPE_OTHER = 3
 
-    USER_CHOICES = (
+    USER_TYPE_CHOICES = (
         (USER_TYPE_STUDENT, "Student"),
         (USER_TYPE_FACULTY, "Faculty"),
         (USER_TYPE_DCC, "DCC"),
         (USER_TYPE_OTHER, "Other"),
     )
 
-    PROGRAM_OTHER = 0
-    PROGRAM_MTECH = 1
-    PROGRAM_MSC = 2
-    PROGRAM_PHD = 3
-    PROGRAM_ME = 4
-
-    PROGRAM_CHOICES = (
-        (PROGRAM_OTHER, 'Other'),
-        (PROGRAM_MTECH, 'MTech'),
-        (PROGRAM_MSC, 'MSc'),
-        (PROGRAM_PHD, 'PhD'),
-        (PROGRAM_ME, 'ME'),
-    )
-
     email = models.EmailField(max_length=254, unique=True)
     full_name = models.CharField(max_length=250)
-    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=USER_CHOICES)
+    user_type = models.IntegerField(default=USER_TYPE_STUDENT, choices=USER_TYPE_CHOICES)
     adviser = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, limit_choices_to={'user_type': USER_TYPE_FACULTY})
-    program = models.IntegerField(default=PROGRAM_OTHER, choices=PROGRAM_CHOICES)
+    degree = models.ForeignKey(Degree, on_delete=models.CASCADE, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
-    dcc_remarks = models.TextField(default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
@@ -81,6 +72,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.full_name.strip()
+
+class Notification(models.Model):
+    ORIGIN_ADVISER = 0
+    ORIGIN_INSTRUCTOR = 1
+    ORIGIN_DCC = 2
+    ORIGIN_OTHER = 3
+
+    ORIGIN_CHOICES = (
+        (ORIGIN_ADVISER, 'Adviser'),
+        (ORIGIN_INSTRUCTOR, 'Instructor'),
+        (ORIGIN_DCC, 'DCC'),
+        (ORIGIN_OTHER, 'Other')
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    origin = models.IntegerField(default=ORIGIN_DCC, choices=ORIGIN_CHOICES)
+    message = models.TextField()
+    is_acknowledged = models.BooleanField(default=False)
+    created_at = models.DateField(auto_now_add=True)
 
 
 class Course(models.Model):

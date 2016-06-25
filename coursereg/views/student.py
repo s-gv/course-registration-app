@@ -40,7 +40,6 @@ def index(request):
         'user_id': request.user.id,
         'participants': participants,
         'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
-                                                last_reg_date__lte=timezone.now()+timedelta(days=100)),
-        'remarks': request.user.dcc_remarks,
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100))
     }
     return render(request, 'coursereg/student.html', context)

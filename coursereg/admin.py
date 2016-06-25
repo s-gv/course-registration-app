@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant, Faq, Department
+from .models import User, Course, Participant, Faq, Department, Degree, Notification
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
@@ -29,19 +29,19 @@ class CourseInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'is_active', 'dcc_remarks', 'is_dcc_review_pending')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'is_active', 'is_dcc_review_pending')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'program', 'sr_no', 'date_joined')}
+            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'date_joined')}
         ),
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'program', 'sr_no', 'is_active', 'is_dcc_review_pending')
-    list_filter = ('is_active', 'user_type', 'program', 'is_dcc_review_pending')
+    list_display = ('email', 'full_name', 'user_type', 'degree', 'sr_no', 'is_active', 'is_dcc_review_pending')
+    list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
     ordering = ('-date_joined',)
@@ -114,8 +114,22 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', )
     search_fields = ('name', )
 
+class DegreeAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    search_fields = ('name', )
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'origin', 'message', 'is_acknowledged', 'created_at')
+    ordering = ('-created_at', 'user__full_name')
+    search_fields = ('user', 'origin', 'message')
+    list_filter = ('origin', 'is_acknowledged', 'created_at')
+    raw_id_fields = ('user', )
+    readonly_fields = ('created_at',)
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Faq, FaqAdmin)
 admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Degree, DegreeAdmin)
+admin.site.register(Notification, NotificationAdmin)
