@@ -5,7 +5,147 @@
 <div class="container" id="maincontainer">
     <div class="row top-buffer-1">
         <div class="col-md-12">
+            <div class="page-header">
+                <h1>{{ student.full_name }}</h1>
+            </div>
+            <p>Degree: {{ student.degree }}</p>
+            <p>Adviser: {{ student.adviser.full_name }}</p>
+            <p>Department: {{ student.department }}</p>
+            <p>Sr No: {{ student.sr_no }}</p>
+            <p>E-mail: {{ student.email }}</p>
+            <p>Join date: {{ student.date_joined|date:'N j, Y' }}</p>
         </div>
     </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if notifications %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <ul>
+                {% for date, origin, message in notifications %}
+                <li>
+                    <strong>
+                        {{ date }}: {{ origin }} -
+                    </strong>
+                    {{ message }}
+                </li>
+                {% endfor %}
+                </ul>
+                <div id="dismiss">
+                    <form action="{% url 'coursereg:notifications_dismiss' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ student.id }}">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="btn btn-danger btn-xs">Dismiss</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if participants %}
+    <div class="row top-buffer-1">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Courses</h3>
+            </div>
+            <ul class="list-group">
+                {% for participant, desc in participants %}
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-md-4 col-xs-12">
+                                    {{ participant.course }}
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <p class="text-muted">
+                                        {{ desc }}
+                                    </p>
+                                </div>
+                                <div class="col-md-2 col-xs-12">
+                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <input type="hidden" name="origin" value="adviser">
+                                        <input type="hidden" name="action" value="state_change">
+                                        <div class="form-group">
+                                            {% if participant.grade == 0 %}
+                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
+                                            {% else %}
+                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()" disabled>
+                                            {% endif %}
+                                                {% if participant.state == 1 %}
+                                                <option value="1" selected>Credit</option>
+                                                {% else %}
+                                                <option value="1">Credit</option>
+                                                {% endif %}
+
+                                                {% if participant.state == 2 %}
+                                                <option value="2" selected>Audit</option>
+                                                {% else %}
+                                                <option value="2">Audit</option>
+                                                {% endif %}
+
+                                                {% if participant.state == 3 %}
+                                                <option value="3" selected>Dropped</option>
+                                                {% else %}
+                                                <option value="3">Dropped</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-2 col-xs-12">
+                                    {% if participant.grade == 0 %}
+                                    <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <input type="hidden" name="origin" value="adviser">
+                                        {% if not participant.is_adviser_approved %}
+                                        <button type="submit" class="btn btn-xs btn-success" name="action" value="approve">Approve</button>
+                                        <button type="submit" class="btn btn-xs btn-danger" name="action" value="delete" style="margin-left: 20px;">Delete</button>
+                                        {% else %}
+                                        <button type="submit" class="btn btn-xs btn-danger" name="action" value="delete">Delete</button>
+                                        {% endif %}
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <form action="{% url 'coursereg:participants_approve_all' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden" name="student_id" value="{{ student.id }}">
+                <input type="hidden" name="origin" value="adviser">
+                <button type="submit" class="btn btn-success">Approve all</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

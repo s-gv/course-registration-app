@@ -18,6 +18,8 @@ def dismiss(request):
     if request.user.user_type == models.User.USER_TYPE_DCC:
         assert user.department == request.user.department
         models.Notification.objects.filter(user=user).update(is_dcc_acknowledged=True)
+    elif request.user.user_type == models.User.USER_TYPE_FACULTY:
+        models.Notification.objects.filter(user=user).update(is_adviser_acknowledged=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required

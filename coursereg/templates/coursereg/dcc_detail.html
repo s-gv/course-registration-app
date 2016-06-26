@@ -13,8 +13,26 @@
             <p>Department: {{ student.department }}</p>
             <p>Sr No: {{ student.sr_no }}</p>
             <p>E-mail: {{ student.email }}</p>
+            <p>Join date: {{ student.date_joined|date:'N j, Y' }}</p>
         </div>
     </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% if notifications %}
     <div class="row top-buffer-1">
         <div class="col-md-12">

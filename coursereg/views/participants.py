@@ -57,12 +57,28 @@ def update(request, participant_id):
         elif request.POST['action'] == 'grade':
             participant.grade = int(request.POST['grade'])
             participant.save()
+    elif request.POST['origin'] == 'adviser':
+        if request.POST['action'] == 'state_change':
+            participant.state = request.POST['state']
+            participant.save()
+        elif request.POST['action'] == 'approve':
+            participant.is_adviser_approved = True
+            participant.save()
+        elif request.POST['action'] == 'delete':
+            models.Notification.objects.create(user=participant.user,
+                                               origin=models.Notification.ORIGIN_ADVISER,
+                                               message='Rejected application for %s' % participant.course)
+            participant.delete()
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required
 def approve_all(request):
-    course = models.Course.objects.get(id=request.POST['course_id'])
-    models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
+    if request.POST['origin'] == 'adviser':
+        student = models.User.objects.get(id=request.POST['student_id'])
+        models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
+    elif request.POST['origin'] == 'instructor':
+        course = models.Course.objects.get(id=request.POST['course_id'])
+        models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required

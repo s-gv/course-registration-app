@@ -20,7 +20,7 @@
                     {% endif %}
                 {% endif %}
                 {% if user_type == 'faculty' %}
-                    {% if nav_active == 'advisees' %}
+                    {% if nav_active == 'adviser' %}
                     <li class="active"><a href="{% url 'coursereg:adviser' %}">Adviser</a></li>
                     {% else %}
                     <li><a href="{% url 'coursereg:adviser' %}">Adviser</a></li>
