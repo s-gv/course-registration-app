@@ -20,29 +20,43 @@
     </div>
     {% endfor %}
     {% endif %}
-    <div class="page-header">
-        <h2>Review pending</h2>
-    </div>
-    {% if pending_students %}
-        {% for name, email, id in pending_students %}
-        <div class="row">
-            <div class="col-md-12">
-                {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})
-            </div>
-        </div>
-        {% endfor %}
-    {% else %}
-        <h2><small>No students pending review</small></h2>
-    {% endif %}
-    <div class="page-header">
-        <h2>All active students</h2>
-    </div>
-    {% for name, email, id in all_active_students %}
     <div class="row">
         <div class="col-md-12">
-            {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})
+            <h2>Review pending</h2>
         </div>
     </div>
-    {% endfor %}
+    {% if pending_students %}
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                {% for name, email, id in pending_students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <h2><small>No students pending review</small></h2>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2>All active students</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+            {% for name, email, id in all_active_students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})</td>
+            </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

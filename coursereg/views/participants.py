@@ -14,7 +14,6 @@ def create(request):
     course_id = request.POST['course_id']
     user_id = request.POST['user_id']
     reg_type = request.POST['reg_type']
-    assert str(user_id) == str(request.user.id)
 
     state = models.Participant.STATE_CREDIT
     if reg_type == 'audit':
@@ -35,12 +34,11 @@ def create(request):
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
                 state=state,
                 grade=models.Participant.GRADE_NA,
-                is_adviser_approved=False,
+                is_adviser_approved=request.POST['origin'] == 'adviser',
                 is_instructor_approved=False
             )
-            messages.success(request, 'Successfully applied for %s.' % course)
 
-    return redirect(request.GET.get('next', reverse('coursereg:index')))
+    return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required
 def update(request, participant_id):

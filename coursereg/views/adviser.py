@@ -28,6 +28,8 @@ def detail(request, student_id):
         'student': student,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
             for n in models.Notification.objects.filter(user=student, is_adviser_acknowledged=False).order_by('-created_at')],
-        'participants': [(p, get_desc(p)) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date')]
+        'participants': [(p, get_desc(p)) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date')],
+        'courses': models.Course.objects.filter(last_reg_date__gte=timezone.now(),
+                                                last_reg_date__lte=timezone.now()+timedelta(days=100))
     }
     return render(request, 'coursereg/adviser_detail.html', context)

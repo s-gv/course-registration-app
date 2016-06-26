@@ -1,5 +1,18 @@
 {% extends "coursereg/base.html" %}
 
+{% block head %}
+{% load staticfiles %}
+<link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'coursereg/js/select2.min.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#course_select_box").select2({
+            placeholder: "Select a course"
+        });
+    });
+</script>
+{% endblock %}
+
 {% block body %}
 {% include "coursereg/nav.html" %}
 <div class="container" id="maincontainer">
@@ -147,5 +160,33 @@
         </div>
     </div>
     {% endif %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <form class="form-inline" method="post" action="{% url 'coursereg:participants_create' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_label_single">
+                        Register for a course
+                        <select class="form-control" id="course_select_box" name="course_id">
+                            <option value=""></option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="reg_type" value="credit" checked>Credit
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="reg_type" value="audit">Audit
+                    </label>
+                </div>
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden" name="user_id" value="{{ student.id }}">
+                <input type="hidden" name="origin" value="adviser">
+                <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
