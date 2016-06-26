@@ -17,7 +17,10 @@ urlpatterns = [
     url(r'^participants/([0-9]+)/delete$', views.participants.delete, name='participants_delete'),
 
     url(r'^notifications/dismiss$', views.notifications.dismiss, name='notifications_dismiss'),
+    url(r'^notifications/create$', views.notifications.notify, name='notify'),
 
-    url(r'^dcc/students/([0-9]+)$', views.dcc.students_read, name='dcc_students_read')
+    url(r'^dcc/([0-9]+)$', views.dcc.students_read, name='dcc_students_read'),
+    url(r'^dcc/([0-9]+)/approve$', views.dcc.approve, name='dcc_approve'),
+
 
 ]

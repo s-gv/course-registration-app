@@ -1,0 +1,111 @@
+{% extends "coursereg/base.html" %}
+
+{% block body %}
+{% include "coursereg/nav.html" %}
+<div class="container" id="maincontainer">
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>{{ student.full_name }}</h1>
+            </div>
+            <p>Degree: {{ student.degree }}</p>
+            <p>Adviser: {{ student.adviser.full_name }}</p>
+            <p>Department: {{ student.department }}</p>
+            <p>Sr No: {{ student.sr_no }}</p>
+            <p>E-mail: {{ student.email }}</p>
+        </div>
+    </div>
+    {% if notifications %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <ul>
+                {% for date, origin, message in notifications %}
+                <li>
+                    <strong>
+                        {{ date }}: {{ origin }} -
+                    </strong>
+                    {{ message }}
+                </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row top-buffer-1">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Registered Courses</h3>
+            </div>
+            <ul class="list-group">
+                {% for participant_id, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
+                <li class="list-group-item">
+                    {% if is_credit %}
+                    <div title="Credit" class="credit-bg pull-left">C</div>
+                    {% elif is_audit  %}
+                    <div title="Audit" class="audit-bg pull-left">A</div>
+                    {% elif is_drop %}
+                    <div title="Dropped" class="audit-bg pull-left">D</div>
+                    {% endif %}
+                    <div class="row courserow">
+                        <div class="col-md-5">
+                            {{ course }}
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-muted">
+                                {{ desc }}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="row top-buffer-1">
+        <div class="col-md-1 col-xs-2">
+            <div title="Credit" class="credit-bg">C</div>
+            <div>Credit</div>
+        </div>
+        <div class="col-md-1 col-xs-2">
+            <div title="Credit" class="audit-bg">A</div>
+            <div style="margin-left:2px;">Audit</div>
+        </div>
+        <div class="col-md-1 col-xs-2">
+            <div title="Credit" class="audit-bg">D</div>
+            <div style="margin-left:3px;">Drop</div>
+        </div>
+    </div>
+
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h2><small>Review</small></h2>
+            </div>
+        </div>
+    </div>
+    {% if student.is_dcc_review_pending %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <form action="{% url 'coursereg:dcc_approve' student.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row top-buffer-1">
+        <div class="col-md-4">
+            <form action="{% url 'coursereg:notify' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ student.id }}">
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" name="message" placeholder="Notification message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">Notify</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

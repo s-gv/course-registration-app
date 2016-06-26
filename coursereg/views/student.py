@@ -17,7 +17,7 @@ def get_desc(participant):
     if not participant.is_instructor_approved:
         return 'Adviser has approved. Awaiting instructor review'
     if participant.grade == models.Participant.GRADE_NA:
-        return 'Enrolled in course'
+        return 'Registered'
     else:
         return models.Participant.GRADE_CHOICES[participant.grade][1] + ' grade'
     return 'Unknown state'

@@ -10,6 +10,27 @@ from coursereg import models
 
 @login_required
 def dismiss(request):
+    user = models.User.objects.get(id=request.POST['id'])
+    assert user is not None
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
-        models.Notification.objects.filter(user=request.user).update(is_student_acknowledged=True)
-    return redirect(request.GET.get('next', reverse('coursereg:index')))
+        assert str(user.id) == str(request.user.id)
+        models.Notification.objects.filter(user=user).update(is_student_acknowledged=True)
+    if request.user.user_type == models.User.USER_TYPE_DCC:
+        assert user.department == request.user.department
+        models.Notification.objects.filter(user=user).update(is_dcc_acknowledged=True)
+    return redirect(request.POST.get('next', reverse('coursereg:index')))
+
+@login_required
+def notify(request):
+    assert request.user.user_type == models.User.USER_TYPE_DCC
+    user = models.User.objects.get(id=request.POST['id'])
+    assert user is not None
+    user.is_dcc_review_pending = True
+    user.save()
+    models.Notification.objects.create(
+        user=user,
+        origin=models.Notification.ORIGIN_DCC,
+        message=request.POST['message'],
+    )
+    messages.success(request, '%s has been notified.' % user.full_name)
+    return redirect(request.POST.get('next', reverse('coursereg:index')))

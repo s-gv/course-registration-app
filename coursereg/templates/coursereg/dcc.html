@@ -3,6 +3,23 @@
 {% block body %}
 {% include "coursereg/nav.html" %}
 <div class="container" id="maincontainer">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
     <div class="page-header">
         <h2>Review pending</h2>
     </div>

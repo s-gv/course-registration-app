@@ -24,7 +24,6 @@
         </div>
     </div>
     {% if notifications %}
-
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-warning">
@@ -41,6 +40,7 @@
                 <div id="dismiss">
                     <form action="{% url 'coursereg:notifications_dismiss' %}" method="post">
                         {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ user_id }}">
                         <button type="submit" class="btn btn-danger btn-xs">Dismiss</button>
                     </form>
                 </div>
@@ -80,6 +80,10 @@
         <div class="col-md-12">
             {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
             <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
             {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
             <div class="alert alert-success" role="alert">{{ message }}</div>
             {% endif %}
