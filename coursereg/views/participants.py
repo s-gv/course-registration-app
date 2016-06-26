@@ -37,6 +37,7 @@ def create(request):
                 is_adviser_approved=request.POST['origin'] == 'adviser',
                 is_instructor_approved=False
             )
+            messages.success(request, 'Successfully applied for %s.' % course)
 
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 

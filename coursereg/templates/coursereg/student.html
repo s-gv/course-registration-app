@@ -41,7 +41,6 @@
                     <form action="{% url 'coursereg:notifications_dismiss' %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="id" value="{{ user_id }}">
-                        <input type="hidden" name="origin" value="student">
                         <button type="submit" class="btn btn-danger btn-xs">Dismiss</button>
                     </form>
                 </div>
@@ -71,6 +70,7 @@
                     </label>
                 </div>
                 <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="hidden" name="origin" value="student">
                 <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
             </form>
         </div>
