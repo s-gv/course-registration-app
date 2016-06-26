@@ -19,6 +19,18 @@
                     <li><a href="{% url 'coursereg:index' %}">Home</a></li>
                     {% endif %}
                 {% endif %}
+                {% if user_type == 'faculty' %}
+                    {% if nav_active == 'advisees' %}
+                    <li class="active"><a href="{% url 'coursereg:adviser' %}">Adviser</a></li>
+                    {% else %}
+                    <li><a href="{% url 'coursereg:adviser' %}">Adviser</a></li>
+                    {% endif %}
+                    {% if nav_active == 'courses' %}
+                    <li class="active"><a href="{% url 'coursereg:instructor' %}">Instructor</a></li>
+                    {% else %}
+                    <li><a href="{% url 'coursereg:instructor' %}">Instructor</a></li>
+                    {% endif %}
+                {% endif %}
                 {% if nav_active == 'faq' %}
                 <li class="active"><a href="{% url 'coursereg:faq' %}">FAQ</a></li>
                 {% else %}

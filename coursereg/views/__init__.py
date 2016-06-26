@@ -3,6 +3,7 @@ from . import common
 from . import participants
 from . import notifications
 
-from . import faculty
+from . import instructor
+from . import adviser
 from . import student
 from . import dcc

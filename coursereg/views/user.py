@@ -11,7 +11,7 @@ from django.contrib.auth import update_session_auth_hash
 
 def signin(request):
     if request.method == 'GET':
-        context = {'signin_url': request.get_full_path()}
+        context = { "next_url": request.GET.get('next', reverse('coursereg:index'))}
         return render(request, 'coursereg/signin.html', context)
     else:
         user = authenticate(email=request.POST['email'], password=request.POST['password'])

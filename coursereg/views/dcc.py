@@ -33,7 +33,7 @@ def index(request):
     return render(request, 'coursereg/dcc.html', context)
 
 @login_required
-def students_read(request, student_id):
+def detail(request, student_id):
     assert request.user.user_type == models.User.USER_TYPE_DCC
     student = models.User.objects.get(id=student_id)
     assert student is not None
@@ -61,6 +61,8 @@ def approve(request, student_id):
     student = models.User.objects.get(id=student_id)
     student.is_dcc_review_pending = False
     student.save()
-    models.Notification.objects.filter(user=student, origin=models.Notification.ORIGIN_DCC).update(is_dcc_acknowledged=True)
+    models.Notification.objects.filter(user=student, origin=models.Notification.ORIGIN_DCC).update(is_dcc_acknowledged=True,
+                                                                                                   is_student_acknowledged=True,
+                                                                                                   is_adviser_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
     return redirect(request.POST.get('next', reverse('coursereg:index')))

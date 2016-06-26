@@ -43,8 +43,27 @@ def create(request):
     return redirect(request.GET.get('next', reverse('coursereg:index')))
 
 @login_required
-def update(request):
-    pass
+def update(request, participant_id):
+    participant = models.Participant.objects.get(id=participant_id)
+    if request.POST['origin'] == 'instructor':
+        if request.POST['action'] == 'approve':
+            participant.is_instructor_approved = True
+            participant.save()
+        elif request.POST['action'] == 'reject':
+            models.Notification.objects.create(user=participant.user,
+                                               origin=models.Notification.ORIGIN_INSTRUCTOR,
+                                               message='Rejected application for %s' % participant.course)
+            participant.delete()
+        elif request.POST['action'] == 'grade':
+            participant.grade = int(request.POST['grade'])
+            participant.save()
+    return redirect(request.POST.get('next', reverse('coursereg:index')))
+
+@login_required
+def approve_all(request):
+    course = models.Course.objects.get(id=request.POST['course_id'])
+    models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
+    return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required
 def delete(request, participant_id):

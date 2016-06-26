@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+import re
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **extra_fields):
@@ -29,6 +30,13 @@ class Department(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def abbreviation(self):
+        r = re.search(r'\((.+)\)\s*$', self.name)
+        if r:
+            return r.group(1)
+        else:
+            return self.name
 
 class Degree(models.Model):
     name = models.CharField(max_length=100)

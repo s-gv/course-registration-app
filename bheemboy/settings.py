@@ -123,7 +123,7 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'coursereg.User'
 
-LOGIN_URL = '/signin/'
+LOGIN_URL = '/signin'
 
 
 
@@ -172,7 +172,7 @@ LOGGING = {
         },
         'coursereg': {
             'handlers': ['console', 'logfile'],
-            'propogate': True,           
+            'propogate': True,
             'level': 'WARN',
         },
     }

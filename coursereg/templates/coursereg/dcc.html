@@ -27,7 +27,7 @@
         {% for name, email, id in pending_students %}
         <div class="row">
             <div class="col-md-12">
-                {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_students_read' id %}">{{ name }}</a> ({{ email }})
+                {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})
             </div>
         </div>
         {% endfor %}
@@ -40,7 +40,7 @@
     {% for name, email, id in all_active_students %}
     <div class="row">
         <div class="col-md-12">
-            {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_students_read' id %}">{{ name }}</a> ({{ email }})
+            {{ forloop.counter }}. <a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})
         </div>
     </div>
     {% endfor %}

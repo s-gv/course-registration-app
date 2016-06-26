@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from . import student, faculty, dcc
+from . import student, instructor, adviser, dcc
 from django.contrib.auth import update_session_auth_hash
 
 @login_required
@@ -17,7 +17,7 @@ def index(request):
     elif request.user.user_type == models.User.USER_TYPE_STUDENT:
         return student.index(request)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
-        return faculty.index(request)
+        return redirect('coursereg:adviser')
     elif request.user.user_type == models.User.USER_TYPE_DCC:
         return dcc.index(request)
     else:
