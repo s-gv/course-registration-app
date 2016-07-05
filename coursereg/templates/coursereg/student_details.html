@@ -127,12 +127,12 @@
                                     </form>
 				                </div>
                     		    <div class="col-md-1">
-                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_advisor_rej' %}" onsubmit="return confirm('Do you want to reject?');">
                                          {% csrf_token %}
                                          <input type="hidden" name="participant_id" value="{{ participant_id }}">
                                          <input type="hidden" name="advisee_id" value="{{ advisee_id }}">
                                          <input type="hidden" name="course_id" value="{{ course.id }}">
-                                         <button type="submit" class="btn btn-danger btn-circle btn-xs"><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs" ><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
                                      </form>
                                  </div>
                                     {% elif state == 1 %}
@@ -167,6 +167,6 @@
         <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
         <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'coursereg/js/chosen.jquery.js' %}"></script>
-
+		
     </body>
 </html>
