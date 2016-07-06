@@ -1,0 +1,4 @@
+[
+    {"key": "smtp_host", "value": "www.ece.iisc.ernet.in"},
+    {"key": "smtp_port", "value": "25"}
+]
