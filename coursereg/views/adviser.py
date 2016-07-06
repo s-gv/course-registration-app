@@ -24,6 +24,7 @@ def detail(request, student_id):
     student = models.User.objects.get(id=student_id)
     context = {
         'user_type': 'faculty',
+        'nav_active': 'adviser',
         'user_email': request.user.email,
         'student': student,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)

@@ -12,7 +12,7 @@ from coursereg import models
 def index(request):
     context = {
         'user_type': 'faculty',
-        'nav_active': 'courses',
+        'nav_active': 'instructor',
         'user_email': request.user.email,
         'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date')]
     }
@@ -44,6 +44,7 @@ def detail(request, course_id):
 
     context = {
         'user_type': 'faculty',
+        'nav_active': 'instructor',
         'user_email': request.user.email,
         'course': course,
         'registration_requests': reg_requests,

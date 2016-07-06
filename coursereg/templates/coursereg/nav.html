@@ -25,7 +25,7 @@
                     {% else %}
                     <li><a href="{% url 'coursereg:adviser' %}">Adviser</a></li>
                     {% endif %}
-                    {% if nav_active == 'courses' %}
+                    {% if nav_active == 'instructor' %}
                     <li class="active"><a href="{% url 'coursereg:instructor' %}">Instructor</a></li>
                     {% else %}
                     <li><a href="{% url 'coursereg:instructor' %}">Instructor</a></li>
