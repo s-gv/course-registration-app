@@ -60,9 +60,15 @@ def update(request, participant_id):
         if request.POST['action'] == 'state_change':
             participant.state = request.POST['state']
             participant.save()
+            student = participant.user
+            student.is_dcc_review_pending = True
+            student.save()
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
             participant.save()
+            student = participant.user
+            student.is_dcc_review_pending = True
+            student.save()
         elif request.POST['action'] == 'delete':
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
@@ -74,6 +80,9 @@ def update(request, participant_id):
 def approve_all(request):
     if request.POST['origin'] == 'adviser':
         student = models.User.objects.get(id=request.POST['student_id'])
+        if models.Participant.objects.filter(user=student, is_adviser_approved=False):
+            student.is_dcc_review_pending = True
+            student.save()
         models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
     elif request.POST['origin'] == 'instructor':
         course = models.Course.objects.get(id=request.POST['course_id'])

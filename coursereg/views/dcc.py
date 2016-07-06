@@ -51,7 +51,7 @@ def detail(request, student_id):
         'student': student,
         'participants': participants,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
-            for n in models.Notification.objects.filter(user=student, is_dcc_acknowledged=False).order_by('-created_at')],
+            for n in models.Notification.objects.filter(user=student, origin=models.Notification.ORIGIN_DCC, is_dcc_acknowledged=False).order_by('-created_at')],
     }
     return render(request, 'coursereg/dcc_detail.html', context)
 
