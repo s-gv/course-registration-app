@@ -35,6 +35,8 @@ def notify(request):
         origin=models.Notification.ORIGIN_DCC,
         message=request.POST['message'],
     )
-    maillib.send_email(request.user.email, user.email, 'Coursereg notification', request.POST['message'])
-    messages.success(request, '%s has been notified.' % user.full_name)
+    if not maillib.send_email(request.user.email, [user.email, user.adviser.email], 'Coursereg notification', request.POST['message']):
+        messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+    else:
+        messages.success(request, '%s has been notified.' % user.full_name)
     return redirect(request.POST.get('next', reverse('coursereg:index')))

@@ -196,3 +196,7 @@ class Faq(models.Model):
 
     def __unicode__(self):
         return self.question
+
+class Config(models.Model):
+    key = models.CharField(max_length=1000)
+    value = models.CharField(max_length = 1000)

@@ -29,7 +29,7 @@ def create(request):
         elif timezone.now().date() > course.last_reg_date:
             messages.error(request, 'Registration for %s is now closed.' % course)
         else:
-            models.Participant.objects.create(
+            participant = models.Participant.objects.create(
                 user_id=user_id,
                 course_id=course_id,
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
@@ -39,6 +39,13 @@ def create(request):
                 is_instructor_approved=False
             )
             messages.success(request, 'Successfully applied for %s.' % course)
+            if request.POST['origin'] == 'adviser':
+                msg = 'Applied for %s.' % participant.course
+                models.Notification.objects.create(user=participant.user,
+                                                   origin=models.Notification.ORIGIN_ADVISER,
+                                                   message=msg)
+                if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+                    messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
 
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
@@ -55,7 +62,8 @@ def update(request, participant_id):
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
                                                message=msg)
             participant.delete()
-            maillib.send_email(request.user.email, participant.user.email, 'Coursereg notification', msg)
+            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+                messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
             participant.grade = int(request.POST['grade'])
             participant.save()
@@ -66,9 +74,10 @@ def update(request, participant_id):
             student = participant.user
             student.is_dcc_review_pending = True
             student.save()
-            maillib.send_email(request.user.email, participant.user.email,
-                               'Coursereg notification', 'Registration of %s changed to %s.' %
-                               (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1]))
+            if not maillib.send_email(request.user.email, [participant.user.email],
+                                      'Coursereg notification', 'Registration of %s changed to %s.' %
+                                      (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1])):
+                messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
             participant.save()
@@ -81,7 +90,8 @@ def update(request, participant_id):
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             participant.delete()
-            maillib.send_email(request.user.email, participant.user.email, 'Coursereg notification', msg)
+            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+                messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required

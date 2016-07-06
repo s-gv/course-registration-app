@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant, Faq, Department, Degree, Notification
+from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
@@ -126,6 +126,10 @@ class NotificationAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', )
     readonly_fields = ('created_at',)
 
+class ConfigAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value')
+    search_fields = ('key',)
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
@@ -133,3 +137,4 @@ admin.site.register(Faq, FaqAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Notification, NotificationAdmin)
+admin.site.register(Config, ConfigAdmin)
