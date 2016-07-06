@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
+import maillib
 
 @login_required
 def create(request):
@@ -49,10 +50,12 @@ def update(request, participant_id):
             participant.is_instructor_approved = True
             participant.save()
         elif request.POST['action'] == 'reject':
+            msg = 'Rejected application for %s' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
-                                               message='Rejected application for %s' % participant.course)
+                                               message=msg)
             participant.delete()
+            maillib.send_email(request.user.email, participant.user.email, 'Coursereg notification', msg)
         elif request.POST['action'] == 'grade':
             participant.grade = int(request.POST['grade'])
             participant.save()
@@ -63,6 +66,9 @@ def update(request, participant_id):
             student = participant.user
             student.is_dcc_review_pending = True
             student.save()
+            maillib.send_email(request.user.email, participant.user.email,
+                               'Coursereg notification', 'Registration of %s changed to %s' %
+                               (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1]))
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
             participant.save()
@@ -70,10 +76,12 @@ def update(request, participant_id):
             student.is_dcc_review_pending = True
             student.save()
         elif request.POST['action'] == 'delete':
+            msg = 'Rejected application for %s' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
-                                               message='Rejected application for %s' % participant.course)
+                                               message=msg)
             participant.delete()
+            maillib.send_email(request.user.email, participant.user.email, 'Coursereg notification', msg)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @login_required
