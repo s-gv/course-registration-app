@@ -50,7 +50,7 @@ def update(request, participant_id):
             participant.is_instructor_approved = True
             participant.save()
         elif request.POST['action'] == 'reject':
-            msg = 'Rejected application for %s' % participant.course
+            msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
                                                message=msg)
@@ -67,7 +67,7 @@ def update(request, participant_id):
             student.is_dcc_review_pending = True
             student.save()
             maillib.send_email(request.user.email, participant.user.email,
-                               'Coursereg notification', 'Registration of %s changed to %s' %
+                               'Coursereg notification', 'Registration of %s changed to %s.' %
                                (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1]))
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
@@ -76,7 +76,7 @@ def update(request, participant_id):
             student.is_dcc_review_pending = True
             student.save()
         elif request.POST['action'] == 'delete':
-            msg = 'Rejected application for %s' % participant.course
+            msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
