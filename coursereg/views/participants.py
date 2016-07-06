@@ -16,6 +16,9 @@ def create(request):
     user_id = request.POST['user_id']
     reg_type = request.POST['reg_type']
 
+    user = models.User.objects.get(id=user_id)
+    assert request.user == user or request.user == user.adviser
+
     state = models.Participant.STATE_CREDIT
     if reg_type == 'audit':
         state = models.Participant.STATE_AUDIT
@@ -51,8 +54,11 @@ def create(request):
 
 @login_required
 def update(request, participant_id):
+    assert request.method == 'POST'
     participant = models.Participant.objects.get(id=participant_id)
     if request.POST['origin'] == 'instructor':
+        assert models.Participant.objects.filter(course=participant.course,
+            user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
         if request.POST['action'] == 'approve':
             participant.is_instructor_approved = True
             participant.save()
@@ -68,6 +74,7 @@ def update(request, participant_id):
             participant.grade = int(request.POST['grade'])
             participant.save()
     elif request.POST['origin'] == 'adviser':
+        assert participant.user.adviser == request.user
         if request.POST['action'] == 'state_change':
             participant.state = request.POST['state']
             participant.save()
@@ -100,12 +107,15 @@ def update(request, participant_id):
 def approve_all(request):
     if request.POST['origin'] == 'adviser':
         student = models.User.objects.get(id=request.POST['student_id'])
+        assert student.adviser == request.user
         if models.Participant.objects.filter(user=student, is_adviser_approved=False):
             student.is_dcc_review_pending = True
             student.save()
         models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
     elif request.POST['origin'] == 'instructor':
         course = models.Course.objects.get(id=request.POST['course_id'])
+        assert models.Participant.objects.filter(course=course,
+            user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
         models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
@@ -113,6 +123,6 @@ def approve_all(request):
 def delete(request, participant_id):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=participant_id)
-    assert str(participant.user.id) == str(request.user.id)
+    assert participant.user == request.user
     participant.delete()
     return redirect(request.GET.get('next', reverse('coursereg:index')))

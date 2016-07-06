@@ -11,6 +11,7 @@ from student import get_desc
 
 @login_required
 def index(request):
+    assert request.user.user_type == models.User.USER_TYPE_FACULTY
     context = {
         'user_type': 'faculty',
         'nav_active': 'adviser',
@@ -22,6 +23,7 @@ def index(request):
 @login_required
 def detail(request, student_id):
     student = models.User.objects.get(id=student_id)
+    assert request.user == student.adviser
     context = {
         'user_type': 'faculty',
         'nav_active': 'adviser',

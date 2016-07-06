@@ -65,5 +65,7 @@ def profile(request):
         context['user_type'] = 'faculty'
     elif request.user.user_type == models.User.USER_TYPE_DCC:
         context['user_type'] = 'dcc'
+    else:
+        raise Http404('User type not recognized')
 
     return render(request, 'coursereg/profile.html', context)

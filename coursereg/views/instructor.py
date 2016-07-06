@@ -10,6 +10,7 @@ from coursereg import models
 
 @login_required
 def index(request):
+    assert request.user.user_type == models.User.USER_TYPE_FACULTY
     context = {
         'user_type': 'faculty',
         'nav_active': 'instructor',
@@ -21,6 +22,9 @@ def index(request):
 @login_required
 def detail(request, course_id):
     course = models.Course.objects.get(id=course_id)
+    assert request.user.user_type == models.User.USER_TYPE_FACULTY
+    assert models.Participant.objects.filter(course=course,
+        user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
     reg_requests = [
         (p.state == models.Participant.STATE_CREDIT, p.id, p.user)
         for p in models.Participant.objects.filter(course=course,

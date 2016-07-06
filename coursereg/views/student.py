@@ -24,6 +24,7 @@ def get_desc(participant):
 
 @login_required
 def index(request):
+    assert request.user.user_type == models.User.USER_TYPE_STUDENT
     if not request.user.adviser:
         messages.error(request, 'Adviser not assigned. Contact the administrator.')
         return redirect('coursereg:fatal')

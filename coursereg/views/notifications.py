@@ -14,12 +14,13 @@ def dismiss(request):
     user = models.User.objects.get(id=request.POST['id'])
     assert user is not None
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
-        assert str(user.id) == str(request.user.id)
+        assert user == request.user
         models.Notification.objects.filter(user=user).update(is_student_acknowledged=True)
     if request.user.user_type == models.User.USER_TYPE_DCC:
         assert user.department == request.user.department
         models.Notification.objects.filter(user=user).update(is_dcc_acknowledged=True)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
+        assert user.adviser == request.user
         models.Notification.objects.filter(user=user).update(is_adviser_acknowledged=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
@@ -28,6 +29,7 @@ def notify(request):
     assert request.user.user_type == models.User.USER_TYPE_DCC
     user = models.User.objects.get(id=request.POST['id'])
     assert user is not None
+    assert user.department == request.user.department
     user.is_dcc_review_pending = True
     user.save()
     models.Notification.objects.create(
