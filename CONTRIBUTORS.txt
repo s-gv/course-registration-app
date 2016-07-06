@@ -1,7 +1,6 @@
 Contributors
 ------------
 
-Aditya Gopalan
 Bhargava Srivatsa
 Nihesh Rathod
 Parimal Parag
@@ -9,4 +8,3 @@ Rajesh Sunderasan
 Sagar Gubbi
 Suman Panchal
 Vinay Kumar B R
-
