@@ -297,13 +297,12 @@ def participant_dcc_act_all(request):
             ## Collect the course page context and pass it back to the course page
             participant = models.Participant.objects.filter(user_id=current_student.id)
             student_name = current_student.full_name
-
+            msg = 0
             for p in participant:
                 if p.state == models.Participant.STATE_INSTRUCTOR_DONE:
                     p.state = models.Participant.STATE_FINAL_APPROVED
-                    req_info = str(student_name) + ' for ' + str(p.course)
                     p.save()
-                    messages.success(request, 'DCC has accepted the enrolment request of %s..' % req_info)
+                    msg = 1
                 elif p.state == models.Participant.STATE_ADV_DROP_DONE:
 					p.state = models.Participant.STATE_DCC_DROP_DONE
 					p.save()
@@ -321,6 +320,11 @@ def participant_dcc_act_all(request):
 					p.save()
 					req_info = str(student_name) + ' for ' + str(p.course)
 					messages.success(request, 'DCC has accepted the credit request of %s..' % req_info)
+                    
+            if msg==1:
+                req_info = str(student_name)
+                messages.success(request, 'DCC has accepted the enrolment request of %s..' % req_info)
+
             current_student.dcc_remarks = ''
             current_student.save()
             url = '/student_details_dcc/?student_id='+str(current_student.id)
