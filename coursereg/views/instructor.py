@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from datetime import date, timedelta
 from coursereg import models
 
 @login_required
@@ -24,6 +24,7 @@ def detail(request, course_id):
     reg_requests = [
         (p.state == models.Participant.STATE_CREDIT, p.id, p.user)
         for p in models.Participant.objects.filter(course=course,
+                                                   course__last_reg_date__gte=date.today(),
                                                    is_adviser_approved=True,
                                                    is_instructor_approved=False)]
 
