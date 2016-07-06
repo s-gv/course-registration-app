@@ -27,20 +27,18 @@ def detail(request, course_id):
                                                    is_adviser_approved=True,
                                                    is_instructor_approved=False)]
 
-    crediting = [(p.user, p.id, p.grade)
-        for p in models.Participant.objects.filter(course=course,
-                                                   state=models.Participant.STATE_CREDIT,
-                                                   is_adviser_approved=True,
-                                                   is_instructor_approved=True)]
-    auditing = [(p.user, p.id, p.grade)
-        for p in models.Participant.objects.filter(course=course,
-                                                   state=models.Participant.STATE_AUDIT,
-                                                   is_adviser_approved=True,
-                                                   is_instructor_approved=True)]
-    dropped = [p.user for p in models.Participant.objects.filter(course=course,
-                                                                 state=models.Participant.STATE_DROP,
-                                                                 is_adviser_approved=True,
-                                                                 is_instructor_approved=True)]
+    crediting = models.Participant.objects.filter(course=course,
+                                                  state=models.Participant.STATE_CREDIT,
+                                                  is_adviser_approved=True,
+                                                  is_instructor_approved=True)
+    auditing = models.Participant.objects.filter(course=course,
+                                                 state=models.Participant.STATE_AUDIT,
+                                                 is_adviser_approved=True,
+                                                 is_instructor_approved=True)
+    dropped = models.Participant.objects.filter(course=course,
+                                                state=models.Participant.STATE_DROP,
+                                                is_adviser_approved=True,
+                                                is_instructor_approved=True)
 
     context = {
         'user_type': 'faculty',

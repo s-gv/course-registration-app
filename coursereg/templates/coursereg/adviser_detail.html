@@ -99,10 +99,10 @@
                                         <input type="hidden" name="origin" value="adviser">
                                         <input type="hidden" name="action" value="state_change">
                                         <div class="form-group">
-                                            {% if participant.grade == 0 %}
-                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
-                                            {% else %}
+                                            {% if participant.course.is_drop_date_passed %}
                                             <select class="form-control input-sm" name="state" onchange="this.form.submit()" disabled>
+                                            {% else %}
+                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
                                             {% endif %}
                                                 {% if participant.state == 1 %}
                                                 <option value="1" selected>Credit</option>
@@ -126,7 +126,7 @@
                                     </form>
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {% if participant.grade == 0 %}
+                                    {% if participant.grade == 0 and not participant.course.is_last_reg_date_passed %}
                                     <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">

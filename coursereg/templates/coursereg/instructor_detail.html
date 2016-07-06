@@ -96,72 +96,76 @@
                 <h3 class="panel-title">Credit</h3>
             </div>
             <ul class="list-group">
-                {% for user, pid, grade in crediting %}
+                {% for participant in crediting %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-11">
                             <div class="row">
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.full_name }}
+                                    {{ participant.user.full_name }}
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.email }}
+                                    {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.department.abbreviation }}
+                                    {{ participant.user.department.abbreviation }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.degree }}
+                                    {{ participant.user.degree }}
                                 </div>
                                 <div class="col-md-4 col-xs-12">
-                                    {{ user.sr_no }}
+                                    {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-1">
-                                    <form class="form-inline" action="{% url 'coursereg:participants_update' pid %}" method="post">
+                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
                                         <input type="hidden" name="origin" value="instructor">
                                         <input type="hidden" name="action" value="grade">
                                         <div class="form-group">
+                                            {% if participant.course.is_last_grade_date_passed %}
+                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()" disabled>
+                                            {% else %}
                                             <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
-                                                {% if grade == 0 %}
-                                                <option value="0" selected>Grade N/A</option>
+                                            {% endif %}
+                                                {% if participant.grade == 0 %}
+                                                <option value="0" selected>Not graded</option>
                                                 {% else %}
-                                                <option value="0">Grade N/A</option>
+                                                <option value="0">Not graded</option>
                                                 {% endif %}
 
-                                                {% if grade == 1 %}
+                                                {% if participant.grade == 1 %}
                                                 <option value="1" selected>S grade</option>
                                                 {% else %}
                                                 <option value="1">S grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 2 %}
+                                                {% if participant.grade == 2 %}
                                                 <option value="2" selected>A grade</option>
                                                 {% else %}
                                                 <option value="2">A grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 3 %}
+                                                {% if participant.grade == 3 %}
                                                 <option value="3" selected>B grade</option>
                                                 {% else %}
                                                 <option value="3">B grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 4 %}
+                                                {% if participant.grade == 4 %}
                                                 <option value="4" selected>C grade</option>
                                                 {% else %}
                                                 <option value="4">C grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 5 %}
+                                                {% if participant.grade == 5 %}
                                                 <option value="5" selected>D grade</option>
                                                 {% else %}
                                                 <option value="5">D grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 6 %}
+                                                {% if participant.grade == 6 %}
                                                 <option value="6" selected>F grade</option>
                                                 {% else %}
                                                 <option value="6">F grade</option>
@@ -186,72 +190,76 @@
                 <h3 class="panel-title">Audit</h3>
             </div>
             <ul class="list-group">
-                {% for user, pid, grade in auditing %}
+                {% for pariticipant in auditing %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-11">
                             <div class="row">
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.full_name }}
+                                    {{ participant.user.full_name }}
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.email }}
+                                    {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.department.abbreviation }}
+                                    {{ participant.user.department.abbreviation }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.degree }}
+                                    {{ participant.user.degree }}
                                 </div>
                                 <div class="col-md-4 col-xs-12">
-                                    {{ user.sr_no }}
+                                    {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-1">
-                                    <form class="form-inline" action="{% url 'coursereg:participants_update' pid %}" method="post">
+                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
                                         <input type="hidden" name="origin" value="instructor">
                                         <input type="hidden" name="action" value="grade">
                                         <div class="form-group">
+                                            {% if participant.course.is_last_grade_date_passed %}
+                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()" disabled>
+                                            {% else %}
                                             <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
-                                                {% if grade == 0 %}
-                                                <option value="0" selected>Grade N/A</option>
+                                            {% endif %}
+                                                {% if participant.grade == 0 %}
+                                                <option value="0" selected>Not graded</option>
                                                 {% else %}
-                                                <option value="0">Grade N/A</option>
+                                                <option value="0">Not graded</option>
                                                 {% endif %}
 
-                                                {% if grade == 1 %}
+                                                {% if participant.grade == 1 %}
                                                 <option value="1" selected>S grade</option>
                                                 {% else %}
                                                 <option value="1">S grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 2 %}
+                                                {% if participant.grade == 2 %}
                                                 <option value="2" selected>A grade</option>
                                                 {% else %}
                                                 <option value="2">A grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 3 %}
+                                                {% if participant.grade == 3 %}
                                                 <option value="3" selected>B grade</option>
                                                 {% else %}
                                                 <option value="3">B grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 4 %}
+                                                {% if participant.grade == 4 %}
                                                 <option value="4" selected>C grade</option>
                                                 {% else %}
                                                 <option value="4">C grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 5 %}
+                                                {% if participant.grade == 5 %}
                                                 <option value="5" selected>D grade</option>
                                                 {% else %}
                                                 <option value="5">D grade</option>
                                                 {% endif %}
 
-                                                {% if grade == 6 %}
+                                                {% if participant.grade == 6 %}
                                                 <option value="6" selected>F grade</option>
                                                 {% else %}
                                                 <option value="6">F grade</option>
@@ -276,26 +284,26 @@
                 <h3 class="panel-title">Dropped</h3>
             </div>
             <ul class="list-group">
-                {% for user in dropped %}
+                {% for participant in dropped %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-11">
                             <div class="row">
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.full_name }}
+                                    {{ participant.user.full_name }}
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.email }}
+                                    {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.department.abbreviation }}
+                                    {{ participant.user.department.abbreviation }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.degree }}
+                                    {{ participant.user.degree }}
                                 </div>
                                 <div class="col-md-4 col-xs-12">
-                                    {{ user.sr_no }}
+                                    {{ participant.user.sr_no }}
                                 </div>
                             </div>
                         </div>

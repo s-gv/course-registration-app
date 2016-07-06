@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from datetime import date, datetime, timedelta
 import re
 
 class CustomUserManager(BaseUserManager):
@@ -123,6 +123,15 @@ class Course(models.Model):
     last_drop_date = models.DateField(verbose_name="Last Drop Date", default=timezone.now)
     credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+
+    def is_last_reg_date_passed(self):
+        return date.today() > self.last_reg_date
+
+    def is_drop_date_passed(self):
+        return date.today() > self.last_drop_date
+
+    def is_last_grade_date_passed(self):
+        return date.today() > (self.last_reg_date + timedelta(days=150))
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)

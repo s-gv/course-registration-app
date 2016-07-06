@@ -74,9 +74,11 @@ def update(request, participant_id):
             student = participant.user
             student.is_dcc_review_pending = True
             student.save()
-            if not maillib.send_email(request.user.email, [participant.user.email],
-                                      'Coursereg notification', 'Registration of %s changed to %s.' %
-                                      (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1])):
+            msg = 'Registration of %s changed to %s.' % (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1])
+            models.Notification.objects.create(user=participant.user,
+                                               origin=models.Notification.ORIGIN_ADVISER,
+                                               message=msg)
+            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
