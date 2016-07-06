@@ -115,12 +115,12 @@
                                 <div class="col-md-2">
                                     <span class="label label-info">{{ state_str }}</span>
                                 </div>
-                                    {% elif state == 2 or state == 17 or state == 22 %}
+                                    {% elif state == 2 %}
                                  <div class="col-md-2">
                                     <span class="label label-success">{{ state_str}}</span>
                                  </div>                                    
-                                  {% elif state == 8 %}
-                                 <div class="col-md-2">
+                                  {% elif state == 8 or state == 17 or state == 22 %}
+                                 <div class="col-md-3">
                                     <span class="label label-success">{{ state_str}}</span>
                                  </div>      
                                  <div class="col-md-1">
@@ -131,6 +131,16 @@
                                          <button type="submit" class="btn btn-primary btn-xs">Accept</button>
                                      </form>
                                  </div>         
+                                
+                                <div class="col-md-1">
+                                     <form class="form-inline" method="POST" action="{% url 'coursereg:participant_dcc_rej' %}">
+                                         {% csrf_token %}                                         
+                                         <input type="hidden" name="participant_id" value="{{ participant_id }}">         
+                                         <input type="hidden" name="student_id" value="{{ student_id }}">          
+                                         <button type="submit" class="btn btn-danger btn-circle btn-xs" ><i class="glyphicon glyphicon-remove" aria-hidden="true"></i>Reject</button>
+                                     </form>
+                                 </div>         
+                                
                                     {% elif state == 3 or state == 11 or state == 14 %}
                                  <div class="col-md-2">
                                     <span class="label label-primary">{{ state_str }}</span>

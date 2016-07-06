@@ -267,6 +267,62 @@ def participant_dcc_act(request):
                 req_info = str(current_student.full_name) + ' for ' + str(participant.course)
                 participant.save()
                 messages.success(request, 'DCC approved the drop request of %s.' % req_info)
+            elif participant.state == models.Participant.STATE_ADV_AUDIT_DONE:
+                participant.state = models.Participant. STATE_DCC_AUDIT_DONE
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.success(request, 'DCC approved the audit conversion of %s.' % req_info)
+            elif participant.state == models.Participant.STATE_ADV_CREDIT_DONE:
+                participant.state = models.Participant.STATE_DCC_CREDIT_DONE
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.success(request, 'DCC approved the credit conversion of %s.' % req_info)
+            else:
+                messages.error(request, 'Unable to accept the drop request, please contact the admin.')
+
+            current_student.dcc_remarks = ''
+            current_student.save()
+
+            url = '/student_details_dcc/?student_id=' + str(current_student.id)
+            return redirect(url)
+        except:
+            messages.error(request, 'The DCC and the student are not from the same department. Possible data entry issue or bug. Please contact the admin.')
+            return redirect('coursereg:index')
+    except:
+        messages.error(request, 'You are not the DCC. Please avoid attempts to break in to the system or use it in unauthorized ways. This attempt has been logged and will be notified to the admin.')
+        return redirect('coursereg:index')
+
+@login_required
+def participant_dcc_rej(request):
+    assert request.method == 'POST'
+
+    # Check if the requestor is DCC himself.
+    user = request.user
+    try:
+        assert (user.user_type == models.User.USER_TYPE_DCC)
+        participant = models.Participant.objects.get(id=request.POST['participant_id'])
+        current_student    = models.User.objects.get(id=request.POST['student_id'])
+        # Check if the student is in the same department as the DCC.
+        try:
+            assert (user.department == current_student.department)
+            student_name = current_student.full_name
+
+            assert participant.user_id == current_student.id
+            if participant.state == models.Participant.STATE_ADV_DROP_DONE:
+                participant.state = models.Participant.STATE_FINAL_APPROVED
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.success(request, 'DCC rejected the drop request of %s.' % req_info)
+            elif participant.state == models.Participant.STATE_ADV_AUDIT_DONE:
+                participant.state = models.Participant.STATE_FINAL_APPROVED
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.error(request, 'DCC rejected the audit conversion of %s.' % req_info)
+            elif participant.state == models.Participant.STATE_ADV_CREDIT_DONE:
+                participant.state = models.Participant.STATE_FINAL_APPROVED
+                req_info = str(current_student.full_name) + ' for ' + str(participant.course)
+                participant.save()
+                messages.error(request, 'DCC rejected the credit conversion of %s.' % req_info)
             else:
                 messages.error(request, 'Unable to accept the drop request, please contact the admin.')
 
@@ -320,7 +376,7 @@ def participant_dcc_act_all(request):
 					p.save()
 					req_info = str(student_name) + ' for ' + str(p.course)
 					messages.success(request, 'DCC has accepted the credit request of %s..' % req_info)
-                    
+
             if msg==1:
                 req_info = str(student_name)
                 messages.success(request, 'DCC has accepted the enrolment request of %s..' % req_info)
