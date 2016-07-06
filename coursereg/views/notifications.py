@@ -11,6 +11,7 @@ import maillib
 
 @login_required
 def dismiss(request):
+    assert request.method == 'POST'
     user = models.User.objects.get(id=request.POST['id'])
     assert user is not None
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
@@ -26,6 +27,7 @@ def dismiss(request):
 
 @login_required
 def notify(request):
+    assert request.method == 'POST'
     assert request.user.user_type == models.User.USER_TYPE_DCC
     user = models.User.objects.get(id=request.POST['id'])
     assert user is not None

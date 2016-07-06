@@ -58,6 +58,7 @@ def detail(request, student_id):
 
 @login_required
 def approve(request, student_id):
+    assert request.method == 'POST'
     assert request.user.user_type == models.User.USER_TYPE_DCC
     student = models.User.objects.get(id=student_id)
     assert student is not None

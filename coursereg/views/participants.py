@@ -105,6 +105,7 @@ def update(request, participant_id):
 
 @login_required
 def approve_all(request):
+    assert request.method == 'POST'
     if request.POST['origin'] == 'adviser':
         student = models.User.objects.get(id=request.POST['student_id'])
         assert student.adviser == request.user
