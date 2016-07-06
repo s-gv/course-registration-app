@@ -30,7 +30,7 @@ def notify(request):
     assert request.method == 'POST'
     assert request.user.user_type == models.User.USER_TYPE_DCC
     user = models.User.objects.get(id=request.POST['id'])
-    assert user is not None
+    assert user
     assert user.department == request.user.department
     user.is_dcc_review_pending = True
     user.save()

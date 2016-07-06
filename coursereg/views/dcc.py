@@ -36,7 +36,7 @@ def index(request):
 def detail(request, student_id):
     assert request.user.user_type == models.User.USER_TYPE_DCC
     student = models.User.objects.get(id=student_id)
-    assert student is not None
+    assert student
     assert student.department == request.user.department
     participants = [(
         p.id,
@@ -61,7 +61,7 @@ def approve(request, student_id):
     assert request.method == 'POST'
     assert request.user.user_type == models.User.USER_TYPE_DCC
     student = models.User.objects.get(id=student_id)
-    assert student is not None
+    assert student
     assert student.department == request.user.department
     student.is_dcc_review_pending = False
     student.save()
