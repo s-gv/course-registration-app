@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from coursereg import maillib
+from django.core.mail import send_mail
 
 @login_required
 def create(request):
@@ -47,7 +47,9 @@ def create(request):
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
                                                    message=msg)
-                if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+                try:
+                    send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+                except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
 
     return redirect(request.POST.get('next', reverse('coursereg:index')))
@@ -68,7 +70,9 @@ def update(request, participant_id):
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
                                                message=msg)
             participant.delete()
-            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+            try:
+                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+            except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
             participant.grade = int(request.POST['grade'])
@@ -85,7 +89,9 @@ def update(request, participant_id):
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
-            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+            try:
+                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+            except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
@@ -99,7 +105,9 @@ def update(request, participant_id):
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             participant.delete()
-            if not maillib.send_email(request.user.email, [participant.user.email], 'Coursereg notification', msg):
+            try:
+                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+            except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 

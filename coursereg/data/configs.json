@@ -1,4 +1,4 @@
 [
-    {"key": "smtp_host", "value": "www.ece.iisc.ernet.in"},
-    {"key": "smtp_port", "value": "25"}
+    {"key": "sample_key", "value": "sample_value"},
+    {"key": "sample_key2", "value": "sample_value2"}
 ]

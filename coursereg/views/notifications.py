@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-from coursereg import maillib
+from django.core.mail import send_mail
 
 @login_required
 def dismiss(request):
@@ -39,8 +39,9 @@ def notify(request):
         origin=models.Notification.ORIGIN_DCC,
         message=request.POST['message'],
     )
-    if not maillib.send_email(request.user.email, [user.email, user.adviser.email], 'Coursereg notification', request.POST['message']):
+    try:
+        send_mail('Coursereg notification', request.POST['message'], request.user.email, [user.email, user.adviser.email])
+    except:
         messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
-    else:
-        messages.success(request, '%s has been notified.' % user.full_name)
+    messages.success(request, '%s has been notified.' % user.full_name)
     return redirect(request.POST.get('next', reverse('coursereg:index')))

@@ -126,8 +126,8 @@ AUTH_USER_MODEL = 'coursereg.User'
 
 LOGIN_URL = '/signin'
 
-
-
+EMAIL_HOST = 'www.ece.iisc.ernet.in'
+EMAIL_TIMEOUT = 3
 
 
 ## Logging
