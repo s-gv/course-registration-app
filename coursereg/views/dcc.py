@@ -9,8 +9,6 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
-import smtplib
-import logging
 from student import get_desc
 
 @login_required

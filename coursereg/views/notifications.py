@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
-import maillib
+from coursereg import maillib
 
 @login_required
 def dismiss(request):
