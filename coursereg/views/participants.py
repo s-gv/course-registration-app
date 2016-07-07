@@ -41,7 +41,6 @@ def create(request):
                 is_adviser_approved=request.POST['origin'] == 'adviser',
                 is_instructor_approved=False
             )
-            messages.success(request, 'Successfully applied for %s.' % course)
             if request.POST['origin'] == 'adviser':
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
@@ -51,6 +50,8 @@ def create(request):
                     send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+            else:
+                messages.success(request, 'Applied for %s.' % course)
 
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 

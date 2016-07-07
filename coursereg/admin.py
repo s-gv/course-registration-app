@@ -68,20 +68,24 @@ class CourseAdmin(admin.ModelAdmin):
     actions = ['clone_courses_increment_year']
 
     def clone_courses_increment_year(self, request, queryset):
-        for course in queryset:
-            d = course.last_reg_date
+        def add_one_year(d):
+            new_d = None
             try:
-                new_last_reg_date = d.replace(year=d.year+1)
+                new_d = d.replace(year=d.year+1)
             except ValueError:
-                new_last_reg_date = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
+                new_d = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
+            return new_d
+        for course in queryset:
+            new_last_reg_date = add_one_year(course.last_reg_date)
             if not Course.objects.filter(num=course.num,
-                    last_reg_date__gte=new_last_reg_date-timedelta(days=30),
-                    last_reg_date__lte=new_last_reg_date+timedelta(days=30)):
+                    last_reg_date__gte=new_last_reg_date-timedelta(days=15),
+                    last_reg_date__lte=new_last_reg_date+timedelta(days=15)):
                 new_course = Course.objects.create(
                     num=course.num,
                     title=course.title,
                     term=course.term,
                     last_reg_date=new_last_reg_date,
+                    last_drop_date=add_one_year(course.last_drop_date),
                     credits=course.credits,
                     department=course.department
                 )

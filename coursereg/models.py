@@ -103,31 +103,19 @@ class Notification(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
 
+def get_recent_last_reg_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_reg_date
+    return timezone.now()
+
+def get_recent_last_drop_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_drop_date
+    return timezone.now()
+
 class Course(models.Model):
-    def get_recent_last_reg_date():
-        recent_course = Course.objects.order_by('-last_reg_date').first()
-        if recent_course:
-            return recent_course.last_reg_date
-        return timezone.now()
-
-    def get_recent_last_drop_date():
-        recent_course = Course.objects.order_by('-last_drop_date').first()
-        if recent_course:
-            return recent_course.last_drop_date
-        return timezone.now()
-
-    def is_last_reg_date_passed(self):
-        return date.today() > self.last_reg_date
-
-    def is_drop_date_passed(self):
-        return date.today() > self.last_drop_date
-
-    def is_last_grade_date_passed(self):
-        return date.today() > (self.last_reg_date + timedelta(days=150))
-
-    def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
-
     TERM_AUG = 0
     TERM_JAN = 1
     TERM_SUMMER = 2
@@ -147,7 +135,20 @@ class Course(models.Model):
     last_drop_date = models.DateField(verbose_name="Last Drop Date", default=get_recent_last_drop_date)
     credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def is_last_reg_date_passed(self):
+        return date.today() > self.last_reg_date
+
+    def is_drop_date_passed(self):
+        return date.today() > self.last_drop_date
+
+    def is_last_grade_date_passed(self):
+        return date.today() > (self.last_reg_date + timedelta(days=150))
+
+    def __unicode__(self):
+        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
 
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
