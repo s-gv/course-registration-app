@@ -16,7 +16,8 @@ How to deploy
 - We recommend [PostgreSQL](http://www.postgresql.org/) database for production use.
 Install it, create a database and a user, and grant all permissions for the DB to the created user.
 - Edit `<proj_root>/bheemboy/settings.py` and give a value to `SECRET_KEY`, add auth details to `DATABASES`, set `DEBUG` to False, and add the hostname (such as `coursereg.iisc.ac.in`) to `ALLOWED_HOSTS`.
-- In `<proj_root>/`, run `python manage.py migrate`.
+- In `<proj_root>/`, run `python manage.py collectstatic` to collect all static files in `<proj_root>/static`.
+- In `<proj_root>/`, run `python manage.py migrate` to update the database.
 - Create a superuser with `python manage.py createsuperuser`.
 - To load the config data in `<project_root>/coursereg/data/configs.json`, run `python manage.py loadconfigs --datafile coursereg/data/configs.json`.
 - To bulk load FAQs in `<project_root>/coursereg/data/faqs.json`, run `python manage.py loadfaqs --datafile coursereg/data/faqs.json`.
