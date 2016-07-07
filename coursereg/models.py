@@ -104,6 +104,30 @@ class Notification(models.Model):
 
 
 class Course(models.Model):
+    def get_recent_last_reg_date():
+        recent_course = Course.objects.order_by('-last_reg_date').first()
+        if recent_course:
+            return recent_course.last_reg_date
+        return timezone.now()
+
+    def get_recent_last_drop_date():
+        recent_course = Course.objects.order_by('-last_drop_date').first()
+        if recent_course:
+            return recent_course.last_drop_date
+        return timezone.now()
+
+    def is_last_reg_date_passed(self):
+        return date.today() > self.last_reg_date
+
+    def is_drop_date_passed(self):
+        return date.today() > self.last_drop_date
+
+    def is_last_grade_date_passed(self):
+        return date.today() > (self.last_reg_date + timedelta(days=150))
+
+    def __unicode__(self):
+        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
+
     TERM_AUG = 0
     TERM_JAN = 1
     TERM_SUMMER = 2
@@ -119,22 +143,11 @@ class Course(models.Model):
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
-    last_reg_date = models.DateField(verbose_name="Last Registration Date", default=timezone.now)
-    last_drop_date = models.DateField(verbose_name="Last Drop Date", default=timezone.now)
+    last_reg_date = models.DateField(verbose_name="Last Registration Date", default=get_recent_last_reg_date)
+    last_drop_date = models.DateField(verbose_name="Last Drop Date", default=get_recent_last_drop_date)
     credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
-    def is_last_reg_date_passed(self):
-        return date.today() > self.last_reg_date
-
-    def is_drop_date_passed(self):
-        return date.today() > self.last_drop_date
-
-    def is_last_grade_date_passed(self):
-        return date.today() > (self.last_reg_date + timedelta(days=150))
-
-    def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
 
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
