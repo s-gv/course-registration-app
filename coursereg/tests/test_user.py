@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
-from django.contrib import messages
 from coursereg.models import User
 import utils
 
@@ -17,9 +16,7 @@ class UserLoginTests(TestCase):
         response = self.client.post(reverse('coursereg:signin'), {'email': 'ben@test.com', 'password': 'blahblah'}, follow=True)
         self.assertTemplateUsed(response, 'coursereg/signin.html')
         self.assertRedirects(response, reverse('coursereg:signin'))
-        ms = list(response.context['messages'])
-        self.assertEquals(len(ms), 1)
-        self.assertEquals(ms[0].level, messages.ERROR)
+        self.assertEquals(utils.is_error_msg_present(response), True)
 
     def test_was_student_without_adviser_shown_fatal_error(self):
         response = self.client.post(reverse('coursereg:signin'), {'email': 'ben@test.com', 'password': 'ben12345'}, follow=True)
