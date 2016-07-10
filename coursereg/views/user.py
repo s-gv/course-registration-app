@@ -31,20 +31,20 @@ def signout(request):
 
 @login_required
 def change_passwd(request):
-	if request.method == 'POST':
-		newpass = request.POST['newpasswd']
-		u = request.user
-		if authenticate(email=u.email, password=request.POST['passwd']):
-			if newpass == request.POST['newpasswd2']:
-				if len(newpass) >= 8:
-					u.set_password(newpass)
-					u.save()
-					update_session_auth_hash(request, u)
-					messages.success(request, 'Password changed successfully.')
-				else:
-					messages.error(request, 'New password must have at least 8 characters.')
-			else:
-				messages.error(request, 'New password does not match. Your new password must be confirmed by entering it twice.')
-		else:
-			messages.error(request, 'Current password is incorrect.')
-		return redirect(request.POST.get('next', reverse('coursereg:index')))
+    if request.method == 'POST':
+        newpass = request.POST['newpasswd']
+        u = request.user
+        if authenticate(email=u.email, password=request.POST['passwd']):
+            if newpass == request.POST['newpasswd2']:
+                if len(newpass) >= 8:
+                    u.set_password(newpass)
+                    u.save()
+                    update_session_auth_hash(request, u)
+                    messages.success(request, 'Password changed successfully.')
+                else:
+                    messages.error(request, 'New password must have at least 8 characters.')
+            else:
+                messages.error(request, 'New password does not match. Your new password must be confirmed by entering it twice.')
+        else:
+            messages.error(request, 'Current password is incorrect.')
+        return redirect(request.POST.get('next', reverse('coursereg:index')))
