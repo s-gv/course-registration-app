@@ -8,7 +8,7 @@ from utils import is_error_msg_present
 class StudentTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        dept = Department.objects.create(name='ECE')
+        dept = Department.objects.create(name='Electrical Communication Engineering (ECE)')
         charles = User.objects.create_user(email='charles@test.com', password='charles12345', user_type=User.USER_TYPE_FACULTY)
         cls.ben = User.objects.create_user(email='ben@test.com', password='ben12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         today = datetime.datetime.now()
