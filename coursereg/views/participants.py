@@ -29,7 +29,7 @@ def create(request):
         course = models.Course.objects.get(id=course_id)
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
             messages.error(request, 'Already registered for %s.' % course)
-        elif timezone.now().date() > course.last_reg_date:
+        elif timezone.now() > course.last_reg_date:
             messages.error(request, 'Registration for %s is now closed.' % course)
         else:
             participant = models.Participant.objects.create(

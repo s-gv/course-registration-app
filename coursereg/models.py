@@ -131,21 +131,21 @@ class Course(models.Model):
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
-    last_reg_date = models.DateField(verbose_name="Last Registration Date", default=get_recent_last_reg_date)
-    last_drop_date = models.DateField(verbose_name="Last Drop Date", default=get_recent_last_drop_date)
+    last_reg_date = models.DateTimeField(verbose_name="Last Registration Date", default=get_recent_last_reg_date)
+    last_drop_date = models.DateTimeField(verbose_name="Last Drop Date", default=get_recent_last_drop_date)
     credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def is_last_reg_date_passed(self):
-        return date.today() > self.last_reg_date
+        return timezone.now() > self.last_reg_date
 
     def is_drop_date_passed(self):
-        return date.today() > self.last_drop_date
+        return timezone.now() > self.last_drop_date
 
     def is_last_grade_date_passed(self):
-        return date.today() > (self.last_reg_date + timedelta(days=150))
+        return timezone.now() > (self.last_reg_date + timedelta(days=150))
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
@@ -222,4 +222,4 @@ class Faq(models.Model):
 
 class Config(models.Model):
     key = models.CharField(max_length=1000)
-    value = models.CharField(max_length = 1000)
+    value = models.CharField(max_length=1000)

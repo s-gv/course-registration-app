@@ -8,10 +8,10 @@
             <div class="page-header">
                 <h1>{{ user_full_name }}</h1>
             </div>
+            <p>Department: {{ request.user.department }}</p>
             {% if user_type == 'student' %}
             <p>Degree: {{ request.user.degree }}</p>
             <p>Adviser: {{ request.user.adviser.full_name }}</p>
-            <p>Department: {{ request.user.department }}</p>
             <p>Sr No: {{ request.user.sr_no }}</p>
             <p>E-mail: {{ request.user.email }}</p>
             <p>Join date: {{ request.user.date_joined|date:'N j, Y' }}</p>

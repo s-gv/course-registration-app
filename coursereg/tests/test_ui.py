@@ -7,7 +7,7 @@ from utils import is_error_msg_present
 import unittest
 import datetime
 
-#@unittest.skip("skip UI tests in selenium")
+@unittest.skip("skip UI tests in selenium")
 class StudentUITests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):

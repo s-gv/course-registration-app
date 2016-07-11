@@ -53,13 +53,13 @@ def profile(request):
     context = {
         'nav_active': 'profile',
         'user_email': request.user.email,
-        'user_full_name': request.user.full_name
+        'user_full_name': request.user.full_name,
+        'department': request.user.department,
     }
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
         context['user_type'] = 'student'
         context['adviser_full_name'] = request.user.adviser.full_name
         context['degree'] = request.user.degree
-        context['department'] = request.user.department
         context['sr_no'] = request.user.sr_no
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         context['user_type'] = 'faculty'
