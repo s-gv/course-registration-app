@@ -168,7 +168,7 @@
                     <label for="id_label_single">
                         Register for a course
                         <select class="form-control" id="course_select_box" name="course_id">
-                            <option value=""></option>
+                            <option value="">No courses available</option>
                             {% for course in courses %}
                                 <option value="{{ course.id }}">{{ course }}</option>
                             {% endfor %}
