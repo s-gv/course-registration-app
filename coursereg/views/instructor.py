@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.utils import timezone
 from datetime import date, timedelta
 from coursereg import models
 

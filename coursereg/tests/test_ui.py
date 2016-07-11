@@ -7,7 +7,7 @@ from utils import is_error_msg_present
 import unittest
 import datetime
 
-@unittest.skip("skip UI tests in selenium")
+#@unittest.skip("skip UI tests in selenium")
 class StudentUITests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -24,7 +24,8 @@ class StudentUITests(StaticLiveServerTestCase):
         dept = Department.objects.create(name='Electrical Communication Engineering (ECE)')
         charles = User.objects.create_user(email='charles@test.com', password='charles12345', user_type=User.USER_TYPE_FACULTY)
         ben = User.objects.create_user(email='ben@ece.iisc.ernet.in', password='test12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
-        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, last_reg_date=datetime.datetime.now())
+        tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
+        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, last_reg_date=tomorrow)
 
     def test_login_add_course(self):
         driver = self.selenium

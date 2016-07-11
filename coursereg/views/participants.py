@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.core.mail import send_mail
@@ -29,7 +28,7 @@ def create(request):
         course = models.Course.objects.get(id=course_id)
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
             messages.error(request, 'Already registered for %s.' % course)
-        elif timezone.now() > course.last_reg_date:
+        elif course.is_last_grade_date_passed():
             messages.error(request, 'Registration for %s is now closed.' % course)
         else:
             participant = models.Participant.objects.create(
@@ -76,11 +75,13 @@ def update(request, participant_id):
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
+            assert not participant.course.is_last_grade_date_passed()
             participant.grade = int(request.POST['grade'])
             participant.save()
     elif request.POST['origin'] == 'adviser':
         assert participant.user.adviser == request.user
         if request.POST['action'] == 'state_change':
+            assert not participant.course.is_drop_date_passed()
             participant.state = request.POST['state']
             participant.save()
             student = participant.user
@@ -101,6 +102,7 @@ def update(request, participant_id):
             student.is_dcc_review_pending = True
             student.save()
         elif request.POST['action'] == 'delete':
+            assert not participant.course.is_last_reg_date_passed() or participant.is_instructor_approved == False
             msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
@@ -134,5 +136,8 @@ def delete(request, participant_id):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=participant_id)
     assert participant.user == request.user
+    assert participant.is_adviser_approved == False
+    assert participant.grade == models.Participant.GRADE_NA
+    assert not participant.course.is_last_reg_date_passed()
     participant.delete()
     return redirect(request.GET.get('next', reverse('coursereg:index')))

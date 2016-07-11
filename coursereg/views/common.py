@@ -4,7 +4,6 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from . import student, instructor, adviser, dcc
