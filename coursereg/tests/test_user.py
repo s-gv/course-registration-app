@@ -23,8 +23,8 @@ class UserLoginTests(TestCase):
         self.assertTrue(is_error_msg_present(response))
 
     def test_was_student_without_adviser_shown_fatal_error(self):
-        response = self.client.post(reverse('coursereg:signin'), {'email': 'ben@test.com', 'password': 'ben12345'}, follow=True)
-        self.assertTemplateUsed(response, 'coursereg/fatal.html')
+        with self.assertRaises(Exception) as context:
+            response = self.client.post(reverse('coursereg:signin'), {'email': 'ben@test.com', 'password': 'ben12345'}, follow=True)
 
     def test_was_student_shown_right_index_page(self):
         response = self.client.post(reverse('coursereg:signin'), {'email': 'alyssa@test.com', 'password': 'alyssa12345'}, follow=True)
