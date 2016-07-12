@@ -7,7 +7,6 @@ urlpatterns = [
     url(r'^signout$', views.user.signout, name='signout'),
     url(r'^changepasswd$', views.user.change_passwd, name='change_passwd'),
 
-    url(r'^fatal$', views.common.fatal_error, name='fatal'),
     url(r'^faq$', views.common.faq, name='faq'),
     url(r'^profile$', views.common.profile, name='profile'),
     url(r'^$', views.common.index, name='index'),

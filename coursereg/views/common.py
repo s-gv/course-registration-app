@@ -25,7 +25,7 @@ def index(request):
 
 def fatal_error(request):
     context = {}
-    return render(request, 'coursereg/fatal.html', context)
+    return render(request, 'coursereg/fatal.html', context, status=500)
 
 @login_required
 def faq(request):

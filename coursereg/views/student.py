@@ -26,8 +26,8 @@ def get_desc(participant):
 def index(request):
     assert request.user.user_type == models.User.USER_TYPE_STUDENT
     if not request.user.adviser:
-        messages.error(request, 'Adviser not assigned. Contact the administrator.')
-        return redirect('coursereg:fatal')
+        messages.error(request, 'Adviser not assigned.')
+        raise AssertionError
 
     participants = [(
         p.id,
