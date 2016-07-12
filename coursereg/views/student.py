@@ -27,7 +27,7 @@ def index(request):
     assert request.user.user_type == models.User.USER_TYPE_STUDENT
     if not request.user.adviser:
         messages.error(request, 'Adviser not assigned.')
-        raise AssertionError
+        raise Exception('Adviser not assigned')
 
     participants = [(
         p.id,
