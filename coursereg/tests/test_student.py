@@ -29,6 +29,19 @@ class StudentTests(TestCase):
         response = self.client.get(reverse('coursereg:index'), follow=True)
         self.assertFalse(self.course_yesterday in response.context['courses'])
 
+    def test_was_student_able_register_for_course_before_last_reg_date(self):
+        self.client.login(email='ben@test.com', password='ben12345')
+        self.client.post(reverse('coursereg:participants_create'),
+                {'course_id': self.course_tomorrow.id, 'reg_type': 'credit', 'user_id': self.ben.id, 'origin': 'student'}, follow=True)
+        self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
+
+    def test_was_student_able_register_for_course_after_last_reg_date(self):
+        self.client.login(email='ben@test.com', password='ben12345')
+        with self.assertRaises(AssertionError) as context:
+            self.client.post(reverse('coursereg:participants_create'),
+                {'course_id': self.course_yesterday.id, 'reg_type': 'credit', 'user_id': self.ben.id, 'origin': 'student'}, follow=True)
+        self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
+
     def test_was_course_added(self):
         self.client.login(email='ben@test.com', password='ben12345')
         response = self.client.post(reverse('coursereg:participants_create'),

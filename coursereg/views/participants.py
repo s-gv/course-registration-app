@@ -26,10 +26,9 @@ def create(request):
         messages.error(request, 'Select a course.')
     else:
         course = models.Course.objects.get(id=course_id)
+        assert not course.is_last_reg_date_passed()
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
             messages.error(request, 'Already registered for %s.' % course)
-        elif course.is_last_grade_date_passed():
-            messages.error(request, 'Registration for %s is now closed.' % course)
         else:
             participant = models.Participant.objects.create(
                 user_id=user_id,
