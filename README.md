@@ -13,7 +13,7 @@ How to deploy
 -------------
 
 - Obtain a stable [release](https://github.com/s-gv/bheemboy/releases) of bheemboy.
-- We recommend [PostgreSQL](http://www.postgresql.org/) database for production use.
+- We recommend [PostgreSQL](http://www.postgresql.org/) for production use.
 Install it, create a database and a user, and grant all permissions for the DB to the created user.
 - Edit `<proj_root>/bheemboy/settings.py` and give a value to `SECRET_KEY`, add auth details to `DATABASES`, set `DEBUG` to False, SMTP server in `EMAIL_HOST`, admin email in `DEFAULT_FROM_EMAIL`, and add the hostname (such as `coursereg.iisc.ac.in`) to `ALLOWED_HOSTS`. The [django documentation](https://docs.djangoproject.com/en/1.9/ref/settings/) has more details about the various settings.
 - In `<proj_root>/`, run `python manage.py collectstatic` to collect all static files in `<proj_root>/static`.
