@@ -38,6 +38,18 @@
             </table>
         </div>
     </div>
+    {% if faculty_approval_pending %}
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-inline" action="{% url 'coursereg:dcc_remind' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" id="sendReminder" class="btn btn-default btn-sm">
+                    Send reminder e-mail to faculty with pending approvals
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
     {% else %}
     <h2><small>No students pending review</small></h2>
     {% endif %}

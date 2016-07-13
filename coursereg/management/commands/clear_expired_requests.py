@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
         expired_participants = Participant.objects.filter(
             Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
-            course__last_reg_date__lt=date.today(), participant_type=Participant.PARTICIPANT_STUDENT)
+            course__last_reg_date__lt=timezone.now(), participant_type=Participant.PARTICIPANT_STUDENT)
 
         count = 0
         should_send_mail = True

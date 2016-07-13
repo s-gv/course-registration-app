@@ -29,4 +29,5 @@ urlpatterns = [
 
     url(r'^dcc/([0-9]+)$', views.dcc.detail, name='dcc_detail'),
     url(r'^dcc/([0-9]+)/approve$', views.dcc.approve, name='dcc_approve'),
+    url(r'^dcc/remind$', views.dcc.remind, name='dcc_remind'),
 ]

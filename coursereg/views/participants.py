@@ -61,11 +61,10 @@ def update(request, participant_id):
         assert models.Participant.objects.filter(course=participant.course,
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
         if request.POST['action'] == 'approve':
-            assert not course.is_last_reg_date_passed()
+            assert participant.is_adviser_approved
             participant.is_instructor_approved = True
             participant.save()
         elif request.POST['action'] == 'reject':
-            assert not course.is_last_reg_date_passed()
             assert not participant.is_instructor_approved
             msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
@@ -104,7 +103,7 @@ def update(request, participant_id):
             student.is_dcc_review_pending = True
             student.save()
         elif request.POST['action'] == 'delete':
-            assert not participant.course.is_last_reg_date_passed() or participant.is_instructor_approved == False
+            assert not participant.course.is_last_reg_date_passed() or not participant.is_instructor_approved
             msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
@@ -138,7 +137,7 @@ def delete(request, participant_id):
     assert request.method == 'POST'
     participant = models.Participant.objects.get(id=participant_id)
     assert participant.user == request.user
-    assert participant.is_adviser_approved == False
+    assert not participant.is_adviser_approved
     assert participant.grade == models.Participant.GRADE_NA
     assert not participant.course.is_last_reg_date_passed()
     participant.delete()
