@@ -1,0 +1,38 @@
+{% extends "coursereg/base.html" %}
+
+{% block head %}
+{% load staticfiles %}
+<link href="{% static 'coursereg/css/signin.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 col-md-offset-4">
+            <form class="form-signin" action="{{ request.path }}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <h3 class="form-signin-heading">Reset password</h3>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail" class="sr-only">Email address</label>
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" name="email" required autofocus>
+                </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Send reset email</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-4">
+
+        </div>
+    </div>
+</div>
+{% endblock %}

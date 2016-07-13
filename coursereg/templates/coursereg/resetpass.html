@@ -1,0 +1,41 @@
+{% extends "coursereg/base.html" %}
+
+{% block head %}
+{% load staticfiles %}
+<link href="{% static 'coursereg/css/signin.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        {% if validlink %}
+        <div class="col-md-3 col-md-offset-4">
+            <form class="form-signin" action="{{ request.path }}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <h3 class="form-signin-heading">Reset password</h3>
+                </div>
+                <div class="form-group">
+                    <label for="id_newpassword1" class="sr-only">New password</label>
+                    <input type="password" id="id_newpassword1" class="form-control" placeholder="New password" name="new_password1" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="id_newpassword2" class="sr-only">New password again</label>
+                    <input type="password" id="id_newpassword2" class="form-control" placeholder="New password again" name="new_password2" required>
+                </div>
+                {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+                {% endfor %}
+                {% endfor %}
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Reset password</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="col-md-12">
+            <p>Password reset link is invalid. Try <a href="{% url 'coursereg:signin' %}">signing in</a> again.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

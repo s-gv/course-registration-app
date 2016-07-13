@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import password_reset, password_reset_confirm
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
@@ -28,6 +29,33 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect(reverse('coursereg:index'))
+
+def forgot_passwd(request):
+    if request.method == 'GET':
+        return render(request, 'coursereg/forgotpass.html')
+    else:
+        user = models.User.objects.filter(email=request.POST['email']).first()
+        if user:
+            messages.success(request, 'Password recovery email sent.')
+            return password_reset(request,
+                template_name='coursereg/forgotpass.html',
+                email_template_name='coursereg/forgotpass_email_body.html',
+                subject_template_name='coursereg/forgotpass_email_subject.txt',
+                post_reset_redirect=reverse('coursereg:signin')
+            )
+        else:
+            messages.error(request, 'Unknown user.')
+            return redirect(reverse('coursereg:forgot_passwd'))
+
+def reset_passwd(request, uidb64=None, token=None):
+    response = password_reset_confirm(request,
+        uidb64=uidb64, token=token,
+        template_name='coursereg/resetpass.html',
+        post_reset_redirect=reverse('coursereg:signin')
+    )
+    if type(response) == HttpResponseRedirect:
+        messages.success(request, 'Password changed.')
+    return response
 
 @login_required
 def change_passwd(request):

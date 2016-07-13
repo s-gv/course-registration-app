@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from . import views
 
 app_name = 'coursereg'
@@ -6,6 +6,8 @@ urlpatterns = [
     url(r'^signin$', views.user.signin, name='signin'),
     url(r'^signout$', views.user.signout, name='signout'),
     url(r'^changepasswd$', views.user.change_passwd, name='change_passwd'),
+    url(r'^forgotpasswd$', views.user.forgot_passwd, name='forgot_passwd'),
+    url(r'^resetpasswd/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$', views.user.reset_passwd, name='reset_passwd'),
 
     url(r'^faq$', views.common.faq, name='faq'),
     url(r'^profile$', views.common.profile, name='profile'),

@@ -126,6 +126,8 @@ AUTH_USER_MODEL = 'coursereg.User'
 
 LOGIN_URL = '/signin'
 
+DEFAULT_FROM_EMAIL = 'admin@coursereg.iisc.ac.in'
+
 EMAIL_HOST = 'www.ece.iisc.ernet.in'
 EMAIL_TIMEOUT = 3
 

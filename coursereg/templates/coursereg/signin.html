@@ -24,14 +24,33 @@
                     <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password" required>
                 </div>
                 {% if messages %}
-                    {% for message in messages %}
+                {% for message in messages %}
+                <div class="row top-buffer-1">
+                    <div class="col-md-12">
                         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                            <div class="alert alert-danger" role="alert">{{ message }}</div>
+                        <div class="alert alert-danger" role="alert">{{ message }}</div>
+                        {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                        <div class="alert alert-warning" role="alert">{{ message }}</div>
+                        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                        <div class="alert alert-info" role="alert">{{ message }}</div>
+                        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                        <div class="alert alert-success" role="alert">{{ message }}</div>
                         {% endif %}
-                    {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
                 {% endif %}
+                <div class="form-group">
+                    <p class="help-block"><a href="{% url 'coursereg:forgot_passwd' %}">Forgot password?</a></p>
+                </div>
+
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-4">
+
         </div>
     </div>
 </div>
