@@ -61,9 +61,12 @@ def update(request, participant_id):
         assert models.Participant.objects.filter(course=participant.course,
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
         if request.POST['action'] == 'approve':
+            assert not course.is_last_reg_date_passed()
             participant.is_instructor_approved = True
             participant.save()
         elif request.POST['action'] == 'reject':
+            assert not course.is_last_reg_date_passed()
+            assert not participant.is_instructor_approved
             msg = 'Rejected application for %s.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
