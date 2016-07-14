@@ -65,6 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(default=timezone.now)
     sr_no = models.CharField(max_length=200, default='-')
+    telephone = models.CharField(max_length=100, default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)

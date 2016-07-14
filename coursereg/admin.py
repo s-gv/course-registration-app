@@ -29,18 +29,18 @@ class CourseInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'is_active', 'is_dcc_review_pending')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'is_active', 'is_dcc_review_pending')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'date_joined')}
+            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'date_joined')}
         ),
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'degree', 'sr_no', 'is_active', 'is_dcc_review_pending')
+    list_display = ('email', 'full_name', 'user_type', 'degree', 'telephone', 'is_active', 'is_dcc_review_pending')
     list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
