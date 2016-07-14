@@ -21,7 +21,7 @@ def index(request):
         return dcc.index(request)
     else:
         messages.error(request, "User type not recognized.")
-        return redirect('coursereg:fatal')
+        assert False, 'Unknown user type'
 
 def fatal_error(request):
     context = {}
