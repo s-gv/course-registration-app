@@ -3,6 +3,7 @@ from django.db.models import Q
 from datetime import date
 from coursereg.models import Participant, User, Notification
 from django.core.mail import send_mail
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = '''Delete enrolment requests past the last registration date that are not approved by adviser/instructor.
