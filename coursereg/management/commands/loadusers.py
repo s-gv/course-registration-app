@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from strgen import StringGenerator as SG
+import random, string
 from coursereg.models import User, Department, Degree
 import csv
 
@@ -52,7 +52,8 @@ class Command(BaseCommand):
                             print 'Warning: Department not found for: '+user_email+'.... Hence not adding him in the database!;'
                         else:
                             if(not User.objects.filter(email=user_email)):
-                                passwd = SG("[\l\d]{10}&[\p]").render()
+                                s=string.lowercase+string.digits
+                                passwd = ''.join(random.sample(s,10))
                                 User.objects.create_user(full_name=user_full_name, email=user_email, password=passwd, user_type=User.USER_TYPE_FACULTY, department=user_department[0] )
                     else:
                         print 'Data format error!!.. Non faculty user listed in faculty_csv_file'
@@ -94,7 +95,8 @@ class Command(BaseCommand):
                                     print 'Warning: enrolled degree not found for: '+user_email+'.... Hence not adding him in the database!;'
                                 else:
                                     if(not User.objects.filter(email=user_email)):
-                                        passwd = SG("[\l\d]{10}&[\p]").render()
+                                        s=string.lowercase+string.digits
+                                        passwd = ''.join(random.sample(s,10))
                                         user = User.objects.create_user(full_name=user_full_name, email=user_email, password=passwd, user_type=User.USER_TYPE_STUDENT, department=user_department[0], sr_no=user_sr_no, degree=user_program[0], adviser=user_adviser[0] )
                                         if(user_doj!=''):
                                             user.date_joined = user_doj
