@@ -3,7 +3,7 @@ from coursereg.models import User, Department, Degree
 import csv
 
 class Command(BaseCommand):
-    help = 'Bulk load departments to the database from a JSON file.'
+    help = 'Bulk load Users to the database from a faculty and student csv files.'
 
     def add_arguments(self, parser):
         parser.add_argument('--student_csv_file', default='coursereg/data/ece_students.csv', help='File to load the student data from (default: coursereg/data/ece_students.csv)')
@@ -11,11 +11,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         #Fixing naming inconsistencies by defining a map.
-        dept_map={'CDS'   : 'Department of Computational and Data Sciences (CDS)',
-                    'DESE' : 'Department of Electronic Systems Engineering (DESE)',
-                    'EE'   : 'Electrical Engineering (EE)',
-                    'CSA'  : 'Computer Science and Automation (CSA)',
-                    'ECE'  : 'Electrical Communication Engineering (ECE)'}
+        dept_map={'CDS'  : 'Department of Computational and Data Sciences (CDS)',
+                  'DESE' : 'Department of Electronic Systems Engineering (DESE)',
+                  'EE'   : 'Electrical Engineering (EE)',
+                  'CSA'  : 'Computer Science and Automation (CSA)',
+                  'ECE'  : 'Electrical Communication Engineering (ECE)'}
 
         degree_map = {  'Ph.D':'PhD',
                         'M.Sc':'MSc',
@@ -92,7 +92,10 @@ class Command(BaseCommand):
                                     print 'Warning: enrolled degree not found for: '+user_email+'.... Hence not adding him in the database!;'
                                 else:
                                     if(not User.objects.filter(email=user_email)):
-                                        User.objects.create_user(full_name=user_full_name, email=user_email, password='initpwd1234', user_type=User.USER_TYPE_STUDENT, department=user_department[0], sr_no=user_sr_no, degree=user_program[0], adviser=user_adviser[0] )
+                                        user = User.objects.create_user(full_name=user_full_name, email=user_email, password='initpwd1234', user_type=User.USER_TYPE_STUDENT, department=user_department[0], sr_no=user_sr_no, degree=user_program[0], adviser=user_adviser[0] )
+                                        if(user_doj!=''):
+                                            user.date_joined = user_doj
+                                            user.save()
                     else:
                         print 'Data format error!!.. Non Student user listed in student_csv_file'
                         print user
