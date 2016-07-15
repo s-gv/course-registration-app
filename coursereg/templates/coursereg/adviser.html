@@ -30,7 +30,13 @@
             <table class="table table-striped">
             {% for student in students %}
                 <tr>
-                    <td><a href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a></td>
+                    <td>
+                        {% if student.is_active %}
+                        <a href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
+                        {% else %}
+                        <a class="inactive-student" href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </table>

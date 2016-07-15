@@ -16,7 +16,7 @@ def index(request):
         'user_type': 'faculty',
         'nav_active': 'adviser',
         'user_email': request.user.email,
-        'students': [u for u in models.User.objects.filter(adviser=request.user).order_by('-date_joined')]
+        'students': [u for u in models.User.objects.filter(adviser=request.user).order_by('-is_active', '-date_joined')]
     }
     return render(request, 'coursereg/adviser.html', context)
 

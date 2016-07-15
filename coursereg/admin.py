@@ -50,11 +50,11 @@ class CustomUserAdmin(UserAdmin):
 
     def make_inactive(self, request, queryset):
         queryset.update(is_active=False)
-    make_inactive.short_description = "Deactivate selected users"
+    make_inactive.short_description = "Make selected users inactive"
 
     def make_active(self, request, queryset):
         queryset.update(is_active=True)
-    make_active.short_description = "Activate selected users"
+    make_active.short_description = "Make selected users active"
 
     def clear_dcc_review(self, request, queryset):
         queryset.update(is_dcc_review_pending=False)
