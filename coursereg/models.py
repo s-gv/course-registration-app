@@ -132,6 +132,26 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.user_type == User.USER_TYPE_STUDENT:
             return Participant.objects.filter(user=self, is_adviser_approved=False).first()
 
+    def cgpa(self):
+        if self.user_type == User.USER_TYPE_STUDENT:
+            grade_point = {
+                Participant.GRADE_S: 8,
+                Participant.GRADE_A: 7,
+                Participant.GRADE_B: 6,
+                Participant.GRADE_C: 5,
+                Participant.GRADE_D: 4,
+                Participant.GRADE_F: 0,
+            }
+            total_credits = 0
+            total_grade_points = 0
+            for p in Participant.objects.filter(user=self, state=Participant.STATE_CREDIT).exclude(grade=Participant.GRADE_NA):
+                total_credits += p.course.credits
+                total_grade_points += grade_point[p.grade] * p.course.credits
+            if total_credits > 0:
+                return "%.2f" % (total_grade_points * 1.0 / total_credits)
+        return '-'
+
+
     def get_full_name(self):
         return self.full_name.strip()
 

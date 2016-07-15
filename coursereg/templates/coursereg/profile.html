@@ -12,6 +12,7 @@
             {% if user_type == 'student' %}
             <p>Degree: {{ request.user.degree }}</p>
             <p>Adviser: {{ request.user.adviser.full_name }}</p>
+            <p>CGPA: {{ request.user.cgpa }}</p>
             <p>Sr No: {{ request.user.sr_no }}</p>
             <p>Join date: {{ request.user.date_joined|date:'N j, Y' }}</p>
             {% endif %}
