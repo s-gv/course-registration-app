@@ -29,7 +29,7 @@ class CourseInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'is_active', 'is_dcc_review_pending')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'cgpa', 'telephone', 'is_active', 'is_dcc_review_pending')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
@@ -44,6 +44,7 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
+    readonly_fields = ('cgpa',)
     ordering = ('-date_joined',)
     inlines = [CourseInline]
     actions = ['make_inactive', 'make_active', 'clear_dcc_review']
