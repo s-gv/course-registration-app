@@ -13,9 +13,10 @@
             <p>Degree: {{ request.user.degree }}</p>
             <p>Adviser: {{ request.user.adviser.full_name }}</p>
             <p>Sr No: {{ request.user.sr_no }}</p>
-            <p>E-mail: {{ request.user.email }}</p>
             <p>Join date: {{ request.user.date_joined|date:'N j, Y' }}</p>
             {% endif %}
+            <p>E-mail: {{ request.user.email }}</p>
+            <p>Phone: {{ request.user.telephone }}</p>
         </div>
     </div>
     <div class="row top-buffer-1">
