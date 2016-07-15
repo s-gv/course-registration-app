@@ -30,7 +30,13 @@
             <table class="table table-striped">
             {% for course in courses %}
                 <tr>
-                    <td><a href="{% url 'coursereg:instructor_detail' course.id %}">{{ course }}</a></td>
+                    <td>
+                        {% if course.is_last_grade_date_passed %}
+                        <a class="inactive" href="{% url 'coursereg:instructor_detail' course.id %}">{{ course }}</a>
+                        {% else %}
+                        <a href="{% url 'coursereg:instructor_detail' course.id %}">{{ course }}</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </table>

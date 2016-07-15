@@ -39,7 +39,7 @@
                             {% endif %}
                         </a>
                         {% else %}
-                        <a class="inactive-student" href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
+                        <a class="inactive" href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
                         {% endif %}
                     </td>
                 </tr>
