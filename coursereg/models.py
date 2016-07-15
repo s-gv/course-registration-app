@@ -44,6 +44,58 @@ class Degree(models.Model):
     def __unicode__(self):
         return self.name
 
+class Participant(models.Model):
+    PARTICIPANT_STUDENT = 0
+    PARTICIPANT_INSTRUCTOR = 1
+    PARTICIPANT_TA = 2
+
+    PARTICIPANT_CHOICES = (
+        (PARTICIPANT_STUDENT, 'Student'),
+        (PARTICIPANT_INSTRUCTOR, 'Instructor'),
+        (PARTICIPANT_TA, 'TA'),
+    )
+
+    STATE_NA = 0
+    STATE_CREDIT = 1
+    STATE_AUDIT = 2
+    STATE_DROP = 3
+
+    STATE_CHOICES = (
+        (STATE_NA, 'N/A'),
+        (STATE_CREDIT, 'Credit'),
+        (STATE_AUDIT, 'Audit'),
+        (STATE_DROP, 'Drop'),
+    )
+
+    GRADE_NA = 0
+    GRADE_S = 1
+    GRADE_A = 2
+    GRADE_B = 3
+    GRADE_C = 4
+    GRADE_D = 5
+    GRADE_F = 6
+
+    GRADE_CHOICES = (
+        (GRADE_NA, 'N/A'),
+        (GRADE_S, 'S'),
+        (GRADE_A, 'A'),
+        (GRADE_B, 'B'),
+        (GRADE_C, 'C'),
+        (GRADE_D, 'D'),
+        (GRADE_F, 'F'),
+    )
+
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
+    state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
+    grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
+    is_adviser_approved = models.BooleanField(default=False)
+    is_instructor_approved = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
+
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_STUDENT = 0
     USER_TYPE_FACULTY = 1
@@ -75,6 +127,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    def is_adviser_review_pending(self):
+        if self.user_type == User.USER_TYPE_STUDENT:
+            return Participant.objects.filter(user=self, is_adviser_approved=False).first()
 
     def get_full_name(self):
         return self.full_name.strip()
@@ -150,58 +206,6 @@ class Course(models.Model):
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
-
-class Participant(models.Model):
-    PARTICIPANT_STUDENT = 0
-    PARTICIPANT_INSTRUCTOR = 1
-    PARTICIPANT_TA = 2
-
-    PARTICIPANT_CHOICES = (
-        (PARTICIPANT_STUDENT, 'Student'),
-        (PARTICIPANT_INSTRUCTOR, 'Instructor'),
-        (PARTICIPANT_TA, 'TA'),
-    )
-
-    STATE_NA = 0
-    STATE_CREDIT = 1
-    STATE_AUDIT = 2
-    STATE_DROP = 3
-
-    STATE_CHOICES = (
-        (STATE_NA, 'N/A'),
-        (STATE_CREDIT, 'Credit'),
-        (STATE_AUDIT, 'Audit'),
-        (STATE_DROP, 'Drop'),
-    )
-
-    GRADE_NA = 0
-    GRADE_S = 1
-    GRADE_A = 2
-    GRADE_B = 3
-    GRADE_C = 4
-    GRADE_D = 5
-    GRADE_F = 6
-
-    GRADE_CHOICES = (
-        (GRADE_NA, 'N/A'),
-        (GRADE_S, 'S'),
-        (GRADE_A, 'A'),
-        (GRADE_B, 'B'),
-        (GRADE_C, 'C'),
-        (GRADE_D, 'D'),
-        (GRADE_F, 'F'),
-    )
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
-    state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
-    grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
-    is_adviser_approved = models.BooleanField(default=False)
-    is_instructor_approved = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
 
 class Faq(models.Model):
     FAQ_STUDENT = 0

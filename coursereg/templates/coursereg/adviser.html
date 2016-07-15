@@ -32,7 +32,12 @@
                 <tr>
                     <td>
                         {% if student.is_active %}
-                        <a href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
+                        <a href="{% url 'coursereg:adviser_detail' student.id %}">
+                            {{ student.full_name }}
+                            {% if student.is_adviser_review_pending %}
+                            <span class="badge">pending</span>
+                            {% endif %}
+                        </a>
                         {% else %}
                         <a class="inactive-student" href="{% url 'coursereg:adviser_detail' student.id %}">{{ student.full_name }}</a>
                         {% endif %}

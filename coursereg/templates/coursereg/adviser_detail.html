@@ -151,6 +151,7 @@
     </div>
     <div class="row">
         <div class="col-md-4">
+            {% if student.is_adviser_review_pending %}
             <form action="{% url 'coursereg:participants_approve_all' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ request.path }}">
@@ -158,6 +159,7 @@
                 <input type="hidden" name="origin" value="adviser">
                 <button type="submit" class="btn btn-success">Approve all</button>
             </form>
+            {% endif %}
         </div>
     </div>
     {% endif %}
