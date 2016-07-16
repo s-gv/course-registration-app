@@ -148,7 +148,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 total_credits += p.course.credits
                 total_grade_points += grade_point[p.grade] * p.course.credits
             if total_credits > 0:
-                return "%.2f" % (total_grade_points * 1.0 / total_credits)
+                return "%.1f" % (total_grade_points * 1.0 / total_credits)
         return '-'
 
 
