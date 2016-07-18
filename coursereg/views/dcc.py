@@ -22,15 +22,15 @@ def index(request):
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
                 user__department=request.user.department,
                 participant_type=models.Participant.PARTICIPANT_STUDENT).first(),
-        'pending_students': [(student.full_name, student.email, student.id)
-            for student in models.User.objects.filter(user_type=models.User.USER_TYPE_STUDENT,
-                                                      is_dcc_review_pending=True,
-                                                      is_active=True,
-                                                      department=request.user.department).order_by('full_name')],
-        'all_active_students': [(student.full_name, student.email, student.id)
-            for student in models.User.objects.filter(user_type=models.User.USER_TYPE_STUDENT,
-                                                      is_active=True,
-                                                      department=request.user.department).order_by('full_name')],
+        'pending_students': [student for student in models.User.objects.filter(
+            user_type=models.User.USER_TYPE_STUDENT,
+            is_dcc_review_pending=True,
+            is_active=True,
+            department=request.user.department).order_by('full_name')],
+        'all_active_students': [student for student in models.User.objects.filter(
+            user_type=models.User.USER_TYPE_STUDENT,
+            is_active=True,
+            department=request.user.department).order_by('full_name')],
         'user_email': request.user.email
     }
     return render(request, 'coursereg/dcc.html', context)
@@ -55,7 +55,7 @@ def detail(request, student_id):
         'student': student,
         'participants': participants,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
-            for n in models.Notification.objects.filter(user=student, origin=models.Notification.ORIGIN_DCC, is_dcc_acknowledged=False).order_by('-created_at')],
+            for n in models.Notification.objects.filter(user=student, is_dcc_acknowledged=False).order_by('-created_at')],
     }
     return render(request, 'coursereg/dcc_detail.html', context)
 
@@ -68,9 +68,7 @@ def approve(request, student_id):
     assert student.department == request.user.department
     student.is_dcc_review_pending = False
     student.save()
-    models.Notification.objects.filter(user=student, origin=models.Notification.ORIGIN_DCC).update(is_dcc_acknowledged=True,
-                                                                                                   is_student_acknowledged=True,
-                                                                                                   is_adviser_acknowledged=True)
+    models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 

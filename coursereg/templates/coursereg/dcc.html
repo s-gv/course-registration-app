@@ -29,11 +29,13 @@
     <div class="row">
         <div class="col-md-12">
             <table class="table table-striped">
-                {% for name, email, id in pending_students %}
+                {% for student in pending_students %}
+                {% if not student.is_instructor_review_pending %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td><a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})</td>
+                    <td><a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})</td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </table>
         </div>
@@ -61,10 +63,19 @@
     <div class="row">
         <div class="col-md-12">
             <table class="table table-striped">
-            {% for name, email, id in all_active_students %}
+            {% for student in all_active_students %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td><a href="{% url 'coursereg:dcc_detail' id %}">{{ name }}</a> ({{ email }})</td>
+                <td>
+                    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
+                    {% if student.is_adviser_or_instructor_pending %}
+                    <span class="badge">In progress</span>
+                    {% elif student.is_dcc_review_pending %}
+                    <span class="badge">DCC pending</span>
+                    {% elif student.is_grade_pending %}
+                    <span class="badge">Registered</span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
             </table>

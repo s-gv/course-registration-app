@@ -64,6 +64,9 @@ def update(request, participant_id):
             assert participant.is_adviser_approved
             participant.is_instructor_approved = True
             participant.save()
+            student = participant.user
+            student.is_dcc_review_pending = True
+            student.save()
         elif request.POST['action'] == 'reject':
             assert not participant.is_instructor_approved
             msg = 'Rejected application for %s.' % participant.course

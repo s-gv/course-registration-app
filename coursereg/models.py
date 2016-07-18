@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from datetime import date, datetime, timedelta
+from django.db.models import Q
 import re
 
 class CustomUserManager(BaseUserManager):
@@ -131,6 +132,24 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_adviser_review_pending(self):
         if self.user_type == User.USER_TYPE_STUDENT:
             return Participant.objects.filter(user=self, is_adviser_approved=False).first()
+
+    def is_instructor_review_pending(self):
+        if self.user_type == User.USER_TYPE_STUDENT:
+            return Participant.objects.filter(user=self, is_instructor_approved=False).first()
+
+    def is_adviser_or_instructor_pending(self):
+        if self.user_type == User.USER_TYPE_STUDENT:
+            return Participant.objects.filter(
+                Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
+                user=self).first()
+
+    def is_grade_pending(self):
+        if self.user_type == User.USER_TYPE_STUDENT:
+            return Participant.objects.filter(
+                is_adviser_approved=True,
+                is_instructor_approved=True,
+                grade=Participant.GRADE_NA,
+                user=self).first()
 
     def cgpa(self):
         if self.user_type == User.USER_TYPE_STUDENT:
