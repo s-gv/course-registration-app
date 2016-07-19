@@ -67,14 +67,8 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>
-                    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
-                    {% if student.is_adviser_or_instructor_pending %}
-                    <span class="badge">In progress</span>
-                    {% elif student.is_dcc_review_pending %}
-                    <span class="badge">DCC pending</span>
-                    {% elif student.is_grade_pending %}
-                    <span class="badge">Registered</span>
-                    {% endif %}
+                    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
+                    ({{ student.email }})
                 </td>
             </tr>
             {% endfor %}
