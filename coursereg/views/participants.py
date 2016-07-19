@@ -37,7 +37,7 @@ def create(request):
                 state=state,
                 grade=models.Participant.GRADE_NA,
                 is_adviser_approved=request.POST['origin'] == 'adviser',
-                is_instructor_approved=False
+                is_instructor_approved=(course.credits == 0)
             )
             if request.POST['origin'] == 'adviser':
                 msg = 'Applied for %s.' % participant.course
@@ -101,6 +101,8 @@ def update(request, participant_id):
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
+            if participant.course.credits == 0:
+                participant.is_instructor_approved = True
             participant.save()
             student = participant.user
             student.is_dcc_review_pending = True
@@ -128,6 +130,7 @@ def approve_all(request):
             student.is_dcc_review_pending = True
             student.save()
         models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
+        models.Participant.objects.filter(user=student, course__credits=0).update(is_instructor_approved=True)
     elif request.POST['origin'] == 'instructor':
         course = models.Course.objects.get(id=request.POST['course_id'])
         assert models.Participant.objects.filter(course=course,
