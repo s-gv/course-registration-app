@@ -148,15 +148,6 @@ LOGGING = {
             'level':'DEBUG',
             'class':'logging.NullHandler',
         },
-        'logfile': {
-            'level':'WARN',
-            'class':'logging.handlers.RotatingFileHandler',
-            #'filename': SITE_ROOT + "/logfile",
-            'filename': "./logfile",
-            'maxBytes': 50000,
-            'backupCount': 2,
-            'formatter': 'standard',
-        },
         'console':{
             'level':'INFO',
             'class':'logging.StreamHandler',
@@ -165,7 +156,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers':['logfile'],
+            'handlers':['console'],
             'propagate': True,
             'level':'WARN',
         },
@@ -175,7 +166,7 @@ LOGGING = {
             'propagate': False,
         },
         'coursereg': {
-            'handlers': ['console', 'logfile'],
+            'handlers': ['console'],
             'propogate': True,
             'level': 'WARN',
         },
