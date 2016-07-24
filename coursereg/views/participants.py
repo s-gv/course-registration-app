@@ -16,7 +16,10 @@ def create(request):
     reg_type = request.POST['reg_type']
 
     user = models.User.objects.get(id=user_id)
-    assert request.user == user or request.user == user.adviser
+    if request.POST['origin'] == 'adviser':
+        assert request.user == user.adviser
+    else:
+        assert request.user == user
 
     state = models.Participant.STATE_CREDIT
     if reg_type == 'audit':
@@ -36,10 +39,13 @@ def create(request):
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
                 state=state,
                 grade=models.Participant.GRADE_NA,
-                is_adviser_approved=request.POST['origin'] == 'adviser',
-                is_instructor_approved=(course.credits == 0)
+                is_adviser_approved=False,
+                is_instructor_approved=False
             )
             if request.POST['origin'] == 'adviser':
+                participant.is_adviser_approved = True
+                participant.is_instructor_approved = (course.credits == 0)
+                participant.save()
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
