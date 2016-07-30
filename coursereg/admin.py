@@ -2,17 +2,16 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config
+from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
     extra = 0
-    can_delete = False
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
+    fields = ('user', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -20,10 +19,9 @@ class CourseInline(admin.TabularInline):
     verbose_name = "Course"
     verbose_name_plural = "Courses"
     extra = 0
-    can_delete = False
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
+    fields = ('course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
     ordering = ('-course__last_reg_date',)
 
 class CustomUserAdmin(UserAdmin):
@@ -40,7 +38,7 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'is_active')
+    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active')
     list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
@@ -62,7 +60,7 @@ class CustomUserAdmin(UserAdmin):
     clear_dcc_review.short_description = "Clear DCC review"
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('num', 'title', 'department', 'last_reg_date', 'last_drop_date')
+    list_display = ('num', 'title', 'department', 'last_reg_date', 'num_credits', 'should_count_towards_cgpa', 'auto_instructor_approve')
     ordering = ('-last_reg_date', 'department__name', 'num', 'title')
     search_fields = ('title', 'num', 'last_reg_date')
     inlines = [ParticipantInline]
@@ -77,38 +75,39 @@ class CourseAdmin(admin.ModelAdmin):
                 new_d = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
             return new_d
         for course in queryset:
-            new_last_reg_date = add_one_year(course.last_reg_date)
             if not Course.objects.filter(num=course.num,
-                    last_reg_date__gte=new_last_reg_date-timedelta(days=15),
-                    last_reg_date__lte=new_last_reg_date+timedelta(days=15)):
+                    last_reg_date__gte=add_one_year(course.last_reg_date)-timedelta(days=15),
+                    last_reg_date__lte=add_one_year(course.last_reg_date)+timedelta(days=15)):
                 new_course = Course.objects.create(
                     num=course.num,
                     title=course.title,
+                    department=course.department,
                     term=course.term,
-                    last_reg_date=new_last_reg_date,
+                    year=course.year,
+                    num_credits=course.num_credits,
+                    credit_label=course.credit_label,
+                    should_count_towards_cgpa=course.should_count_towards_cgpa,
+                    last_reg_date=add_one_year(course.last_reg_date),
+                    last_conversion_date=add_one_year(course.last_conversion_date),
                     last_drop_date=add_one_year(course.last_drop_date),
-                    credits=course.credits,
-                    department=course.department
+                    last_drop_with_mention_date=add_one_year(course.last_drop_with_mention_date),
+                    last_grade_date=add_one_year(course.last_grade_date)
                 )
                 for participant in Participant.objects.filter(course=course, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
                     Participant.objects.create(
                         user=participant.user,
                         course=new_course,
-                        participant_type=participant.participant_type,
-                        state=participant.state,
-                        grade=participant.grade,
-                        is_adviser_approved=participant.is_adviser_approved,
-                        is_instructor_approved=participant.is_instructor_approved
+                        participant_type=participant.participant_type
                     )
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'state', 'grade', 'is_adviser_approved', 'is_instructor_approved')
+    list_display = ('user', 'course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade')
     ordering = ('-course__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'state', 'course__last_reg_date', 'is_adviser_approved', 'is_instructor_approved')
+    list_filter = ('participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'course__last_reg_date', 'is_adviser_approved', 'is_instructor_approved')
 
 class FaqAdmin(admin.ModelAdmin):
     list_display = ('question', 'faq_for')
@@ -116,8 +115,8 @@ class FaqAdmin(admin.ModelAdmin):
     list_filter = ('faq_for',)
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-    search_fields = ('name', )
+    list_display = ('name', 'abbreviation')
+    search_fields = ('name', 'abbreviation')
 
 class DegreeAdmin(admin.ModelAdmin):
     list_display = ('name', )
@@ -135,6 +134,9 @@ class ConfigAdmin(admin.ModelAdmin):
     list_display = ('key', 'value')
     search_fields = ('key',)
 
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'points', 'should_count_towards_cgpa')
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
@@ -143,3 +145,4 @@ admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Config, ConfigAdmin)
+admin.site.register(Grade, GradeAdmin)

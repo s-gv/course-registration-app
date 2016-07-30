@@ -25,21 +25,21 @@ def detail(request, course_id):
     assert models.Participant.objects.filter(course=course,
         user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
     reg_requests = [
-        (p.state == models.Participant.STATE_CREDIT, p.id, p.user)
+        (p.is_credit, p.id, p.user)
         for p in models.Participant.objects.filter(course=course,
                                                    is_adviser_approved=True,
                                                    is_instructor_approved=False)]
 
     crediting = models.Participant.objects.filter(course=course,
-                                                  state=models.Participant.STATE_CREDIT,
+                                                  is_credit=True,
                                                   is_adviser_approved=True,
                                                   is_instructor_approved=True)
     auditing = models.Participant.objects.filter(course=course,
-                                                 state=models.Participant.STATE_AUDIT,
+                                                 is_credit=False,
                                                  is_adviser_approved=True,
                                                  is_instructor_approved=True)
     dropped = models.Participant.objects.filter(course=course,
-                                                state=models.Participant.STATE_DROP,
+                                                is_drop=True,
                                                 is_adviser_approved=True,
                                                 is_instructor_approved=True)
 
@@ -51,6 +51,7 @@ def detail(request, course_id):
         'registration_requests': reg_requests,
         'crediting': crediting,
         'auditing': auditing,
-        'dropped': dropped
+        'dropped': dropped,
+        'grades': models.Grade.objects.all().order_by('-points')
     }
     return render(request, 'coursereg/instructor_detail.html', context)

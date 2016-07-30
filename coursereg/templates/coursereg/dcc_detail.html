@@ -61,12 +61,12 @@
             <ul class="list-group">
                 {% for participant_id, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
                 <li class="list-group-item">
-                    {% if is_credit %}
-                    <div title="Credit" class="credit-bg pull-left">C</div>
+                    {% if is_drop %}
+                    <div title="Dropped" class="audit-bg pull-left">D</div>
                     {% elif is_audit  %}
                     <div title="Audit" class="audit-bg pull-left">A</div>
-                    {% elif is_drop %}
-                    <div title="Dropped" class="audit-bg pull-left">D</div>
+                    {% elif is_credit %}
+                    <div title="Credit" class="credit-bg pull-left">C</div>
                     {% endif %}
                     <div class="row courserow">
                         <div class="col-md-5">

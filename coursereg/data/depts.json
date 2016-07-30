@@ -1,7 +1,22 @@
 [
-    "Electrical Communication Engineering (ECE)",
-    "Computer Science and Automation (CSA)",
-    "Electrical Engineering (EE)",
-    "Department of Electronic Systems Engineering (DESE)",
-    "Department of Computational and Data Sciences (CDS)"
+    {
+        "name": "Electrical Communication Engineering",
+        "abbreviation": "ECE"
+    },
+    {
+        "name": "Computer Science and Automation",
+        "abbreviation": "CSA"
+    },
+    {
+        "name": "Electrical Engineering",
+        "abbreviation": "EE"
+    },
+    {
+        "name": "Department of Electronic Systems Engineering",
+        "abbreviation": "DESE"
+    },
+    {
+        "name": "Department of Computational and Data Sciences",
+        "abbreviation": "CDS"
+    }
 ]

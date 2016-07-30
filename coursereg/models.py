@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from decimal import Decimal
 from datetime import date, datetime, timedelta
 from django.db.models import Q
 import re
@@ -14,8 +15,7 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email,
                           is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
-                          date_joined=now, **extra_fields)
+                          is_superuser=is_superuser, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -28,22 +28,30 @@ class CustomUserManager(BaseUserManager):
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
+    abbreviation = models.CharField(max_length=100, default='-')
 
     def __unicode__(self):
-        return self.name
-
-    def abbreviation(self):
-        r = re.search(r'\((.+)\)\s*$', self.name)
-        if r:
-            return r.group(1)
-        else:
-            return self.name
+        return self.abbreviation
 
 class Degree(models.Model):
     name = models.CharField(max_length=100)
 
     def __unicode__(self):
         return self.name
+
+class Grade(models.Model):
+    name = models.CharField(max_length=100)
+    points = models.DecimalField(max_digits=10, decimal_places=3, default=Decimal('0.00'))
+    should_count_towards_cgpa = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return self.name
+
+def get_default_grade():
+    default_grade = Grade.objects.filter(name="Not graded", should_count_towards_cgpa=False).first()
+    if not default_grade:
+        default_grade = Grade.objects.create(name="Not graded", should_count_towards_cgpa=False, points=0)
+    return default_grade
 
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
@@ -56,43 +64,16 @@ class Participant(models.Model):
         (PARTICIPANT_TA, 'TA'),
     )
 
-    STATE_NA = 0
-    STATE_CREDIT = 1
-    STATE_AUDIT = 2
-    STATE_DROP = 3
-
-    STATE_CHOICES = (
-        (STATE_NA, 'N/A'),
-        (STATE_CREDIT, 'Credit'),
-        (STATE_AUDIT, 'Audit'),
-        (STATE_DROP, 'Drop'),
-    )
-
-    GRADE_NA = 0
-    GRADE_S = 1
-    GRADE_A = 2
-    GRADE_B = 3
-    GRADE_C = 4
-    GRADE_D = 5
-    GRADE_F = 6
-
-    GRADE_CHOICES = (
-        (GRADE_NA, 'N/A'),
-        (GRADE_S, 'S'),
-        (GRADE_A, 'A'),
-        (GRADE_B, 'B'),
-        (GRADE_C, 'C'),
-        (GRADE_D, 'D'),
-        (GRADE_F, 'F'),
-    )
-
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
-    state = models.IntegerField(default=STATE_NA, choices=STATE_CHOICES)
-    grade = models.IntegerField(default=GRADE_NA, choices=GRADE_CHOICES)
+    is_credit = models.BooleanField(default=True)
+    is_drop = models.BooleanField(default=False)
+    is_drop_mentioned = models.BooleanField(default=False)
+    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, null=True, blank=True, default=get_default_grade)
     is_adviser_approved = models.BooleanField(default=False)
     is_instructor_approved = models.BooleanField(default=False)
+    should_count_towards_cgpa = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
@@ -153,19 +134,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def cgpa(self):
         if self.user_type == User.USER_TYPE_STUDENT:
-            grade_point = {
-                Participant.GRADE_S: 8,
-                Participant.GRADE_A: 7,
-                Participant.GRADE_B: 6,
-                Participant.GRADE_C: 5,
-                Participant.GRADE_D: 4,
-                Participant.GRADE_F: 0,
-            }
             total_credits = 0
             total_grade_points = 0
-            for p in Participant.objects.filter(user=self, state=Participant.STATE_CREDIT).exclude(grade=Participant.GRADE_NA):
-                total_credits += p.course.credits
-                total_grade_points += grade_point[p.grade] * p.course.credits
+            for p in Participant.objects.filter(user=self, is_credit=True).exclude(is_drop=False).exclude(should_count_towards_cgpa=False):
+                if p.course.should_count_towards_cgpa and p.grade and p.grade.should_count_towards_cgpa:
+                    total_credits += p.course.credits
+                    total_grade_points += p.grade.points * p.course.credits
             if total_credits > 0:
                 return "%.1f" % (total_grade_points * 1.0 / total_credits)
         return '-'
@@ -205,11 +179,42 @@ def get_recent_last_reg_date():
         return recent_course.last_reg_date
     return timezone.now()
 
+def get_recent_last_conversion_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_conversion_date
+    return timezone.now()
+
 def get_recent_last_drop_date():
     recent_course = Course.objects.order_by('-updated_at').first()
     if recent_course:
         return recent_course.last_drop_date
     return timezone.now()
+
+def get_recent_last_drop_with_mention_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_drop_with_mention_date
+    return timezone.now()
+
+def get_recent_last_grade_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_grade_date
+    return timezone.now()
+
+def get_recent_term():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.term
+    return Course.TERM_AUG
+
+def get_recent_year():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.year
+    return str(timezone.now().year)
+
 
 class Course(models.Model):
     TERM_AUG = 0
@@ -226,25 +231,35 @@ class Course(models.Model):
 
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
-    term = models.IntegerField(default=TERM_AUG, choices=TERM_CHOICES)
-    last_reg_date = models.DateTimeField(verbose_name="Last Registration Date", default=get_recent_last_reg_date)
-    last_drop_date = models.DateTimeField(verbose_name="Last Drop Date", default=get_recent_last_drop_date)
-    credits = models.IntegerField(default=3)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    term = models.IntegerField(default=get_recent_term, choices=TERM_CHOICES)
+    year = models.CharField(max_length=4, default=get_recent_year)
+    num_credits = models.IntegerField(default=3, verbose_name="Number of credits")
+    credit_label = models.CharField(max_length=100, default='', verbose_name="Credit split (ex: 3:0)", blank=True)
+    should_count_towards_cgpa = models.BooleanField(default=True)
+    auto_instructor_approve = models.BooleanField(default=False)
+    last_reg_date = models.DateTimeField(verbose_name="Last registration date", default=get_recent_last_reg_date)
+    last_conversion_date = models.DateTimeField(verbose_name="Last credit/audit conversion date", default=get_recent_last_conversion_date)
+    last_drop_date = models.DateTimeField(verbose_name="Last drop date", default=get_recent_last_drop_date)
+    last_drop_with_mention_date = models.DateTimeField(verbose_name="Last drop with mention date", default=get_recent_last_drop_with_mention_date)
+    last_grade_date = models.DateTimeField(verbose_name="Last grade date", default=get_recent_last_grade_date)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def is_last_reg_date_passed(self):
         return timezone.now() > self.last_reg_date
 
+    def is_last_conversion_date_passed(self):
+        return timezone.now() > self.last_conversion_date
+
     def is_drop_date_passed(self):
         return timezone.now() > self.last_drop_date
 
     def is_last_grade_date_passed(self):
-        return timezone.now() > (self.last_reg_date + timedelta(days=150))
+        return timezone.now() > self.last_grade_date
 
     def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s %s)' % (self.TERM_CHOICES[self.term][1], self.last_reg_date.year)
+        return self.num + ' ' + self.title + ' (%s %s)' % (Course.TERM_CHOICES[self.term][1], self.year)
 
 class Faq(models.Model):
     FAQ_STUDENT = 0

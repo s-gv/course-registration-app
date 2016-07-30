@@ -43,9 +43,9 @@ def detail(request, student_id):
     assert student.department == request.user.department
     participants = [(
         p.id,
-        p.state == models.Participant.STATE_CREDIT,
-        p.state == models.Participant.STATE_AUDIT,
-        p.state == models.Participant.STATE_DROP,
+        p.is_credit,
+        not p.is_credit,
+        p.is_drop,
         p.course, get_desc(p),
         not p.is_adviser_approved
     ) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date', 'course__title')]

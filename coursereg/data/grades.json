@@ -1,0 +1,32 @@
+[
+    {
+        "name": "S grade",
+        "points": "8.0",
+        "should_count_towards_cgpa": true
+    },
+    {
+        "name": "A grade",
+        "points": "7.0",
+        "should_count_towards_cgpa": true
+    },
+    {
+        "name": "B grade",
+        "points": "6.0",
+        "should_count_towards_cgpa": true
+    },
+    {
+        "name": "C grade",
+        "points": "5.0",
+        "should_count_towards_cgpa": true
+    },
+    {
+        "name": "D grade",
+        "points": "4.0",
+        "should_count_towards_cgpa": true
+    },
+    {
+        "name": "F grade",
+        "points": "0.0",
+        "should_count_towards_cgpa": true
+    }
+]

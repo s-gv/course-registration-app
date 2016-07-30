@@ -7,6 +7,7 @@ from django.contrib import messages
 from datetime import timedelta
 from coursereg import models
 from django.core.mail import send_mail
+from django.db.models import Q
 
 @login_required
 def create(request):
@@ -21,10 +22,6 @@ def create(request):
     else:
         assert request.user == user
 
-    state = models.Participant.STATE_CREDIT
-    if reg_type == 'audit':
-        state = models.Participant.STATE_AUDIT
-
     if not course_id:
         messages.error(request, 'Select a course.')
     else:
@@ -37,14 +34,14 @@ def create(request):
                 user_id=user_id,
                 course_id=course_id,
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
-                state=state,
-                grade=models.Participant.GRADE_NA,
+                is_credit=(reg_type == 'credit'),
+                should_count_towards_cgpa=course.should_count_towards_cgpa,
                 is_adviser_approved=False,
                 is_instructor_approved=False
             )
             if request.POST['origin'] == 'adviser':
                 participant.is_adviser_approved = True
-                participant.is_instructor_approved = (course.credits == 0)
+                participant.is_instructor_approved = couse.auto_instructor_approve
                 participant.save()
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
@@ -86,18 +83,30 @@ def update(request, participant_id):
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
             assert not participant.course.is_last_grade_date_passed()
-            participant.grade = int(request.POST['grade'])
+            participant.grade = models.Grade.objects.get(id=request.POST['grade'])
             participant.save()
     elif request.POST['origin'] == 'adviser':
         assert participant.user.adviser == request.user
         if request.POST['action'] == 'state_change':
             assert not participant.course.is_drop_date_passed()
-            participant.state = request.POST['state']
+            state = request.POST['state']
+            if state == 'credit':
+                if not participant.is_credit:
+                    assert not participant.course.is_last_conversion_date_passed()
+                participant.is_credit = True
+                participant.is_drop = False
+            elif state == 'audit':
+                if participant.is_credit:
+                    assert not participant.course.is_last_conversion_date_passed()
+                participant.is_credit = False
+                participant.is_drop = False
+            elif state == 'drop':
+                participant.is_drop = True
             participant.save()
             student = participant.user
             student.is_dcc_review_pending = True
             student.save()
-            msg = 'Registration of %s changed to %s.' % (participant.course, models.Participant.STATE_CHOICES[int(participant.state)][1])
+            msg = 'Registration of %s changed.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
@@ -107,8 +116,7 @@ def update(request, participant_id):
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
             participant.is_adviser_approved = True
-            if participant.course.credits == 0:
-                participant.is_instructor_approved = True
+            participant.is_instructor_approved = participant.course.auto_instructor_approve
             participant.save()
             student = participant.user
             student.is_dcc_review_pending = True
@@ -136,7 +144,7 @@ def approve_all(request):
             student.is_dcc_review_pending = True
             student.save()
         models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
-        models.Participant.objects.filter(user=student, course__credits=0).update(is_instructor_approved=True)
+        models.Participant.objects.filter(course__auto_instructor_approve=True, user=student).update(is_instructor_approved=True)
     elif request.POST['origin'] == 'instructor':
         course = models.Course.objects.get(id=request.POST['course_id'])
         assert models.Participant.objects.filter(course=course,
@@ -150,7 +158,6 @@ def delete(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
     assert participant.user == request.user
     assert not participant.is_adviser_approved
-    assert participant.grade == models.Participant.GRADE_NA
     assert not participant.course.is_last_reg_date_passed()
     participant.delete()
     return redirect(request.GET.get('next', reverse('coursereg:index')))

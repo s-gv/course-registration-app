@@ -10,16 +10,16 @@ from coursereg import models
 from django.contrib.auth import update_session_auth_hash
 
 def get_desc(participant):
-    if participant.state  == models.Participant.STATE_DROP:
+    if participant.is_drop:
         return 'Dropped this course'
     if not participant.is_adviser_approved:
         return 'Awaiting adviser review'
     if not participant.is_instructor_approved:
         return 'Adviser has approved. Awaiting instructor review'
-    if participant.grade == models.Participant.GRADE_NA:
+    if participant.grade == models.get_default_grade():
         return 'Registered'
     else:
-        return models.Participant.GRADE_CHOICES[participant.grade][1] + ' grade'
+        return participant.grade
     return 'Unknown state'
 
 @login_required
@@ -31,9 +31,9 @@ def index(request):
 
     participants = [(
         p.id,
-        p.state == models.Participant.STATE_CREDIT,
-        p.state == models.Participant.STATE_AUDIT,
-        p.state == models.Participant.STATE_DROP,
+        p.is_credit,
+        not p.is_credit,
+        p.is_drop,
         p.course, get_desc(p),
         not p.is_adviser_approved
     ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]

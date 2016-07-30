@@ -129,47 +129,13 @@
                                             {% else %}
                                             <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
                                             {% endif %}
-                                                {% if participant.grade == 0 %}
-                                                <option value="0" selected>Not graded</option>
+                                                {% for grade in grades %}
+                                                {% if participant.grade == grade %}
+                                                <option value="{{ grade.id }}" selected>{{ grade }}</option>
                                                 {% else %}
-                                                <option value="0">Not graded</option>
+                                                <option value="{{ grade.id }}">{{ grade }}</option>
                                                 {% endif %}
-
-                                                {% if participant.grade == 1 %}
-                                                <option value="1" selected>S grade</option>
-                                                {% else %}
-                                                <option value="1">S grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 2 %}
-                                                <option value="2" selected>A grade</option>
-                                                {% else %}
-                                                <option value="2">A grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 3 %}
-                                                <option value="3" selected>B grade</option>
-                                                {% else %}
-                                                <option value="3">B grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 4 %}
-                                                <option value="4" selected>C grade</option>
-                                                {% else %}
-                                                <option value="4">C grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 5 %}
-                                                <option value="5" selected>D grade</option>
-                                                {% else %}
-                                                <option value="5">D grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 6 %}
-                                                <option value="6" selected>F grade</option>
-                                                {% else %}
-                                                <option value="6">F grade</option>
-                                                {% endif %}
+                                                {% endfor %}
                                             </select>
                                         </div>
                                     </form>
@@ -223,47 +189,13 @@
                                             {% else %}
                                             <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
                                             {% endif %}
-                                                {% if participant.grade == 0 %}
-                                                <option value="0" selected>Not graded</option>
+                                                {% for grade in grades %}
+                                                {% if participant.grade == grade %}
+                                                <option value="{{ grade.id }}" selected>{{ grade }}</option>
                                                 {% else %}
-                                                <option value="0">Not graded</option>
+                                                <option value="{{ grade.id }}">{{ grade }}</option>
                                                 {% endif %}
-
-                                                {% if participant.grade == 1 %}
-                                                <option value="1" selected>S grade</option>
-                                                {% else %}
-                                                <option value="1">S grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 2 %}
-                                                <option value="2" selected>A grade</option>
-                                                {% else %}
-                                                <option value="2">A grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 3 %}
-                                                <option value="3" selected>B grade</option>
-                                                {% else %}
-                                                <option value="3">B grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 4 %}
-                                                <option value="4" selected>C grade</option>
-                                                {% else %}
-                                                <option value="4">C grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 5 %}
-                                                <option value="5" selected>D grade</option>
-                                                {% else %}
-                                                <option value="5">D grade</option>
-                                                {% endif %}
-
-                                                {% if participant.grade == 6 %}
-                                                <option value="6" selected>F grade</option>
-                                                {% else %}
-                                                <option value="6">F grade</option>
-                                                {% endif %}
+                                                {% endfor %}
                                             </select>
                                         </div>
                                     </form>

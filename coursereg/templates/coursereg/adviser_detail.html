@@ -103,32 +103,54 @@
                                         <div class="form-group">
                                             {% if participant.course.is_drop_date_passed %}
                                             <select class="form-control input-sm" name="state" onchange="this.form.submit()" disabled>
-                                            {% else %}
-                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
-                                            {% endif %}
-                                                {% if participant.state == 1 %}
-                                                <option value="1" selected>Credit</option>
+                                                {% if participant.is_drop %}
+                                                <option value="drop" selected>Drop</option>
+                                                {% elif participant.is_credit %}
+                                                <option value="credit" selected>Credit</option>
                                                 {% else %}
-                                                <option value="1">Credit</option>
-                                                {% endif %}
-
-                                                {% if participant.state == 2 %}
-                                                <option value="2" selected>Audit</option>
-                                                {% else %}
-                                                <option value="2">Audit</option>
-                                                {% endif %}
-
-                                                {% if participant.state == 3 %}
-                                                <option value="3" selected>Dropped</option>
-                                                {% else %}
-                                                <option value="3">Dropped</option>
+                                                <option value="audit" selected>Audit</option>
                                                 {% endif %}
                                             </select>
+                                            {% elif participant.course.is_last_conversion_date_passed %}
+                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
+                                                {% if participant.is_drop %}
+                                                    <option value="drop" selected>Drop</option>
+                                                    {% if participant.is_credit %}
+                                                    <option value="credit">Credit</option>
+                                                    {% else %}
+                                                    <option value="audit">Audit</option>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <option value="drop">Drop</option>
+                                                    {% if participant.is_credit %}
+                                                    <option value="credit" selected>Credit</option>
+                                                    {% else %}
+                                                    <option value="audit" selected>Audit</option>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </select>
+                                            {% else %}
+                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
+                                                {% if participant.is_drop %}
+                                                <option value="credit">Credit</option>
+                                                <option value="audit">Audit</option>
+                                                <option value="drop" selected>Drop</option>
+                                                {% elif participant.is_credit %}
+                                                <option value="credit" selected>Credit</option>
+                                                <option value="audit">Audit</option>
+                                                <option value="drop">Drop</option>
+                                                {% else %}
+                                                <option value="credit">Credit</option>
+                                                <option value="audit" selected>Audit</option>
+                                                <option value="drop">Drop</option>
+                                                {% endif %}
+                                            </select>
+                                            {% endif %}
                                         </div>
                                     </form>
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {% if participant.grade == 0 and not participant.course.is_last_reg_date_passed or not participant.is_instructor_approved %}
+                                    {% if not participant.course.is_last_reg_date_passed or not participant.is_instructor_approved %}
                                     <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
