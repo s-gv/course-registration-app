@@ -16,7 +16,7 @@ def get_desc(participant):
         return 'Awaiting adviser review'
     if not participant.is_instructor_approved:
         return 'Adviser has approved. Awaiting instructor review'
-    if participant.grade == models.get_default_grade():
+    if participant.grade.id == models.get_default_grade():
         return 'Registered'
     else:
         return participant.grade
