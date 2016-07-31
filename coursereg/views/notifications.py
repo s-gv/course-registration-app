@@ -39,7 +39,7 @@ def notify(request):
         message=request.POST['message'],
     )
     try:
-        send_mail('Coursereg notification', request.POST['message'], request.user.email, [user.email, user.adviser.email])
+        send_mail('Coursereg notification', request.POST['message'], settings.DEFAULT_FROM_EMAIL, [user.email, user.adviser.email])
     except:
         messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
     messages.success(request, '%s has been notified.' % user.full_name)

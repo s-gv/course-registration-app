@@ -101,7 +101,7 @@ def remind(request):
     for faculty_id in faculty_pending:
         faculty = models.User.objects.get(id=faculty_id)
         try:
-            send_mail('Coursereg notification', msg, request.user.email, [faculty.email])
+            send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [faculty.email])
         except:
             mail_send_failed = True
             break

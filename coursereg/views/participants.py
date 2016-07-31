@@ -8,6 +8,7 @@ from datetime import timedelta
 from coursereg import models
 from django.core.mail import send_mail
 from django.db.models import Q
+from django.conf import settings
 
 @login_required
 def create(request):
@@ -41,14 +42,14 @@ def create(request):
             )
             if request.POST['origin'] == 'adviser':
                 participant.is_adviser_approved = True
-                participant.is_instructor_approved = couse.auto_instructor_approve
+                participant.is_instructor_approved = course.auto_instructor_approve
                 participant.save()
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
                                                    message=msg)
                 try:
-                    send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+                    send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
             else:
@@ -72,13 +73,13 @@ def update(request, participant_id):
             student.save()
         elif request.POST['action'] == 'reject':
             assert not participant.is_instructor_approved
-            msg = 'Rejected application for %s.' % participant.course
+            msg = 'Application for %s has been rejected by the course instructor.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
                                                message=msg)
             participant.delete()
             try:
-                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+                send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
@@ -106,12 +107,12 @@ def update(request, participant_id):
             student = participant.user
             student.is_dcc_review_pending = True
             student.save()
-            msg = 'Registration of %s changed.' % participant.course
+            msg = 'Registration for %s has changed to %s.' % (participant.course, state)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             try:
-                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+                send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
@@ -123,13 +124,13 @@ def update(request, participant_id):
             student.save()
         elif request.POST['action'] == 'delete':
             assert not participant.course.is_last_reg_date_passed() or not participant.is_instructor_approved
-            msg = 'Rejected application for %s.' % participant.course
+            msg = 'Application for %s has been rejected by your adviser.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             participant.delete()
             try:
-                send_mail('Coursereg notification', msg, request.user.email, [participant.user.email])
+                send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
     return redirect(request.POST.get('next', reverse('coursereg:index')))
