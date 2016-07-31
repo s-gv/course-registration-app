@@ -18,8 +18,8 @@ from django.contrib import admin
 import coursereg.views
 
 urlpatterns = [
-    url(r'^sudo/logout/$', coursereg.views.user.signout),
-    url(r'^sudo/', admin.site.urls),
+    url(r'^su/logout/$', coursereg.views.user.signout),
+    url(r'^su/', admin.site.urls),
     url(r'', include('coursereg.urls'))
 ]
 handler500 = coursereg.views.common.fatal_error

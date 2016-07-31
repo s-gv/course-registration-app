@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
+from django.core.urlresolvers import reverse
+from django.utils.html import format_html
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -38,7 +40,7 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = UserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active')
+    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active', 'login_as')
     list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
@@ -58,6 +60,9 @@ class CustomUserAdmin(UserAdmin):
     def clear_dcc_review(self, request, queryset):
         queryset.update(is_dcc_review_pending=False)
     clear_dcc_review.short_description = "Clear DCC review"
+
+    def login_as(self, user):
+        return format_html("<a href='{url}'>Login</a>", url=reverse('coursereg:sudo_login', args=[user.id]))
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date', 'num_credits', 'should_count_towards_cgpa', 'auto_instructor_approve')

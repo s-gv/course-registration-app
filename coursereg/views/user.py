@@ -9,6 +9,7 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
+from django.conf import settings
 
 def signin(request):
     if request.method == 'GET':
@@ -76,3 +77,11 @@ def change_passwd(request):
         else:
             messages.error(request, 'Current password is incorrect.')
         return redirect(request.POST.get('next', reverse('coursereg:index')))
+
+@login_required
+def sudo_login(request, user_id):
+    assert request.user.is_superuser
+    user = models.User.objects.get(id=user_id)
+    user.backend = settings.AUTHENTICATION_BACKENDS[0]
+    login(request, user)
+    return redirect(reverse('coursereg:index'))
