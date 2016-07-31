@@ -51,7 +51,7 @@ def get_default_grade():
     default_grade = Grade.objects.filter(name="Not graded", should_count_towards_cgpa=False).first()
     if not default_grade:
         default_grade = Grade.objects.create(name="Not graded", should_count_towards_cgpa=False, points=0)
-    return default_grade
+    return default_grade.id
 
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
@@ -70,7 +70,7 @@ class Participant(models.Model):
     is_credit = models.BooleanField(default=True)
     is_drop = models.BooleanField(default=False)
     is_drop_mentioned = models.BooleanField(default=False)
-    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, null=True, blank=True, default=get_default_grade)
+    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, default=get_default_grade)
     is_adviser_approved = models.BooleanField(default=False)
     is_instructor_approved = models.BooleanField(default=False)
     should_count_towards_cgpa = models.BooleanField(default=True)
