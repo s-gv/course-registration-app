@@ -8,6 +8,10 @@
     margin-top: 80px;
 }
 
+.row {
+    word-break:break-all;
+}
+
 #maincontainer {
     margin-bottom: 50px;
 }
