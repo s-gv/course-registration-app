@@ -258,6 +258,9 @@ class Course(models.Model):
     def is_last_grade_date_passed(self):
         return timezone.now() > self.last_grade_date
 
+    def is_instructor_review_pending(self):
+        return Participant.objects.filter(course=self, is_adviser_approved=True, is_instructor_approved=False).first()
+
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (Course.TERM_CHOICES[self.term][1], self.year)
 
