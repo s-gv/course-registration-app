@@ -10,6 +10,7 @@ from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 def signin(request):
     if request.method == 'GET':
@@ -80,7 +81,7 @@ def change_passwd(request):
 
 @login_required
 def sudo_login(request, user_id):
-    assert request.user.is_superuser
+    if not request.user.is_superuser: raise PermissionDenied
     user = models.User.objects.get(id=user_id)
     user.backend = settings.AUTHENTICATION_BACKENDS[0]
     login(request, user)

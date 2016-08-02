@@ -8,10 +8,12 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from student import get_desc
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def index(request):
-    assert request.user.user_type == models.User.USER_TYPE_FACULTY
+    if not request.user.user_type == models.User.USER_TYPE_FACULTY:
+        raise PermissionDenied
     context = {
         'user_type': 'faculty',
         'nav_active': 'adviser',
@@ -23,7 +25,8 @@ def index(request):
 @login_required
 def detail(request, student_id):
     student = models.User.objects.get(id=student_id)
-    assert request.user == student.adviser
+    if not request.user == student.adviser:
+        raise PermissionDenied
     context = {
         'user_type': 'faculty',
         'nav_active': 'adviser',

@@ -3,6 +3,7 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from coursereg.models import User, Faq
 from utils import is_error_msg_present
+import logging
 
 class ProfileTests(TestCase):
     @classmethod
@@ -13,6 +14,10 @@ class ProfileTests(TestCase):
 
     def setUp(self):
         self.client = Client()
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_was_student_shown_right_profile_page(self):
         self.client.login(email='ben@test.com', password='ben12345')

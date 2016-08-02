@@ -6,10 +6,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from datetime import date, timedelta
 from coursereg import models
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def index(request):
-    assert request.user.user_type == models.User.USER_TYPE_FACULTY
+    if not request.user.user_type == models.User.USER_TYPE_FACULTY:
+        raise PermissionDenied
     context = {
         'user_type': 'faculty',
         'nav_active': 'instructor',
@@ -21,9 +23,11 @@ def index(request):
 @login_required
 def detail(request, course_id):
     course = models.Course.objects.get(id=course_id)
-    assert request.user.user_type == models.User.USER_TYPE_FACULTY
-    assert models.Participant.objects.filter(course=course,
-        user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
+    if not request.user.user_type == models.User.USER_TYPE_FACULTY:
+        raise PermissionDenied
+    if not models.Participant.objects.filter(course=course,
+            user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
+        raise PermissionDenied
     reg_requests = [
         (p.is_credit, p.id, p.user)
         for p in models.Participant.objects.filter(course=course,

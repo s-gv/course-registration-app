@@ -6,6 +6,7 @@ from coursereg.models import User, Course, Department
 from utils import is_error_msg_present
 import unittest
 import datetime
+import logging
 
 #@unittest.skip("skip UI tests in selenium")
 class StudentUITests(StaticLiveServerTestCase):
@@ -26,6 +27,10 @@ class StudentUITests(StaticLiveServerTestCase):
         ben = User.objects.create_user(email='ben@ece.iisc.ernet.in', password='test12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
         self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, last_reg_date=tomorrow)
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_login_add_course(self):
         driver = self.selenium

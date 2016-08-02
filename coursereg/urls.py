@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^sudo/([0-9]+)$', views.user.sudo_login, name='sudo_login'),
 
     url(r'^faq$', views.common.faq, name='faq'),
+    url(r'^fatal$', views.common.fatal_error, name='fatal'),
     url(r'^profile$', views.common.profile, name='profile'),
     url(r'^$', views.common.index, name='index'),
 

@@ -11,10 +11,13 @@ from django.contrib.auth import update_session_auth_hash
 from student import get_desc
 from django.db.models import Q, Count
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
 
 @login_required
 def index(request):
-    assert request.user.user_type == models.User.USER_TYPE_DCC
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
     context = {
         'user_type': 'dcc',
         'nav_active': 'home',
@@ -37,10 +40,11 @@ def index(request):
 
 @login_required
 def detail(request, student_id):
-    assert request.user.user_type == models.User.USER_TYPE_DCC
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
     student = models.User.objects.get(id=student_id)
-    assert student
-    assert student.department == request.user.department
+    if not student or student.department != request.user.department:
+        raise PermissionDenied
     participants = [(
         p.id,
         p.is_credit,
@@ -59,24 +63,25 @@ def detail(request, student_id):
     }
     return render(request, 'coursereg/dcc_detail.html', context)
 
+@require_POST
 @login_required
 def approve(request, student_id):
-    assert request.method == 'POST'
-    assert request.user.user_type == models.User.USER_TYPE_DCC
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
     student = models.User.objects.get(id=student_id)
-    assert student
-    assert student.department == request.user.department
+    if not student or student.department != request.user.department:
+        raise PermissionDenied
     student.is_dcc_review_pending = False
     student.save()
     models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
+@require_POST
 @login_required
 def remind(request):
-    assert request.method == 'POST'
-    assert request.user.user_type == models.User.USER_TYPE_DCC
-
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
     adviser_pending = models.Participant.objects.filter(
         participant_type=models.Participant.PARTICIPANT_STUDENT,
         is_adviser_approved=False,

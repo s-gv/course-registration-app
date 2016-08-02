@@ -22,4 +22,3 @@ urlpatterns = [
     url(r'^su/', admin.site.urls),
     url(r'', include('coursereg.urls'))
 ]
-handler500 = coursereg.views.common.fatal_error

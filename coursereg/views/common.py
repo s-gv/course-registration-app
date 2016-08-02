@@ -21,11 +21,11 @@ def index(request):
         return dcc.index(request)
     else:
         messages.error(request, "User type not recognized.")
-        assert False, 'Unknown user type'
+        return redirect('coursereg:fatal')
 
 def fatal_error(request):
     context = {}
-    return render(request, 'coursereg/fatal.html', context, status=500)
+    return render(request, 'coursereg/fatal.html', context)
 
 @login_required
 def faq(request):

@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
+from django.core.exceptions import PermissionDenied
 
 def get_desc(participant):
     if participant.is_drop:
@@ -24,10 +25,10 @@ def get_desc(participant):
 
 @login_required
 def index(request):
-    assert request.user.user_type == models.User.USER_TYPE_STUDENT
+    if not request.user.user_type == models.User.USER_TYPE_STUDENT: raise PermissionDenied
     if not request.user.adviser:
         messages.error(request, 'Adviser not assigned.')
-        raise Exception('Adviser not assigned')
+        return redirect('coursereg:fatal')
 
     participants = [(
         p.id,

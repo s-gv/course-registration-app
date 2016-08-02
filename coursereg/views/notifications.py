@@ -7,30 +7,33 @@ from django.contrib import messages
 from datetime import timedelta
 from coursereg import models
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
 
+@require_POST
 @login_required
 def dismiss(request):
-    assert request.method == 'POST'
     user = models.User.objects.get(id=request.POST['id'])
-    assert user is not None
+    if not user: raise PermissionDenied
     if request.user.user_type == models.User.USER_TYPE_STUDENT:
-        assert user == request.user
+        if not user == request.user: raise PermissionDenied
         models.Notification.objects.filter(user=user).update(is_student_acknowledged=True)
     if request.user.user_type == models.User.USER_TYPE_DCC:
-        assert user.department == request.user.department
+        if not user.department == request.user.department: raise PermissionDenied
         models.Notification.objects.filter(user=user).update(is_dcc_acknowledged=True)
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
-        assert user.adviser == request.user
+        if not user.adviser == request.user: raise PermissionDenied
         models.Notification.objects.filter(user=user).update(is_adviser_acknowledged=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
+@require_POST
 @login_required
 def notify(request):
-    assert request.method == 'POST'
-    assert request.user.user_type == models.User.USER_TYPE_DCC
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
     user = models.User.objects.get(id=request.POST['id'])
-    assert user
-    assert user.department == request.user.department
+    if not user or user.department != request.user.department:
+        raise PermissionDenied
     user.is_dcc_review_pending = True
     user.save()
     models.Notification.objects.create(
