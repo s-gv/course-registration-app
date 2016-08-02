@@ -106,6 +106,15 @@ class ParticipantAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
     raw_id_fields = ('user', 'course')
     list_filter = ('participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'course__last_reg_date', 'is_adviser_approved', 'is_instructor_approved')
+    actions = ['adviser_approve', 'instructor_approve']
+
+    def adviser_approve(self, request, queryset):
+        queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_adviser_approved=True)
+    adviser_approve.short_description = 'Adviser approve selected students'
+
+    def instructor_approve(self, request, queryset):
+        queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_instructor_approved=True)
+    instructor_approve.short_description = 'Instructor approve selected students'
 
 class FaqAdmin(admin.ModelAdmin):
     list_display = ('question', 'faq_for')
