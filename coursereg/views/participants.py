@@ -39,8 +39,8 @@ def create(request):
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
                 is_credit=(reg_type == 'credit'),
                 should_count_towards_cgpa=course.should_count_towards_cgpa,
-                is_adviser_approved=False,
-                is_instructor_approved=False
+                is_adviser_approved=course.auto_adviser_approve,
+                is_instructor_approved=course.auto_adviser_approve and course.auto_instructor_approve
             )
             if request.POST['origin'] == 'adviser':
                 participant.is_adviser_approved = True

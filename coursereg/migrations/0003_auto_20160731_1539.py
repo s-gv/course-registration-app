@@ -31,6 +31,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='course',
+            name='auto_adviser_approve',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='course',
             name='credit_label',
             field=models.CharField(blank=True, default='', max_length=100, verbose_name='Credit split (ex: 3:0)'),
         ),

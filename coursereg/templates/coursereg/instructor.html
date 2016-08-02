@@ -35,6 +35,9 @@
                         <a class="inactive" href="{% url 'coursereg:instructor_detail' course.id %}">{{ course }}</a>
                         {% else %}
                         <a href="{% url 'coursereg:instructor_detail' course.id %}">{{ course }}</a>
+                        {% if course.is_instructor_review_pending %}
+                        <span class="badge">pending</span>
+                        {% endif %}
                         {% endif %}
                     </td>
                 </tr>
