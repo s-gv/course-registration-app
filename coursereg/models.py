@@ -237,6 +237,7 @@ class Course(models.Model):
     num_credits = models.IntegerField(default=3, verbose_name="Number of credits")
     credit_label = models.CharField(max_length=100, default='', verbose_name="Credit split (ex: 3:0)", blank=True)
     should_count_towards_cgpa = models.BooleanField(default=True)
+    auto_adviser_approve = models.BooleanField(default=False)
     auto_instructor_approve = models.BooleanField(default=False)
     last_reg_date = models.DateTimeField(verbose_name="Last registration date", default=get_recent_last_reg_date)
     last_conversion_date = models.DateTimeField(verbose_name="Last credit/audit conversion date", default=get_recent_last_conversion_date)

@@ -28,6 +28,7 @@ def migrate_course_table(apps, schema_editor):
         course.credit_label = '%s:0' % course.credits
         course.should_count_towards_cgpa = True
         course.auto_instructor_approve = False
+        course.auto_adviser_approve = False
         if course.credits == 0:
             course.auto_instructor_approve = True
             course.should_count_towards_cgpa = False
