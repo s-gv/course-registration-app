@@ -83,25 +83,18 @@ class CourseAdmin(admin.ModelAdmin):
             if not Course.objects.filter(num=course.num,
                     last_reg_date__gte=add_one_year(course.last_reg_date)-timedelta(days=15),
                     last_reg_date__lte=add_one_year(course.last_reg_date)+timedelta(days=15)):
-                new_course = Course.objects.create(
-                    num=course.num,
-                    title=course.title,
-                    department=course.department,
-                    term=course.term,
-                    year=course.year,
-                    num_credits=course.num_credits,
-                    credit_label=course.credit_label,
-                    should_count_towards_cgpa=course.should_count_towards_cgpa,
-                    last_reg_date=add_one_year(course.last_reg_date),
-                    last_conversion_date=add_one_year(course.last_conversion_date),
-                    last_drop_date=add_one_year(course.last_drop_date),
-                    last_drop_with_mention_date=add_one_year(course.last_drop_with_mention_date),
-                    last_grade_date=add_one_year(course.last_grade_date)
-                )
-                for participant in Participant.objects.filter(course=course, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
+                old_course_id = course.id
+                course.pk = None
+                course.last_reg_date = add_one_year(course.last_reg_date)
+                course.last_conversion_date = add_one_year(course.last_conversion_date)
+                course.last_drop_date = add_one_year(course.last_drop_date)
+                course.last_drop_with_mention_date = add_one_year(course.last_drop_with_mention_date)
+                course.last_grade_date = add_one_year(course.last_grade_date)
+                course.save()
+                for participant in Participant.objects.filter(course__id=old_course_id, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
                     Participant.objects.create(
                         user=participant.user,
-                        course=new_course,
+                        course=course,
                         participant_type=participant.participant_type
                     )
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
