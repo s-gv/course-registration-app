@@ -32,6 +32,7 @@ def index(request):
 
     participants = [(
         p.id,
+        p.should_count_towards_cgpa,
         p.is_credit,
         not p.is_credit,
         p.is_drop,

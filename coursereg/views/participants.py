@@ -38,7 +38,7 @@ def create(request):
                 course_id=course_id,
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
                 is_credit=(reg_type == 'credit'),
-                should_count_towards_cgpa=course.should_count_towards_cgpa,
+                should_count_towards_cgpa=True,
                 is_adviser_approved=course.auto_adviser_approve,
                 is_instructor_approved=course.auto_adviser_approve and course.auto_instructor_approve
             )

@@ -47,6 +47,7 @@ def detail(request, student_id):
         raise PermissionDenied
     participants = [(
         p.id,
+        p.should_count_towards_cgpa,
         p.is_credit,
         not p.is_credit,
         p.is_drop,

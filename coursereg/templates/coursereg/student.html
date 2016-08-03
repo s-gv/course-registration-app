@@ -98,7 +98,7 @@
                 <h3 class="panel-title">Registered Courses</h3>
             </div>
             <ul class="list-group">
-                {% for participant_id, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
+                {% for participant_id, should_count_towards_cgpa, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
                 <li class="list-group-item">
                     {% if is_drop %}
                     <div title="Dropped" class="audit-bg pull-left">D</div>
@@ -121,7 +121,13 @@
 
                     <div class="row courserow">
                         <div class="col-md-5">
-                            {{ course }}
+                            {% if not should_count_towards_cgpa %}
+                            <p class="text-muted">
+                            {% else %}
+                            <p>
+                            {% endif %}
+                                {{ course }}
+                            </p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted">
@@ -135,15 +141,15 @@
         </div>
     </div>
     <div class="row top-buffer-1">
-        <div class="col-md-1 col-xs-2">
+        <div class="col-md-1 col-xs-3">
             <div title="Credit" class="credit-bg">C</div>
             <div>Credit</div>
         </div>
-        <div class="col-md-1 col-xs-2">
+        <div class="col-md-1 col-xs-3">
             <div title="Credit" class="audit-bg">A</div>
             <div style="margin-left:2px;">Audit</div>
         </div>
-        <div class="col-md-1 col-xs-2">
+        <div class="col-md-1 col-xs-3">
             <div title="Credit" class="audit-bg">D</div>
             <div style="margin-left:3px;">Drop</div>
         </div>
