@@ -26,6 +26,29 @@ class CourseInline(admin.TabularInline):
     fields = ('course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
     ordering = ('-course__last_reg_date',)
 
+class CustomUserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.fields['password1'].required = False
+        self.fields['password1'].help_text = 'Leave blank for random password'
+        self.fields['password2'].required = False
+        self.fields['password1'].widget.attrs['autocomplete'] = 'off'
+        self.fields['password2'].widget.attrs['autocomplete'] = 'off'
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 == '' and password2 == '':
+            return User.objects.make_random_password()
+        return UserCreationForm.clean_password2(self)
+
+    def save(self, commit=True):
+        user = super(UserCreationForm, self).save(commit=False)
+        user.set_password(self.clean_password2())
+        if commit:
+            user.save()
+        return user
+
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -35,11 +58,11 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'date_joined')}
+            'fields': ('email', 'full_name', 'password1', 'password2', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'date_joined')}
         ),
     )
     form = UserChangeForm
-    add_form = UserCreationForm
+    add_form = CustomUserCreationForm
     list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active', 'login_as')
     list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
     search_fields = ('email', 'full_name')
