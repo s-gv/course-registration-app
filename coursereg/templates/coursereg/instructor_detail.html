@@ -246,5 +246,100 @@
         </div>
     </div>
     {% endif %}
+    <div class="row top-buffer-1">
+        <button id="pdfexport" type="button" class="btn btn-primary">Export as PDF</button>
+        <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
+    </div>
 </div>
+{% endblock %}
+
+{% block script %}
+{% load staticfiles %}
+<script src="{% static 'coursereg/js/Blob.js' %}"></script>
+<script src="{% static 'coursereg/js/FileSaver.min.js' %}"></script>
+<script src="{% static 'coursereg/js/pdfmake.min.js' %}"></script>
+<script src="{% static 'coursereg/js/vfs_fonts.js' %}"></script>
+<script type="text/javascript">
+    var courseName = '{{ course }}';
+    var exportData = {
+        'fileNameWithoutExt': courseName.replace(/\s/g, '_').replace(/[^A-Za-z0-9_]/g, '') + '_Students',
+        'columnNames': ['Name', 'Email', 'Program', 'Department', 'SrNo', 'Enrollment', 'Grade'],
+        'rows': [
+            {% for participant in participants_for_export %}
+            [
+                "{{ forloop.counter }}",
+                "{{ participant.user.full_name }}",
+                "{{ participant.user.email }}",
+                "{{ participant.user.degree }}",
+                "{{ participant.user.department.abbreviation }}",
+                "{{ participant.user.sr_no }}",
+                {% if participant.is_drop %}
+                "Drop",
+                {% elif participant.is_credit %}
+                "Credit",
+                {% else %}
+                "Audit",
+                {% endif %}
+                "{{ participant.grade }}",
+            ],
+            {% endfor %}
+        ]
+    };
+    $('#pdfexport').on('click', function() {
+        var columnNames = ['#', 'Name', 'Email', 'Program', 'Dept', 'SR No.', 'Status', 'Grade'];
+        var headerRow = columnNames.map(function(title) {
+            return {
+                'text': title,
+                'style': 'tableHeader'
+            };
+        });
+        var docDefinition = {
+            styles: {
+                'tableHeader': {
+                    fontSize: 8,
+                    bold: true
+                },
+                'tableRow': {
+                    fontSize: 8
+                },
+                'title': {
+                    fontSize: 14,
+                    margin: [0, 0, 0, 12]
+                }
+            },
+            content: [
+                {
+                    'text': courseName,
+                    'style': 'title'
+                },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: [ 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto' ],
+                        body: [headerRow].concat(exportData['rows'].map(function(row) {
+                            return row.map(function(element) {
+                                return {
+                                    'text': element,
+                                    'style': 'tableRow'
+                                }
+                            })
+                        })),
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            pageSize: 'a4'
+        };
+        var pdfDoc = pdfMake.createPdf(docDefinition);
+        pdfDoc.getBuffer( function (buffer) {
+            var blob = new Blob([buffer], {type: "application/pdf"});
+            saveAs(blob, exportData['fileNameWithoutExt']+'.pdf');
+        });
+    });
+    $('#csvexport').on('click', function() {
+        var csv = exportData['rows'].map(function(arr) {return arr.join(',');}).join('\n');
+        var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, exportData['fileNameWithoutExt']+'.txt');
+    });
+</script>
 {% endblock %}

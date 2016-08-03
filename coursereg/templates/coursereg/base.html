@@ -8,9 +8,6 @@
         <title>Coursereg</title>
 
         {% load staticfiles %}
-        <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
-        <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
-
         <link href="{% static 'coursereg/css/bootstrap.min.css' %}" rel="stylesheet">
         <link href="{% static 'coursereg/css/coursereg.css' %}" rel="stylesheet">
 
@@ -19,6 +16,12 @@
     </head>
     <body>
         {% block body %}
+        {% endblock %}
+
+        <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
+        <script src="{% static 'coursereg/js/bootstrap.min.js' %}"></script>
+
+        {% block script %}
         {% endblock %}
     </body>
 </html>

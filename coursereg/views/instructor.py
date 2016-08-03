@@ -36,10 +36,12 @@ def detail(request, course_id):
 
     crediting = models.Participant.objects.filter(course=course,
                                                   is_credit=True,
+                                                  is_drop=False,
                                                   is_adviser_approved=True,
                                                   is_instructor_approved=True)
     auditing = models.Participant.objects.filter(course=course,
                                                  is_credit=False,
+                                                 is_drop=False,
                                                  is_adviser_approved=True,
                                                  is_instructor_approved=True)
     dropped = models.Participant.objects.filter(course=course,
@@ -56,6 +58,9 @@ def detail(request, course_id):
         'crediting': crediting,
         'auditing': auditing,
         'dropped': dropped,
-        'grades': models.Grade.objects.all().order_by('-points')
+        'grades': models.Grade.objects.all().order_by('-points'),
+        'participants_for_export': models.Participant.objects.filter(course=course,
+                                        is_adviser_approved=True,
+                                        is_instructor_approved=True).order_by('is_drop').order_by('-is_credit')
     }
     return render(request, 'coursereg/instructor_detail.html', context)
