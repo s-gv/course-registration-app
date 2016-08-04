@@ -246,12 +246,14 @@
         </div>
     </div>
     {% endif %}
+    {% if participants_for_export %}
     <div class="row top-buffer-1">
         <div class="col-md-12 col-xs-12">
             <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
             <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 
