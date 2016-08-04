@@ -19,6 +19,10 @@ class Migration(migrations.Migration):
             name='credits',
         ),
         migrations.RemoveField(
+            model_name='course',
+            name='term',
+        ),
+        migrations.RemoveField(
             model_name='participant',
             name='grade',
         ),
@@ -53,11 +57,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='course',
-            name='term',
-            field=models.IntegerField(choices=[(0, 'Aug-Dec'), (1, 'Jan-Apr'), (2, 'Summer'), (3, 'Other')], default=coursereg.models.get_recent_term),
-        ),
-        migrations.AlterField(
-            model_name='course',
             name='year',
             field=models.CharField(default=coursereg.models.get_recent_year, max_length=4),
         ),
@@ -70,5 +69,15 @@ class Migration(migrations.Migration):
             model_name='participant',
             name='grade',
             field=models.ForeignKey(blank=True, default=coursereg.models.get_default_grade, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
+        ),
+        migrations.RenameField(
+            model_name='course',
+            old_name='new_term',
+            new_name='term',
+        ),
+        migrations.AlterField(
+            model_name='course',
+            name='term',
+            field=models.ForeignKey(default=coursereg.models.get_recent_term, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
     ]

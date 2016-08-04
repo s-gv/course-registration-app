@@ -1,5 +1,10 @@
 [
     {
+        "name": "Not graded",
+        "points": "0.0",
+        "should_count_towards_cgpa": false
+    },
+    {
         "name": "S grade",
         "points": "8.0",
         "should_count_towards_cgpa": true

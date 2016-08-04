@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade
+from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade, Term
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 from django.core.urlresolvers import reverse
@@ -167,6 +167,9 @@ class ConfigAdmin(admin.ModelAdmin):
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('name', 'points', 'should_count_towards_cgpa')
 
+class TermAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Participant, ParticipantAdmin)
@@ -176,3 +179,4 @@ admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Config, ConfigAdmin)
 admin.site.register(Grade, GradeAdmin)
+admin.site.register(Term, TermAdmin)

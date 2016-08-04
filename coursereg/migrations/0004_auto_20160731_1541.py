@@ -20,9 +20,29 @@ def separate_dept_abbreviation(apps, schema_editor):
         dept.abbreviation = abbreviation
         dept.save()
 
+def migrate_term(Term, term):
+    TERM_AUG = 0
+    TERM_JAN = 1
+    TERM_SUMMER = 2
+    TERM_OTHER = 3
+
+    TERM_CHOICES = (
+        (TERM_AUG, "Aug-Dec"),
+        (TERM_JAN, "Jan-Apr"),
+        (TERM_SUMMER, "Summer"),
+        (TERM_OTHER, "Other"),
+    )
+
+    new_term = Term.objects.filter(name=TERM_CHOICES[term][1]).first()
+    if not new_term:
+        new_term = Term.objects.create(name=TERM_CHOICES[term][1])
+    return new_term
+
 def migrate_course_table(apps, schema_editor):
     Course = apps.get_model("coursereg", "Course")
+    Term = apps.get_model("coursereg", "Term")
     for course in Course.objects.all():
+        course.new_term = migrate_term(Term, course.term)
         course.year = str(course.last_reg_date.year)
         course.num_credits = course.credits
         course.credit_label = '%s:0' % course.credits

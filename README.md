@@ -23,6 +23,7 @@ Install it, create a database and a user. For the user, set the client encoding 
 - To bulk load departments in `<project_root>/coursereg/data/depts.json`, run `python manage.py loaddepts --datafile coursereg/data/depts.json`.
 - To bulk load degree programs in `<project_root>/coursereg/data/degrees.json`, run `python manage.py loaddegrees --datafile coursereg/data/degrees.json`.
 - To bulk load grades in `<project_root>/coursereg/data/grades.json`, run `python manage.py loadgrades --datafile coursereg/data/grades.json`.
+- To bulk load academic terms in `<project_root>/coursereg/data/terms.json`, run `python manage.py loadterms --datafile coursereg/data/terms.json`.
 - Test if the app is working by running `python manage.py runserver` and going to [localhost:8000/](http://localhost:8000/).
 - Set-up a production-grade webserver such as `gunicorn` to run on start-up and configure a reverse proxy like `nginx` to proxy requests to it.
 - Set-up the server to serve static files at `/static/*` from `<proj_root>/bheemboy/coursereg/static/*`.

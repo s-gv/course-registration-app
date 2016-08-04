@@ -206,8 +206,10 @@ def get_recent_last_grade_date():
 def get_recent_term():
     recent_course = Course.objects.order_by('-updated_at').first()
     if recent_course:
-        return recent_course.term
-    return Course.TERM_AUG
+        return recent_course.term.id
+    else:
+        default_term = Term.objects.create(name="Summer")
+        return default_term.id
 
 def get_recent_year():
     recent_course = Course.objects.order_by('-updated_at').first()
@@ -215,24 +217,17 @@ def get_recent_year():
         return recent_course.year
     return str(timezone.now().year)
 
+class Term(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
 
 class Course(models.Model):
-    TERM_AUG = 0
-    TERM_JAN = 1
-    TERM_SUMMER = 2
-    TERM_OTHER = 3
-
-    TERM_CHOICES = (
-        (TERM_AUG, "Aug-Dec"),
-        (TERM_JAN, "Jan-Apr"),
-        (TERM_SUMMER, "Summer"),
-        (TERM_OTHER, "Other"),
-    )
-
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    term = models.IntegerField(default=get_recent_term, choices=TERM_CHOICES)
+    term = models.ForeignKey(Term, default=get_recent_term)
     year = models.CharField(max_length=4, default=get_recent_year)
     num_credits = models.IntegerField(default=3, verbose_name="Number of credits")
     credit_label = models.CharField(max_length=100, default='', verbose_name="Credit split (ex: 3:0)", blank=True)
@@ -263,7 +258,7 @@ class Course(models.Model):
         return Participant.objects.filter(course=self, is_adviser_approved=True, is_instructor_approved=False).first()
 
     def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s %s)' % (Course.TERM_CHOICES[self.term][1], self.year)
+        return self.num + ' ' + self.title + ' (%s %s)' % (self.term, self.year)
 
 class Faq(models.Model):
     FAQ_STUDENT = 0

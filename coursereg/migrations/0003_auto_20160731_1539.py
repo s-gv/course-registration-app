@@ -24,6 +24,13 @@ class Migration(migrations.Migration):
                 ('should_count_towards_cgpa', models.BooleanField(default=True)),
             ],
         ),
+        migrations.CreateModel(
+            name='Term',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=100)),
+            ],
+        ),
         migrations.AddField(
             model_name='course',
             name='auto_instructor_approve',
@@ -108,5 +115,10 @@ class Migration(migrations.Migration):
             model_name='participant',
             name='new_grade',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='new_term',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
     ]
