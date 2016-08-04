@@ -2,7 +2,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from django.core.urlresolvers import reverse
-from coursereg.models import User, Course, Department
+from coursereg.models import User, Course, Department, Term
 from utils import is_error_msg_present
 import unittest
 import datetime
@@ -26,7 +26,8 @@ class StudentUITests(StaticLiveServerTestCase):
         charles = User.objects.create_user(email='charles@test.com', password='charles12345', user_type=User.USER_TYPE_FACULTY)
         ben = User.objects.create_user(email='ben@ece.iisc.ernet.in', password='test12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
-        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, last_reg_date=tomorrow)
+        term = Term.objects.create(name='Aug-Dec')
+        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=term, last_reg_date=tomorrow)
         logging.disable(logging.CRITICAL)
 
     def tearDown(self):

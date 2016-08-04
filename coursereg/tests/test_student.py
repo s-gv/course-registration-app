@@ -2,7 +2,7 @@ import datetime
 from django.test import TestCase
 from django.test import Client
 from django.core.urlresolvers import reverse
-from coursereg.models import User, Course, Department, Participant, Grade
+from coursereg.models import User, Course, Department, Participant, Grade, Term
 from utils import is_error_msg_present
 import logging
 
@@ -14,9 +14,10 @@ class StudentTests(TestCase):
         cls.ben = User.objects.create_user(email='ben@test.com', password='ben12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        aug_term = Term.objects.create(name='Aug-Dec')
         cls.s_grade = Grade.objects.create(name="S grade", points=7.5, should_count_towards_cgpa=True)
-        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, last_reg_date=tomorrow)
-        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, last_reg_date=yesterday)
+        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=aug_term, last_reg_date=tomorrow)
+        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, term=aug_term, last_reg_date=yesterday)
 
     def setUp(self):
         self.client = Client()
@@ -52,7 +53,7 @@ class StudentTests(TestCase):
         self.client.login(email='ben@test.com', password='ben12345')
         response = self.client.post(reverse('coursereg:participants_create'),
             {'course_id': self.course_tomorrow.id, 'reg_type': 'credit', 'user_id': self.ben.id, 'origin': 'student'}, follow=True)
-        self.assertTrue(any([p[4] == self.course_tomorrow for p in response.context['participants']]))
+        self.assertTrue(any([p[5] == self.course_tomorrow for p in response.context['participants']]))
 
     def test_was_course_removed(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow,
