@@ -30,12 +30,9 @@
         <div class="col-md-12">
             <table class="table table-striped">
                 {% for student in pending_students %}
-                {% if not student.is_instructor_review_pending %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
                     <td><a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})</td>
                 </tr>
-                {% endif %}
                 {% endfor %}
             </table>
         </div>
@@ -65,7 +62,6 @@
             <table class="table table-striped">
             {% for student in all_active_students %}
             <tr>
-                <td>{{ forloop.counter }}</td>
                 <td>
                     <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
                     ({{ student.email }})
