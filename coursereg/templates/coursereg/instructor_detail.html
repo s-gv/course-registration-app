@@ -105,7 +105,7 @@
                                 <div class="col-md-2 col-xs-12">
                                     {{ participant.user.full_name }}
                                 </div>
-                                <div class="col-md-2 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
@@ -114,7 +114,7 @@
                                 <div class="col-md-1 col-xs-12">
                                     {{ participant.user.degree }}
                                 </div>
-                                <div class="col-md-4 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-1">
@@ -165,7 +165,7 @@
                                 <div class="col-md-2 col-xs-12">
                                     {{ participant.user.full_name }}
                                 </div>
-                                <div class="col-md-2 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
@@ -174,7 +174,7 @@
                                 <div class="col-md-1 col-xs-12">
                                     {{ participant.user.degree }}
                                 </div>
-                                <div class="col-md-4 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-1">
@@ -225,7 +225,7 @@
                                 <div class="col-md-2 col-xs-12">
                                     {{ participant.user.full_name }}
                                 </div>
-                                <div class="col-md-2 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
@@ -234,7 +234,7 @@
                                 <div class="col-md-1 col-xs-12">
                                     {{ participant.user.degree }}
                                 </div>
-                                <div class="col-md-4 col-xs-12">
+                                <div class="col-md-3 col-xs-12">
                                     {{ participant.user.sr_no }}
                                 </div>
                             </div>
@@ -247,8 +247,10 @@
     </div>
     {% endif %}
     <div class="row top-buffer-1">
-        <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
-        <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
+        <div class="col-md-12 col-xs-12">
+            <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
+            <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -316,7 +318,7 @@
                         {
                             table: {
                                 headerRows: 1,
-                                widths: [ 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto' ],
+                                widths: [ 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '7%', '11%' ],
                                 body: [headerRow].concat(exportData['rows'].map(function(row) {
                                     return row.map(function(element) {
                                         return {
