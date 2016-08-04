@@ -247,7 +247,7 @@
     </div>
     {% endif %}
     <div class="row top-buffer-1">
-        <button id="pdfexport" type="button" class="btn btn-primary">Export as PDF</button>
+        <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
         <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
     </div>
 </div>
@@ -257,8 +257,6 @@
 {% load staticfiles %}
 <script src="{% static 'coursereg/js/Blob.js' %}"></script>
 <script src="{% static 'coursereg/js/FileSaver.min.js' %}"></script>
-<script src="{% static 'coursereg/js/pdfmake.min.js' %}"></script>
-<script src="{% static 'coursereg/js/vfs_fonts.js' %}"></script>
 <script type="text/javascript">
     var courseName = '{{ course }}';
     var exportData = {
@@ -286,60 +284,66 @@
         ]
     };
     $('#pdfexport').on('click', function() {
-        var columnNames = ['#', 'Name', 'Email', 'Program', 'Dept', 'SR No.', 'Status', 'Grade'];
-        var headerRow = columnNames.map(function(title) {
-            return {
-                'text': title,
-                'style': 'tableHeader'
-            };
-        });
-        var docDefinition = {
-            styles: {
-                'tableHeader': {
-                    fontSize: 8,
-                    bold: true
-                },
-                'tableRow': {
-                    fontSize: 8
-                },
-                'title': {
-                    fontSize: 14,
-                    margin: [0, 0, 0, 12]
-                }
-            },
-            content: [
-                {
-                    'text': courseName,
-                    'style': 'title'
-                },
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: [ 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto' ],
-                        body: [headerRow].concat(exportData['rows'].map(function(row) {
-                            return row.map(function(element) {
-                                return {
-                                    'text': element,
-                                    'style': 'tableRow'
-                                }
-                            })
-                        })),
+        var $btn = $(this).button('loading');
+        $.getScript("{% static 'coursereg/js/pdfmake.min.js' %}", function() {
+            $.getScript("{% static 'coursereg/js/vfs_fonts.js' %}", function() {
+                var columnNames = ['#', 'Name', 'Email', 'Program', 'Dept', 'SR No.', 'Status', 'Grade'];
+                var headerRow = columnNames.map(function(title) {
+                    return {
+                        'text': title,
+                        'style': 'tableHeader'
+                    };
+                });
+                var docDefinition = {
+                    styles: {
+                        'tableHeader': {
+                            fontSize: 8,
+                            bold: true
+                        },
+                        'tableRow': {
+                            fontSize: 8
+                        },
+                        'title': {
+                            fontSize: 14,
+                            margin: [0, 0, 0, 12]
+                        }
                     },
-                    layout: 'lightHorizontalLines'
-                }
-            ],
-            pageSize: 'a4'
-        };
-        var pdfDoc = pdfMake.createPdf(docDefinition);
-        pdfDoc.getBuffer( function (buffer) {
-            var blob = new Blob([buffer], {type: "application/pdf"});
-            saveAs(blob, exportData['fileNameWithoutExt']+'.pdf');
+                    content: [
+                        {
+                            'text': courseName,
+                            'style': 'title'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: [ 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto' ],
+                                body: [headerRow].concat(exportData['rows'].map(function(row) {
+                                    return row.map(function(element) {
+                                        return {
+                                            'text': element,
+                                            'style': 'tableRow'
+                                        }
+                                    })
+                                })),
+                            },
+                            layout: 'lightHorizontalLines'
+                        }
+                    ],
+                    pageSize: 'a4'
+                };
+                var pdfDoc = pdfMake.createPdf(docDefinition);
+                pdfDoc.getBuffer( function (buffer) {
+                    var blob = new Blob([buffer], {type: "application/pdf"});
+                    saveAs(blob, exportData['fileNameWithoutExt']+'.pdf');
+                    $btn.button('reset');
+                });
+            });
         });
     });
     $('#csvexport').on('click', function() {
         var csv = exportData['rows'].map(function(arr) {return arr.join(',');}).join('\n');
         var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, exportData['fileNameWithoutExt']+'.txt');
+        saveAs(blob, exportData['fileNameWithoutExt']+'.csv');
     });
 </script>
 {% endblock %}
