@@ -25,11 +25,6 @@ def index(request):
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
                 user__department=request.user.department,
                 participant_type=models.Participant.PARTICIPANT_STUDENT).first(),
-        'pending_students': [student for student in models.User.objects.filter(
-            user_type=models.User.USER_TYPE_STUDENT,
-            is_dcc_review_pending=True,
-            is_active=True,
-            department=request.user.department).order_by('full_name')],
         'all_active_students': [student for student in models.User.objects.filter(
             user_type=models.User.USER_TYPE_STUDENT,
             is_active=True,
