@@ -20,6 +20,11 @@
         "answer": "Please ask the administrator to add the course."
     },
     {
+        "faq_for": "faculty",
+        "question": "Is it possible to automatically approve all enrollment requests for my course?",
+        "answer": "If you wish to approve all enrollment requests without review, ask the administrator to enable auto instructor approval for your course."
+    },
+    {
         "faq_for": "dcc",
         "question": "Can the adviser see remarks that I make?",
         "answer": "Yes, both the student and the adviser can see your remarks."
