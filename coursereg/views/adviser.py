@@ -29,6 +29,7 @@ def detail(request, student_id):
         raise PermissionDenied
     context = {
         'user_type': 'faculty',
+        'nav_active': 'adviser',
         'user_email': request.user.email,
         'student': student,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)

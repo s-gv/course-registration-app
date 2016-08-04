@@ -51,6 +51,7 @@ def detail(request, course_id):
 
     context = {
         'user_type': 'faculty',
+        'nav_active': 'instructor',
         'user_email': request.user.email,
         'course': course,
         'registration_requests': reg_requests,
