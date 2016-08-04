@@ -31,7 +31,15 @@
             <table class="table table-striped">
                 {% for student in pending_students %}
                 <tr>
-                    <td><a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})</td>
+                    <td>
+                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
+                        {% if student.is_adviser_review_pending %}
+                        <span class="badge">adviser pending</span>
+                        {% endif %}
+                        {% if student.is_instructor_review_pending %}
+                        <span class="badge">instructor pending</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </table>

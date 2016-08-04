@@ -46,6 +46,8 @@ def create(request):
                 participant.is_adviser_approved = True
                 participant.is_instructor_approved = course.auto_instructor_approve
                 participant.save()
+                user.is_dcc_review_pending = True
+                user.save()
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
@@ -127,6 +129,9 @@ def update(request, participant_id):
             student.save()
         elif request.POST['action'] == 'delete':
             if participant.course.is_last_reg_date_passed() and participant.is_instructor_approved: raise PermissionDenied
+            student = participant.user
+            student.is_dcc_review_pending = True
+            student.save()
             msg = 'Application for %s has been rejected by your adviser.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
