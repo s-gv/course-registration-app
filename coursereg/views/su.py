@@ -24,8 +24,8 @@ def parse_datetime_str(date_str):
 @login_required
 def course_date_change(request, courses):
     if not request.user.is_superuser: raise PermissionDenied
+    course_ids = urlunquote_plus(courses).split('-')
     if request.method == 'POST':
-        course_ids = urlunquote_plus(courses).split(',')
         models.Course.objects.filter(pk__in=course_ids).update(
             term=request.POST['term'],
             year=request.POST['year'],
@@ -38,7 +38,6 @@ def course_date_change(request, courses):
         messages.success(request, "The dates of %s courses were modified successfully." % len(course_ids))
         return redirect(reverse('admin:coursereg_course_changelist'))
     else:
-        course_ids = urlunquote_plus(courses).split(',')
         return render(request, 'admin/course_date_change.html', {
             'title': 'Change course dates',
             'terms': models.Term.objects.all(),

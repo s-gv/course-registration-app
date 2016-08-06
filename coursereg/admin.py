@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
-
+from django.contrib import messages
 from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade, Term
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
@@ -110,8 +110,13 @@ class CourseAdmin(admin.ModelAdmin):
     actions = ['clone_courses_increment_year', 'change_dates']
 
     def change_dates(self, request, queryset):
-        selected = ','.join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
-        return redirect(reverse('coursereg:admin_course_date_change', args=[urlquote_plus(selected)]))
+        selected_list = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
+        max_courses = 50
+        if len(selected_list) > max_courses:
+            self.message_user(request, 'Select fewer than %s courses to modify at a time.' % max_courses, level=messages.ERROR)
+        else:
+            selected = '-'.join(selected_list)
+            return redirect(reverse('coursereg:admin_course_date_change', args=[urlquote_plus(selected)]))
     change_dates.short_description = 'Change dates for the selected courses'
 
     def clone_courses_increment_year(self, request, queryset):
