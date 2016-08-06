@@ -7,6 +7,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 from django.core.urlresolvers import reverse
 from django.utils.html import format_html
+from django.shortcuts import redirect
+from django.utils.http import urlquote_plus, urlunquote_plus
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -73,23 +75,28 @@ class CustomUserAdmin(UserAdmin):
     actions = ['make_inactive', 'make_active', 'clear_dcc_review', 'enable_auto_advisee_approval', 'disable_auto_advisee_approval']
 
     def make_inactive(self, request, queryset):
-        queryset.update(is_active=False)
+        n = queryset.update(is_active=False)
+        self.message_user(request, "%s users marked as inactive." % n)
     make_inactive.short_description = "Make selected users inactive"
 
     def make_active(self, request, queryset):
-        queryset.update(is_active=True)
+        n = queryset.update(is_active=True)
+        self.message_user(request, "%s users marked as active." % n)
     make_active.short_description = "Make selected users active"
 
     def enable_auto_advisee_approval(self, request, queryset):
-        queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=True)
+        n = queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=True)
+        self.message_user(request, "Auto advisee approval enabled for %s users." % n)
     enable_auto_advisee_approval.short_description = "Enable auto advisee approval for selected faculty"
 
     def disable_auto_advisee_approval(self, request, queryset):
-        queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=False)
+        n = queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=False)
+        self.message_user(request, "Auto advisee approval disabled for %s users." % n)
     disable_auto_advisee_approval.short_description = "Disable auto advisee approval for selected faculty"
 
     def clear_dcc_review(self, request, queryset):
-        queryset.update(is_dcc_review_pending=False)
+        n = queryset.update(is_dcc_review_pending=False)
+        self.message_user(request, "DCC review cleared for %s users." % n)
     clear_dcc_review.short_description = "Clear DCC review"
 
     def login_as(self, user):
@@ -100,7 +107,12 @@ class CourseAdmin(admin.ModelAdmin):
     ordering = ('-last_reg_date', 'department__name', 'num', 'title')
     search_fields = ('title', 'num', 'last_reg_date')
     inlines = [ParticipantInline]
-    actions = ['clone_courses_increment_year']
+    actions = ['clone_courses_increment_year', 'change_dates']
+
+    def change_dates(self, request, queryset):
+        selected = ','.join(request.POST.getlist(admin.ACTION_CHECKBOX_NAME))
+        return redirect(reverse('coursereg:admin_course_date_change', args=[urlquote_plus(selected)]))
+    change_dates.short_description = 'Change dates for the selected courses'
 
     def clone_courses_increment_year(self, request, queryset):
         def add_one_year(d):
@@ -110,10 +122,12 @@ class CourseAdmin(admin.ModelAdmin):
             except ValueError:
                 new_d = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
             return new_d
+        n = 0
         for course in queryset:
             if not Course.objects.filter(num=course.num,
                     last_reg_date__gte=add_one_year(course.last_reg_date)-timedelta(days=15),
                     last_reg_date__lte=add_one_year(course.last_reg_date)+timedelta(days=15)):
+                n += 1
                 old_course_id = course.id
                 course.pk = None
                 course.last_reg_date = add_one_year(course.last_reg_date)
@@ -128,6 +142,7 @@ class CourseAdmin(admin.ModelAdmin):
                         course=course,
                         participant_type=participant.participant_type
                     )
+        self.message_user(request, "Cloned %s courses" % n)
     clone_courses_increment_year.short_description = "Clone selected courses and increment year"
 
 
@@ -140,11 +155,13 @@ class ParticipantAdmin(admin.ModelAdmin):
     actions = ['adviser_approve', 'instructor_approve']
 
     def adviser_approve(self, request, queryset):
-        queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_adviser_approved=True)
+        n = queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_adviser_approved=True)
+        self.message_user(request, 'Adviser approved %s enrollment requests' % n)
     adviser_approve.short_description = 'Adviser approve selected students'
 
     def instructor_approve(self, request, queryset):
-        queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_instructor_approved=True)
+        n = queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_instructor_approved=True)
+        self.message_user(request, 'Instructor approved %s enrollment requests' % n)
     instructor_approve.short_description = 'Instructor approve selected students'
 
 class FaqAdmin(admin.ModelAdmin):
