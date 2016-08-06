@@ -58,7 +58,7 @@ def detail(request, course_id):
         'crediting': crediting,
         'auditing': auditing,
         'dropped': dropped,
-        'grades': models.Grade.objects.all().order_by('-points'),
+        'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants_for_export': models.Participant.objects.filter(course=course,
                                         is_adviser_approved=True,
                                         is_instructor_approved=True).order_by('is_drop').order_by('-is_credit')

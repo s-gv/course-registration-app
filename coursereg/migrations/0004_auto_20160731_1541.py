@@ -18,6 +18,7 @@ def separate_dept_abbreviation(apps, schema_editor):
             abbreviation = r.group(2)
         dept.name = dept_name_without_abbreviation
         dept.abbreviation = abbreviation
+        dept.is_active = True
         dept.save()
 
 def migrate_term(Term, term):
@@ -35,7 +36,7 @@ def migrate_term(Term, term):
 
     new_term = Term.objects.filter(name=TERM_CHOICES[term][1]).first()
     if not new_term:
-        new_term = Term.objects.create(name=TERM_CHOICES[term][1])
+        new_term = Term.objects.create(name=TERM_CHOICES[term][1], is_active=True)
     return new_term
 
 def migrate_course_table(apps, schema_editor):
@@ -82,7 +83,8 @@ def migrate_grade(Participant, Grade, grade):
         ng = Grade.objects.create(
             name=new_grade_name,
             should_count_towards_cgpa=(grade != GRADE_NA),
-            points=GRADE_POINTS[grade]
+            points=GRADE_POINTS[grade],
+            is_active=True
         )
     return ng
 

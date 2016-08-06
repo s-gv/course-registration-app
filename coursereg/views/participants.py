@@ -33,21 +33,20 @@ def create(request):
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
             messages.error(request, 'Already registered for %s.' % course)
         else:
+            adviser_approve = course.auto_adviser_approve or user.adviser.auto_advisee_approve
             participant = models.Participant.objects.create(
                 user_id=user_id,
                 course_id=course_id,
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
                 is_credit=(reg_type == 'credit'),
                 should_count_towards_cgpa=True,
-                is_adviser_approved=course.auto_adviser_approve,
-                is_instructor_approved=course.auto_adviser_approve and course.auto_instructor_approve
+                is_adviser_approved=adviser_approve,
+                is_instructor_approved=adviser_approve and course.auto_instructor_approve
             )
             if request.POST['origin'] == 'adviser':
                 participant.is_adviser_approved = True
                 participant.is_instructor_approved = course.auto_instructor_approve
                 participant.save()
-                user.is_dcc_review_pending = True
-                user.save()
                 msg = 'Applied for %s.' % participant.course
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
@@ -124,14 +123,12 @@ def update(request, participant_id):
             participant.is_adviser_approved = True
             participant.is_instructor_approved = participant.course.auto_instructor_approve
             participant.save()
-            student = participant.user
-            student.is_dcc_review_pending = True
-            student.save()
         elif request.POST['action'] == 'delete':
             if participant.course.is_last_reg_date_passed() and participant.is_instructor_approved: raise PermissionDenied
-            student = participant.user
-            student.is_dcc_review_pending = True
-            student.save()
+            if participant.is_instructor_approved:
+                student = participant.user
+                student.is_dcc_review_pending = True
+                student.save()
             msg = 'Application for %s has been rejected by your adviser.' % participant.course
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
@@ -146,12 +143,9 @@ def update(request, participant_id):
 @require_POST
 @login_required
 def approve_all(request):
+    student = models.User.objects.get(id=request.POST['student_id'])
     if request.POST['origin'] == 'adviser':
-        student = models.User.objects.get(id=request.POST['student_id'])
         if not student.adviser == request.user: raise PermissionDenied
-        if models.Participant.objects.filter(user=student, is_adviser_approved=False):
-            student.is_dcc_review_pending = True
-            student.save()
         models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
         models.Participant.objects.filter(course__auto_instructor_approve=True, user=student).update(is_instructor_approved=True)
     elif request.POST['origin'] == 'instructor':
@@ -159,15 +153,23 @@ def approve_all(request):
         if not models.Participant.objects.filter(course=course,
                 user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
             raise PermissionDenied
+        if models.Participant.objects.filter(user=student, is_adviser_approved=True, is_instructor_approved=False):
+            student.is_dcc_review_pending = True
+            student.save()
         models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
+
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @require_POST
 @login_required
 def delete(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
+    student = participant.user
     if not participant.user == request.user: raise PermissionDenied
-    if participant.is_adviser_approved: raise PermissionDenied
+    if participant.is_adviser_approved and not student.adviser.auto_advisee_approve: raise PermissionDenied
+    if participant.user.adviser.auto_advisee_approve and participant.is_instructor_approved:
+        student.is_dcc_review_pending = True
+        student.save()
     if participant.course.is_last_reg_date_passed(): raise PermissionDenied
     participant.delete()
     return redirect(request.GET.get('next', reverse('coursereg:index')))

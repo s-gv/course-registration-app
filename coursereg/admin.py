@@ -52,13 +52,13 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'cgpa', 'telephone', 'is_active', 'is_dcc_review_pending')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'cgpa', 'telephone', 'is_active', 'is_dcc_review_pending', 'auto_advisee_approve')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'date_joined')}
+            'fields': ('email', 'full_name', 'password1', 'password2', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'auto_advisee_approve', 'date_joined')}
         ),
     )
     form = UserChangeForm
@@ -70,7 +70,7 @@ class CustomUserAdmin(UserAdmin):
     readonly_fields = ('cgpa',)
     ordering = ('-date_joined',)
     inlines = [CourseInline]
-    actions = ['make_inactive', 'make_active', 'clear_dcc_review']
+    actions = ['make_inactive', 'make_active', 'clear_dcc_review', 'enable_auto_advisee_approval', 'disable_auto_advisee_approval']
 
     def make_inactive(self, request, queryset):
         queryset.update(is_active=False)
@@ -79,6 +79,14 @@ class CustomUserAdmin(UserAdmin):
     def make_active(self, request, queryset):
         queryset.update(is_active=True)
     make_active.short_description = "Make selected users active"
+
+    def enable_auto_advisee_approval(self, request, queryset):
+        queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=True)
+    enable_auto_advisee_approval.short_description = "Enable auto advisee approval for selected faculty"
+
+    def disable_auto_advisee_approval(self, request, queryset):
+        queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=False)
+    disable_auto_advisee_approval.short_description = "Disable auto advisee approval for selected faculty"
 
     def clear_dcc_review(self, request, queryset):
         queryset.update(is_dcc_review_pending=False)
@@ -145,11 +153,11 @@ class FaqAdmin(admin.ModelAdmin):
     list_filter = ('faq_for',)
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'abbreviation')
+    list_display = ('name', 'abbreviation', 'is_active')
     search_fields = ('name', 'abbreviation')
 
 class DegreeAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'is_active')
     search_fields = ('name', )
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -165,10 +173,10 @@ class ConfigAdmin(admin.ModelAdmin):
     search_fields = ('key',)
 
 class GradeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'points', 'should_count_towards_cgpa')
+    list_display = ('name', 'points', 'should_count_towards_cgpa', 'is_active')
 
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'is_active')
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)

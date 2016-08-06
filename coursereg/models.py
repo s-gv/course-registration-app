@@ -29,12 +29,14 @@ class CustomUserManager(BaseUserManager):
 class Department(models.Model):
     name = models.CharField(max_length=100)
     abbreviation = models.CharField(max_length=100, default='-')
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.abbreviation
 
 class Degree(models.Model):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
@@ -43,12 +45,13 @@ class Grade(models.Model):
     name = models.CharField(max_length=100)
     points = models.DecimalField(max_digits=10, decimal_places=3, default=Decimal('0.00'))
     should_count_towards_cgpa = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
 
 def get_default_grade():
-    default_grade = Grade.objects.filter(name="Not graded", should_count_towards_cgpa=False).first()
+    default_grade = Grade.objects.filter(name="Not graded", should_count_towards_cgpa=False, is_active=True).first()
     if not default_grade:
         default_grade = Grade.objects.create(name="Not graded", should_count_towards_cgpa=False, points=0)
     return default_grade.id
@@ -101,6 +104,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     sr_no = models.CharField(max_length=200, default='-')
     telephone = models.CharField(max_length=100, default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
+    auto_advisee_approve = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -208,7 +212,7 @@ def get_recent_term():
     if recent_course:
         return recent_course.term.id
     else:
-        default_term = Term.objects.create(name="Summer")
+        default_term = Term.objects.create(name="Summer", is_active=True)
         return default_term.id
 
 def get_recent_year():
@@ -219,6 +223,7 @@ def get_recent_year():
 
 class Term(models.Model):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name

@@ -121,4 +121,30 @@ class Migration(migrations.Migration):
             name='new_term',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
+
+        migrations.AddField(
+            model_name='degree',
+            name='is_active',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='department',
+            name='is_active',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='grade',
+            name='is_active',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='is_active',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='auto_advisee_approve',
+            field=models.BooleanField(default=False),
+        ),
     ]

@@ -1,22 +1,27 @@
 [
     {
         "name": "Electrical Communication Engineering",
-        "abbreviation": "ECE"
+        "abbreviation": "ECE",
+        "is_active": true
     },
     {
         "name": "Computer Science and Automation",
-        "abbreviation": "CSA"
+        "abbreviation": "CSA",
+        "is_active": true
     },
     {
         "name": "Electrical Engineering",
-        "abbreviation": "EE"
+        "abbreviation": "EE",
+        "is_active": true
     },
     {
         "name": "Department of Electronic Systems Engineering",
-        "abbreviation": "DESE"
+        "abbreviation": "DESE",
+        "is_active": true
     },
     {
         "name": "Department of Computational and Data Sciences",
-        "abbreviation": "CDS"
+        "abbreviation": "CDS",
+        "is_active": true
     }
 ]

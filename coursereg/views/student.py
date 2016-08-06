@@ -37,7 +37,7 @@ def index(request):
         not p.is_credit,
         p.is_drop,
         p.course, get_desc(p),
-        not p.is_adviser_approved
+        not p.course.is_last_reg_date_passed() and (not p.is_adviser_approved or p.user.adviser.auto_advisee_approve)
     ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date', 'course__title')]
 
     context = {

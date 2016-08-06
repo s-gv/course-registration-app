@@ -1,6 +1,18 @@
 [
-    "PhD",
-    "MTech",
-    "MSc",
-    "ME"
+    {
+        "name": "PhD",
+        "is_active": true
+    },
+    {
+        "name": "MTech",
+        "is_active": true
+    },
+    {
+        "name": "MSc",
+        "is_active": true
+    },
+    {
+        "name": "ME",
+        "is_active": true
+    }
 ]

@@ -1,11 +1,14 @@
 [
     {
-        "name": "Aug-Dec"
+        "name": "Aug-Dec",
+        "is_active": true
     },
     {
-        "name": "Jan-Apr"
+        "name": "Jan-Apr",
+        "is_active": true
     },
     {
-        "name": "Summer"
+        "name": "Summer",
+        "is_active": true
     }
 ]
