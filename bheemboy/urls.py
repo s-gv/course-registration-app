@@ -16,8 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 import coursereg.views
-
-admin.site.site_header = 'Coursereg administration'
+from . import settings
 
 urlpatterns = [
     url(r'^su/logout/$', coursereg.views.user.signout),

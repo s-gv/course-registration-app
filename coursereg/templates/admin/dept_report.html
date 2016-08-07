@@ -1,0 +1,163 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='coursereg' %}">Coursereg</a>
+    &rsaquo; <a href="{% url 'admin:coursereg_department_changelist' %}">Departments</a>
+    &rsaquo; {{ dept }}
+</div>
+{% endblock %}
+
+{% block content %}
+<form action="" method="get">
+    <div>
+        <p>
+            Generate report of students in {{ dept }} for courses with last registration date in the range:
+        </p>
+    </div>
+    <div>
+        <label for="from_date">From:</label>
+        <input id="from_date" size="40" type="text" name="from_date" value="{{ default_from_date }}">
+
+        <label for="to_date">To:</label>
+        <input id="to_date" size="40" type="text" name="to_date" value="{{ default_to_date }}">
+
+        <input type="submit" value="Generate report" />
+    </div>
+</form>
+{% if participants %}
+<div>
+    <button id="pdfexport" type="button" data-loading-text="Loading..." >Export as PDF</button>
+    <button id="csvexport" type="button" >Export as CSV</button>
+</div>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>SR No.</th>
+        <th>Degree</th>
+        <th>Course</th>
+        <th>Enrollment</th>
+        <th>Grade</th>
+    </tr>
+    {% for participant in participants %}
+    <tr>
+        <td>{{ participant.user.full_name }}</td>
+        <td>{{ participant.user.email }}</td>
+        <td>{{ participant.user.sr_no }}</td>
+        <td>{{ participant.user.degree }}</td>
+        <td>{{ participant.course }}</td>
+        <td>
+            {% if participant.is_drop %}
+            Drop
+            {% elif participant.is_credit %}
+            Credit
+            {% else %}
+            Audit
+            {% endif %}
+        </td>
+        <td>{{ participant.grade }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% load staticfiles %}
+<script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
+<script src="{% static 'coursereg/js/pikaday.js' %}"></script>
+<script src="{% static 'coursereg/js/Blob.js' %}"></script>
+<script src="{% static 'coursereg/js/FileSaver.min.js' %}"></script>
+<script type='text/javascript'>
+$("<link/>", {
+    rel: "stylesheet",
+    type: "text/css",
+    href: "{% static 'coursereg/css/pikaday.css' %}"
+}).appendTo("head");
+var picker = new Pikaday({ field: $('#from_date')[0] });
+var picker2 = new Pikaday({ field: $('#to_date')[0] });
+var exportData = {
+    'fileNameWithoutExt': "{{ dept }}".replace(/\s/g, '_').replace(/[^A-Za-z0-9_]/g, '') + '_report',
+    'columnNames': ['#', 'Name', 'Email', 'SrNo', 'Degree', 'Course', 'Enrollment', 'Grade'],
+    'rows': [
+        {% for participant in participants %}
+        [
+            "{{ forloop.counter }}",
+            "{{ participant.user.full_name }}",
+            "{{ participant.user.email }}",
+            "{{ participant.user.sr_no }}",
+            "{{ participant.user.degree }}",
+            "{{ participant.course }}",
+            {% if participant.is_drop %}
+            "Drop",
+            {% elif participant.is_credit %}
+            "Credit",
+            {% else %}
+            "Audit",
+            {% endif %}
+            "{{ participant.grade }}",
+        ],
+        {% endfor %}
+    ]
+};
+$('#pdfexport').on('click', function() {
+    $.getScript("{% static 'coursereg/js/pdfmake.min.js' %}", function() {
+        $.getScript("{% static 'coursereg/js/vfs_fonts.js' %}", function() {
+            var columnNames = exportData['columnNames'];
+            var headerRow = columnNames.map(function(title) {
+                return {
+                    'text': title,
+                    'style': 'tableHeader'
+                };
+            });
+            var docDefinition = {
+                styles: {
+                    'tableHeader': {
+                        fontSize: 8,
+                        bold: true
+                    },
+                    'tableRow': {
+                        fontSize: 8
+                    },
+                    'title': {
+                        fontSize: 14,
+                        margin: [0, 0, 0, 12]
+                    }
+                },
+                content: [
+                    {
+                        'text': "{{ dept }}",
+                        'style': 'title'
+                    },
+                    {
+                        table: {
+                            headerRows: 1,
+                            widths: [ 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '7%', '11%' ],
+                            body: [headerRow].concat(exportData['rows'].map(function(row) {
+                                return row.map(function(element) {
+                                    return {
+                                        'text': element,
+                                        'style': 'tableRow'
+                                    }
+                                })
+                            })),
+                        },
+                        layout: 'lightHorizontalLines'
+                    }
+                ],
+                pageSize: 'a4'
+            };
+            var pdfDoc = pdfMake.createPdf(docDefinition);
+            pdfDoc.getBuffer( function (buffer) {
+                var blob = new Blob([buffer], {type: "application/pdf"});
+                saveAs(blob, exportData['fileNameWithoutExt']+'.pdf');
+            });
+        });
+    });
+});
+$('#csvexport').on('click', function() {
+    var csv = exportData['rows'].map(function(arr) {return arr.join(',');}).join('\n');
+    var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, exportData['fileNameWithoutExt']+'.csv');
+});
+</script>
+{% endblock %}

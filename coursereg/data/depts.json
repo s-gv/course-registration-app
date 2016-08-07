@@ -15,12 +15,12 @@
         "is_active": true
     },
     {
-        "name": "Department of Electronic Systems Engineering",
+        "name": "Electronic Systems Engineering",
         "abbreviation": "DESE",
         "is_active": true
     },
     {
-        "name": "Department of Computational and Data Sciences",
+        "name": "Computational and Data Sciences",
         "abbreviation": "CDS",
         "is_active": true
     }

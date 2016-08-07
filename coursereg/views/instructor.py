@@ -61,6 +61,6 @@ def detail(request, course_id):
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants_for_export': models.Participant.objects.filter(course=course,
                                         is_adviser_approved=True,
-                                        is_instructor_approved=True).order_by('is_drop').order_by('-is_credit')
+                                        is_instructor_approved=True).order_by('is_drop', '-is_credit')
     }
     return render(request, 'coursereg/instructor_detail.html', context)

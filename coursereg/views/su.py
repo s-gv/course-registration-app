@@ -13,13 +13,17 @@ from django.utils.http import urlquote_plus, urlunquote_plus
 
 def parse_datetime_str(date_str):
     naive_date_str = ' '.join(date_str.split(' ')[:5])
-    offset_str = date_str.split(' ')[5][3:]
-    print offset_str
+    offset_str = date_str.split(' ')[5][-5:]
+    offset_name = str(date_str.split(' ')[5][:-5])
     naive_dt = datetime.strptime(naive_date_str, '%a %b %d %Y %H:%M:%S')
     offset = int(offset_str[-4:-2])*60 + int(offset_str[-2:])
     if offset_str[0] == "-":
         offset = -offset
-    return naive_dt.replace(tzinfo=timezone.FixedOffset(offset))
+    return naive_dt.replace(tzinfo=timezone.FixedOffset(offset, offset_name))
+
+
+def datetime_to_str(datetime):
+    return datetime.strftime('%a %b %d %Y %H:%M:%S %z (%Z)')
 
 @login_required
 def course_date_change(request, courses):
@@ -44,9 +48,32 @@ def course_date_change(request, courses):
             'courses': models.Course.objects.filter(pk__in=course_ids),
             'default_term_id': models.get_recent_term(),
             'default_year': models.get_recent_year(),
-            'default_last_reg_date': models.get_recent_last_reg_date().strftime('%a %b %d %Y %H:%M:%S %z (%Z)'),
-            'default_last_conversion_date': models.get_recent_last_conversion_date().strftime('%a %b %d %Y %H:%M:%S %z (%Z)'),
-            'default_last_drop_date': models.get_recent_last_drop_date().strftime('%a %b %d %Y %H:%M:%S %z (%Z)'),
-            'default_last_drop_with_mention_date': models.get_recent_last_drop_with_mention_date().strftime('%a %b %d %Y %H:%M:%S %z (%Z)'),
-            'default_last_grade_date': models.get_recent_last_grade_date().strftime('%a %b %d %Y %H:%M:%S %z (%Z)'),
+            'default_last_reg_date': datetime_to_str(models.get_recent_last_reg_date()),
+            'default_last_conversion_date': datetime_to_str(models.get_recent_last_conversion_date()),
+            'default_last_drop_date': datetime_to_str(models.get_recent_last_drop_date()),
+            'default_last_drop_with_mention_date': datetime_to_str(models.get_recent_last_drop_with_mention_date()),
+            'default_last_grade_date': datetime_to_str(models.get_recent_last_grade_date()),
         })
+
+@login_required
+def dept_report(request, dept_id):
+    if not request.user.is_superuser: raise PermissionDenied
+    dept = models.Department.objects.get(id=dept_id)
+    from_date = models.get_recent_last_reg_date()
+    to_date = timezone.now()
+    if request.GET.get('from_date') and request.GET.get('to_date'):
+        from_date = parse_datetime_str(request.GET['from_date'])
+        to_date = parse_datetime_str(request.GET['to_date'])
+    participants = [p for p in models.Participant.objects.filter(
+        user__department=dept,
+        user__user_type=models.User.USER_TYPE_STUDENT,
+        course__last_reg_date__range=[from_date, to_date]
+    ).order_by('user__degree', 'user__full_name')]
+    context = {
+        'title': 'Report',
+        'default_from_date': datetime_to_str(from_date),
+        'default_to_date': datetime_to_str(to_date),
+        'participants': participants,
+        'dept': dept
+    }
+    return render(request, 'admin/dept_report.html', context)

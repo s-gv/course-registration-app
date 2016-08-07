@@ -177,6 +177,15 @@ class FaqAdmin(admin.ModelAdmin):
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'abbreviation', 'is_active')
     search_fields = ('name', 'abbreviation')
+    actions = ['generate_report']
+
+    def generate_report(self, request, queryset):
+        selected_list = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
+        if len(selected_list) != 1:
+            self.message_user(request, 'Select exactly one department.', level=messages.ERROR)
+        else:
+            return redirect(reverse('coursereg:admin_dept_report', args=[selected_list[0]]))
+    generate_report.short_description = 'Generate report for the selected department'
 
 class DegreeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active')
