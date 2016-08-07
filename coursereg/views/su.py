@@ -66,6 +66,8 @@ def dept_report(request, dept_id):
         to_date = parse_datetime_str(request.GET['to_date'])
     participants = [p for p in models.Participant.objects.filter(
         user__department=dept,
+        is_adviser_approved=True,
+        is_instructor_approved=True,
         user__user_type=models.User.USER_TYPE_STUDENT,
         course__last_reg_date__range=[from_date, to_date]
     ).order_by('user__degree', 'user__full_name')]
