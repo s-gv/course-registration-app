@@ -29,7 +29,10 @@ def create(request):
         messages.error(request, 'Select a course.')
     else:
         course = models.Course.objects.get(id=course_id)
-        if course.is_last_reg_date_passed(): raise PermissionDenied
+        if request.POST['origin'] == 'adviser':
+            if course.is_last_adviser_approval_date_passed() : raise PermissionDenied
+        else:
+            if course.is_last_reg_date_passed(): raise PermissionDenied
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):
             messages.error(request, 'Already registered for %s.' % course)
         else:
@@ -70,6 +73,7 @@ def update(request, participant_id):
             raise PermissionDenied
         if request.POST['action'] == 'approve':
             if not participant.is_adviser_approved: raise PermissionDenied
+            if participant.course.is_last_instructor_approval_date_passed(): raise PermissionDenied
             participant.is_instructor_approved = True
             participant.save()
             student = participant.user
@@ -93,7 +97,7 @@ def update(request, participant_id):
     elif request.POST['origin'] == 'adviser':
         if not participant.user.adviser == request.user: raise PermissionDenied
         if request.POST['action'] == 'state_change':
-            if participant.course.is_drop_date_passed(): raise PermissionDenied
+            if participant.course.is_last_drop_date_passed(): raise PermissionDenied
             state = request.POST['state']
             if state == 'credit':
                 if not participant.is_credit:
@@ -120,11 +124,12 @@ def update(request, participant_id):
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'approve':
+            if participant.course.is_last_adviser_approval_date_passed(): raise PermissionDenied
             participant.is_adviser_approved = True
             participant.is_instructor_approved = participant.course.auto_instructor_approve
             participant.save()
         elif request.POST['action'] == 'delete':
-            if participant.course.is_last_reg_date_passed() and participant.is_instructor_approved: raise PermissionDenied
+            if participant.course.is_last_adviser_approval_date_passed() and participant.is_instructor_approved: raise PermissionDenied
             if participant.is_instructor_approved:
                 student = participant.user
                 student.is_dcc_review_pending = True
@@ -143,20 +148,33 @@ def update(request, participant_id):
 @require_POST
 @login_required
 def approve_all(request):
-    student = models.User.objects.get(id=request.POST['student_id'])
     if request.POST['origin'] == 'adviser':
+        student = models.User.objects.get(id=request.POST['student_id'])
         if not student.adviser == request.user: raise PermissionDenied
-        models.Participant.objects.filter(user=student).update(is_adviser_approved=True)
-        models.Participant.objects.filter(course__auto_instructor_approve=True, user=student).update(is_instructor_approved=True)
+        for p in models.Participant.objects.filter(user=student, is_adviser_approved=False):
+            if not p.course.is_last_adviser_approval_date_passed():
+                p.is_adviser_approved = True
+                if p.course.auto_instructor_approve:
+                    p.is_instructor_approved = True
+                p.save()
+            else:
+                messages.error(request, "Last date for %s has passed" % p.course)
     elif request.POST['origin'] == 'instructor':
         course = models.Course.objects.get(id=request.POST['course_id'])
         if not models.Participant.objects.filter(course=course,
                 user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
             raise PermissionDenied
-        if models.Participant.objects.filter(user=student, is_adviser_approved=True, is_instructor_approved=False):
+        if course.is_last_instructor_approval_date_passed(): raise PermissionDenied
+        for p in models.Participant.objects.filter(
+                course=course,
+                participant_type=models.Participant.PARTICIPANT_STUDENT,
+                is_adviser_approved=True,
+                is_instructor_approved=False):
+            p.is_instructor_approved = True
+            p.save()
+            student = p.user
             student.is_dcc_review_pending = True
             student.save()
-        models.Participant.objects.filter(course=course, is_adviser_approved=True).update(is_instructor_approved=True)
 
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 

@@ -32,6 +32,16 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='course',
+            name='last_adviser_approval_date',
+            field=models.DateTimeField(default=coursereg.models.get_recent_last_adviser_approval_date, verbose_name='Last adviser approval date'),
+        ),
+        migrations.AlterField(
+            model_name='course',
+            name='last_instructor_approval_date',
+            field=models.DateTimeField(default=coursereg.models.get_recent_last_instructor_approval_date, verbose_name='Last instructor approval date'),
+        ),
+        migrations.AlterField(
+            model_name='course',
             name='last_conversion_date',
             field=models.DateTimeField(default=coursereg.models.get_recent_last_conversion_date, verbose_name='Last credit/audit conversion date'),
         ),

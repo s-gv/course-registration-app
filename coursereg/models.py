@@ -183,6 +183,18 @@ def get_recent_last_reg_date():
         return recent_course.last_reg_date
     return timezone.now()
 
+def get_recent_last_adviser_approval_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_adviser_approval_date
+    return timezone.now()
+
+def get_recent_last_instructor_approval_date():
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_instructor_approval_date
+    return timezone.now()
+
 def get_recent_last_conversion_date():
     recent_course = Course.objects.order_by('-updated_at').first()
     if recent_course:
@@ -240,6 +252,8 @@ class Course(models.Model):
     auto_adviser_approve = models.BooleanField(default=False)
     auto_instructor_approve = models.BooleanField(default=False)
     last_reg_date = models.DateTimeField(verbose_name="Last registration date", default=get_recent_last_reg_date)
+    last_adviser_approval_date = models.DateTimeField(verbose_name="Last adviser approval date", default=get_recent_last_adviser_approval_date)
+    last_instructor_approval_date = models.DateTimeField(verbose_name="Last instructor approval date", default=get_recent_last_instructor_approval_date)
     last_conversion_date = models.DateTimeField(verbose_name="Last credit/audit conversion date", default=get_recent_last_conversion_date)
     last_drop_date = models.DateTimeField(verbose_name="Last drop date", default=get_recent_last_drop_date)
     last_drop_with_mention_date = models.DateTimeField(verbose_name="Last drop with mention date", default=get_recent_last_drop_with_mention_date)
@@ -250,10 +264,16 @@ class Course(models.Model):
     def is_last_reg_date_passed(self):
         return timezone.now() > self.last_reg_date
 
+    def is_last_adviser_approval_date_passed(self):
+        return timezone.now() > self.last_adviser_approval_date
+
+    def is_last_instructor_approval_date_passed(self):
+        return timezone.now() > self.last_instructor_approval_date
+
     def is_last_conversion_date_passed(self):
         return timezone.now() > self.last_conversion_date
 
-    def is_drop_date_passed(self):
+    def is_last_drop_date_passed(self):
         return timezone.now() > self.last_drop_date
 
     def is_last_grade_date_passed(self):

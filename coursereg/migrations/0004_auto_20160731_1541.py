@@ -53,6 +53,8 @@ def migrate_course_table(apps, schema_editor):
         if course.credits == 0:
             course.auto_instructor_approve = True
             course.should_count_towards_cgpa = False
+        course.last_adviser_approval_date = course.last_reg_date
+        course.last_instructor_approval_date = course.last_reg_date
         course.last_conversion_date = course.last_drop_date
         course.last_drop_with_mention_date = course.last_drop_date
         course.last_grade_date = course.last_reg_date + timedelta(days=150)

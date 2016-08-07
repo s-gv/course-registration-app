@@ -73,7 +73,9 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
                                         <input type="hidden" name="origin" value="instructor">
+                                        {% if not course.is_last_instructor_approval_date_passed %}
                                         <button type="submit" class="btn btn-xs btn-success" name="action" value="approve">Approve</button>
+                                        {% endif %}
                                         <button type="submit" class="btn btn-xs btn-danger" name="action" value="reject" style="margin-left: 15px;">Reject</button>
                                     </form>
                                 </div>
@@ -85,6 +87,7 @@
             </ul>
         </div>
     </div>
+    {% if not course.is_last_instructor_approval_date_passed %}
     <div class="row">
         <div class="col-md-4">
             <form action="{% url 'coursereg:participants_approve_all' %}" method="post">
@@ -96,6 +99,7 @@
             </form>
         </div>
     </div>
+    {% endif %}
     {% endif %}
     {% if crediting %}
     <div class="row top-buffer-1">

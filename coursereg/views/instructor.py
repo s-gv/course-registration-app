@@ -33,7 +33,6 @@ def detail(request, course_id):
         for p in models.Participant.objects.filter(course=course,
                                                    is_adviser_approved=True,
                                                    is_instructor_approved=False)]
-
     crediting = models.Participant.objects.filter(course=course,
                                                   is_credit=True,
                                                   is_drop=False,

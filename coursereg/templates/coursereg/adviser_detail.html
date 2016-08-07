@@ -151,12 +151,12 @@
                                     </form>
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {% if not participant.course.is_last_reg_date_passed or not participant.is_instructor_approved %}
+                                    {% if not participant.course.is_last_adviser_approval_date_passed or not participant.is_instructor_approved %}
                                     <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
                                         <input type="hidden" name="origin" value="adviser">
-                                        {% if not participant.is_adviser_approved and not participant.course.is_last_reg_date_passed %}
+                                        {% if not participant.is_adviser_approved and not participant.course.is_last_adviser_approval_date_passed %}
                                         <button type="submit" class="btn btn-xs btn-success" name="action" value="approve">Approve</button>
                                         <button type="submit" class="btn btn-xs btn-danger" name="action" value="delete" style="margin-left: 20px;">Delete</button>
                                         {% else %}
