@@ -1,4 +1,3 @@
 [
-    {"key": "sample_key", "value": "sample_value"},
-    {"key": "sample_key2", "value": "sample_value2"}
+    {"key": "can_faculty_add_courses", "value": "1"}
 ]

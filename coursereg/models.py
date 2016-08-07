@@ -6,6 +6,7 @@ from decimal import Decimal
 from datetime import date, datetime, timedelta
 from django.db.models import Q
 import re
+from django.core.exceptions import ValidationError
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **extra_fields):
@@ -236,9 +237,27 @@ def get_recent_year():
 class Term(models.Model):
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
+    default_last_reg_date = models.DateTimeField(verbose_name="Deafult last registration date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_adviser_approval_date = models.DateTimeField(verbose_name="Deafult last adviser approval date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_instructor_approval_date = models.DateTimeField(verbose_name="Deafult last instructor approval date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_conversion_date = models.DateTimeField(verbose_name="Deafult last credit/audit conversion date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_drop_date = models.DateTimeField(verbose_name="Deafult last drop date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_drop_with_mention_date = models.DateTimeField(verbose_name="Deafult last drop with mention date", help_text="Note: Year field is ignored", default=timezone.now)
+    default_last_grade_date = models.DateTimeField(verbose_name="Deafult last grade date", help_text="Note: Year field is ignored", default=timezone.now)
 
     def __unicode__(self):
         return self.name
+
+    def clean(self):
+        if self.default_last_reg_date <= self.default_last_adviser_approval_date:
+            if self.default_last_adviser_approval_date <= self.default_last_instructor_approval_date:
+                if self.default_last_instructor_approval_date <= self.default_last_conversion_date:
+                    if self.default_last_conversion_date <= self.default_last_drop_date:
+                        if self.default_last_drop_date <= self.default_last_drop_with_mention_date:
+                            if self.default_last_drop_with_mention_date <= self.default_last_grade_date:
+                                return
+        raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
+
 
 class Course(models.Model):
     num = models.CharField(max_length=100)
@@ -285,6 +304,16 @@ class Course(models.Model):
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s %s)' % (self.term, self.year)
 
+    def clean(self):
+        if self.last_reg_date <= self.last_adviser_approval_date:
+            if self.last_adviser_approval_date <= self.last_instructor_approval_date:
+                if self.last_instructor_approval_date <= self.last_conversion_date:
+                    if self.last_conversion_date <= self.last_drop_date:
+                        if self.last_drop_date <= self.last_drop_with_mention_date:
+                            if self.last_drop_with_mention_date <= self.last_grade_date:
+                                return
+        raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
+
 class Faq(models.Model):
     FAQ_STUDENT = 0
     FAQ_FACULTY = 1
@@ -306,3 +335,9 @@ class Faq(models.Model):
 class Config(models.Model):
     key = models.CharField(max_length=1000)
     value = models.CharField(max_length=1000)
+
+    @classmethod
+    def can_faculty_add_courses(cls):
+        c = cls.objects.filter(key="can_faculty_add_courses").first()
+        if c:
+            return c.value == "1" or c.value == "true"

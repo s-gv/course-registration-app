@@ -32,6 +32,41 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddField(
+            model_name='term',
+            name='default_last_adviser_approval_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last adviser approval date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_conversion_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last credit/audit conversion date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_drop_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last drop date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_drop_with_mention_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last drop with mention date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_grade_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last grade date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_instructor_approval_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last instructor approval date'),
+        ),
+        migrations.AddField(
+            model_name='term',
+            name='default_last_reg_date',
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last registration date'),
+        ),
+        migrations.AddField(
             model_name='course',
             name='auto_instructor_approve',
             field=models.BooleanField(default=False),

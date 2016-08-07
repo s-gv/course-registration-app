@@ -1,0 +1,125 @@
+{% extends "coursereg/base.html" %}
+
+{% block body %}
+{% include "coursereg/nav.html" %}
+<div class="container" id="maincontainer">
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'coursereg:instructor' %}">Courses</a></li>
+                <li class="breadcrumb-item active">New course</li>
+            </ol>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>New course</h1>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="row top-buffer-1">
+        <div class="col-md-6 col-xs-12">
+            <form method="post" action="{% url 'coursereg:instructor_new_course' %}" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="courseName" class="col-sm-3 control-label">Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="courseName" name="name" placeholder="Topics on Quantum Mechanics" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseNum" class="col-sm-3 control-label">Number</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="courseNum" name="num" placeholder="E0 929" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseTerm" class="col-sm-3 control-label">Term</label>
+                    <div class="col-sm-9">
+                        <select id="courseTerm" name="term" class="form-control">
+                            {% for term in terms %}
+                            <option value="{{ term.id }}">{{ term }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseYear" class="col-sm-3 control-label">Year</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="courseYear" name="year" placeholder="2016" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseCreditSplit" class="col-sm-3 control-label">Credit split</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="courseCreditSplit" name="credit_label" placeholder="3:1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseNumCredits" class="col-sm-3 control-label">Year</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="courseNumCredits" name="num_credits" placeholder="4" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseCoInstructor" class="col-sm-3 control-label">Co-instructor</label>
+                    <div class="col-sm-9">
+                        <select id="courseCoInstructor" name="coinstructor" class="form-control">
+                            <option value="">None</option>
+                            {% for instructor in instructors %}
+                            <option value="{{ instructor.id }}">{{ instructor.full_name }} ({{ instructor.email }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="auto_instructor_approve" value="true"> Auto approve all enrollment requests
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% load staticfiles %}
+<link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'coursereg/js/select2.min.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#courseCoInstructor").select2({
+            placeholder: "Select a co-instructor",
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %}

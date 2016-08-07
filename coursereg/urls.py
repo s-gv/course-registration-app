@@ -25,6 +25,7 @@ urlpatterns = [
 
     url(r'^instructor$', views.instructor.index, name='instructor'),
     url(r'^instructor/([0-9]+)$', views.instructor.detail, name='instructor_detail'),
+    url(r'^instructor/new$', views.instructor.new_course, name='instructor_new_course'),
 
     url(r'^adviser$', views.adviser.index, name='adviser'),
     url(r'^adviser/([0-9]+)$', views.adviser.detail, name='adviser_detail'),
