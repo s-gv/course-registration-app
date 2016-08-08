@@ -37,6 +37,7 @@ def detail(request, student_id):
             for n in models.Notification.objects.filter(user=student, is_adviser_acknowledged=False).order_by('-created_at')],
         'participants': [(p, get_desc(p)) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date')],
         'courses': models.Course.objects.filter(last_adviser_approval_date__gte=timezone.now(),
-                                                last_adviser_approval_date__lte=timezone.now()+timedelta(days=100))
+                                                last_reg_date__lte=timezone.now()+
+                                                    timedelta(days=models.Config.num_days_before_last_reg_date_course_registerable()))
     }
     return render(request, 'coursereg/adviser_detail.html', context)

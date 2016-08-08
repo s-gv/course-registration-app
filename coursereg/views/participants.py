@@ -30,8 +30,9 @@ def create(request):
         messages.error(request, 'Select a course.')
     else:
         course = models.Course.objects.get(id=course_id)
+        if not course.is_start_reg_date_passed(): raise PermissionDenied
         if request.POST['origin'] == 'adviser':
-            if course.is_last_adviser_approval_date_passed() : raise PermissionDenied
+            if course.is_last_adviser_approval_date_passed(): raise PermissionDenied
         else:
             if course.is_last_reg_date_passed(): raise PermissionDenied
         if models.Participant.objects.filter(user__id=user_id, course__id=course_id):

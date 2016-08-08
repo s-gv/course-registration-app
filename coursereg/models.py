@@ -280,6 +280,10 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def is_start_reg_date_passed(self):
+        return timezone.now() > self.last_reg_date-timedelta(
+            days=Config.num_days_before_last_reg_date_course_registerable())
+
     def is_last_reg_date_passed(self):
         return timezone.now() > self.last_reg_date
 
@@ -350,3 +354,10 @@ class Config(models.Model):
         c = cls.objects.filter(key="can_adviser_add_courses_for_students").first()
         if c:
             return c.value == "1" or c.value == "true"
+
+    @classmethod
+    def num_days_before_last_reg_date_course_registerable(cls):
+        c = cls.objects.filter(key="num_days_before_last_reg_date_course_registerable").first()
+        if c:
+            return int(c.value)
+        return 60
