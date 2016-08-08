@@ -336,6 +336,9 @@ class Config(models.Model):
     key = models.CharField(max_length=1000)
     value = models.CharField(max_length=1000)
 
+    def __unicode__(self):
+        return self.key + ': ' + self.value
+
     @classmethod
     def can_faculty_create_courses(cls):
         c = cls.objects.filter(key="can_faculty_create_courses").first()

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from datetime import date, timedelta
+from django.utils import timezone
 from coursereg import models
 from django.core.exceptions import PermissionDenied
 
@@ -83,46 +84,55 @@ def course_new(request):
         raise PermissionDenied
     if not models.Config.can_faculty_create_courses():
         raise PermissionDenied
-    context = {
-        'user_type': 'faculty',
-        'nav_active': 'instructor',
-        'user_email': request.user.email,
-        'terms': models.Term.objects.filter(is_active=True),
-        'instructors': models.User.objects.filter(
-            is_active=True,
-            user_type=models.User.USER_TYPE_FACULTY).exclude(email=request.user.email).order_by('full_name'),
-    }
+
     if request.method == 'POST':
         term = models.Term.objects.get(id=request.POST['term'])
         year = str(request.POST['year'])
-        last_reg_date = replace_year(term.default_last_reg_date, year, None)
-        course = models.Course.objects.create(
-            title=request.POST['name'],
-            num=request.POST['num'],
-            department=request.user.department,
-            term=term,
-            year=year,
-            num_credits=request.POST['num_credits'],
-            credit_label=request.POST['credit_label'],
-            auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
-            last_reg_date=last_reg_date,
-            last_adviser_approval_date=replace_year(term.default_last_adviser_approval_date, year, last_reg_date),
-            last_instructor_approval_date=replace_year(term.default_last_instructor_approval_date, year, last_reg_date),
-            last_conversion_date=replace_year(term.default_last_conversion_date, year, last_reg_date),
-            last_drop_date=replace_year(term.default_last_drop_date, year, last_reg_date),
-            last_grade_date=replace_year(term.default_last_grade_date, year, last_reg_date)
-        )
-        models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
-        for coinstructor_id in request.POST.getlist('coinstructor'):
-            if coinstructor_id:
-                coinstructor = models.User.objects.get(id=coinstructor_id)
-                models.Participant.objects.create(
-                    user=coinstructor,
-                    course=course,
-                    participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
-        messages.success(request, '%s created' % course)
+        num = request.POST['num']
+        course = models.Course.objects.filter(num=num, term=term, year=year).first()
+        if course:
+            messages.error(request, "%s already exists." % course)
+        else:
+            last_reg_date = replace_year(term.default_last_reg_date, year, None)
+            course = models.Course.objects.create(
+                title=request.POST['name'],
+                num=num,
+                department=request.user.department,
+                term=term,
+                year=year,
+                num_credits=request.POST['num_credits'],
+                credit_label=request.POST['credit_label'],
+                auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
+                last_reg_date=last_reg_date,
+                last_adviser_approval_date=replace_year(term.default_last_adviser_approval_date, year, last_reg_date),
+                last_instructor_approval_date=replace_year(term.default_last_instructor_approval_date, year, last_reg_date),
+                last_conversion_date=replace_year(term.default_last_conversion_date, year, last_reg_date),
+                last_drop_date=replace_year(term.default_last_drop_date, year, last_reg_date),
+                last_grade_date=replace_year(term.default_last_grade_date, year, last_reg_date)
+            )
+            models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
+            for coinstructor_id in request.POST.getlist('coinstructor'):
+                if coinstructor_id:
+                    coinstructor = models.User.objects.get(id=coinstructor_id)
+                    models.Participant.objects.create(
+                        user=coinstructor,
+                        course=course,
+                        participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
+            messages.success(request, '%s created.' % course)
         return redirect('coursereg:instructor')
     else:
+        context = {
+            'user_type': 'faculty',
+            'nav_active': 'instructor',
+            'user_email': request.user.email,
+            'terms': models.Term.objects.filter(is_active=True),
+            'recent_courses': models.Course.objects.filter(
+                department=request.user.department,
+                last_reg_date__gte=timezone.now()-timedelta(days=800)),
+            'instructors': models.User.objects.filter(
+                is_active=True,
+                user_type=models.User.USER_TYPE_FACULTY).exclude(email=request.user.email).order_by('full_name'),
+        }
         return render(request, 'coursereg/course_new.html', context)
 
 @login_required
@@ -141,10 +151,11 @@ def course_update(request, course_id):
     if request.method == 'POST':
         term = models.Term.objects.get(id=request.POST['term'])
         year = str(request.POST['year'])
+        num = request.POST['num']
         last_reg_date = replace_year(term.default_last_reg_date, year, None)
         models.Course.objects.filter(id=course_id).update(
             title=request.POST['name'],
-            num=request.POST['num'],
+            num=num,
             term=term,
             year=year,
             num_credits=request.POST['num_credits'],
