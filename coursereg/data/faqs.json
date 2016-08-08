@@ -16,13 +16,8 @@
     },
     {
         "faq_for": "faculty",
-        "question": "My course is not on this system. How do I add my course?",
-        "answer": "Please ask the administrator to add the course."
-    },
-    {
-        "faq_for": "faculty",
-        "question": "Is it possible to automatically approve all enrollment requests for my course?",
-        "answer": "If you wish to approve all enrollment requests without review, ask the administrator to enable auto instructor approval for your course."
+        "question": "How do I cancel a course?",
+        "answer": "Please ask the administrator to delete the course."
     },
     {
         "faq_for": "dcc",
