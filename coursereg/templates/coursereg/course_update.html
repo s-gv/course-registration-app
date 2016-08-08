@@ -88,7 +88,6 @@
                     <label for="courseCoInstructor" class="col-sm-3 control-label">Co-instructors</label>
                     <div class="col-sm-9">
                         <select id="courseCoInstructor" name="coinstructor" class="form-control" multiple="multiple">
-                            <option value="">None</option>
                             {% for instructor in instructors %}
                             {% if instructor.id in coinstructor_ids %}
                             <option value="{{ instructor.id }}" selected="selected">{{ instructor.full_name }} ({{ instructor.email }})</option>
@@ -127,12 +126,14 @@
 {% block script %}
 {% load staticfiles %}
 <link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
+<link href="{% static 'coursereg/css/select2-bootstrap.min.css' %}" rel="stylesheet">
 <script src="{% static 'coursereg/js/select2.min.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $("#courseCoInstructor").select2({
             placeholder: "Search for co-instructors",
-            allowClear: true
+            allowClear: true,
+            theme: "bootstrap"
         });
     });
 </script>
