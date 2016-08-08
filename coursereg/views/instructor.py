@@ -16,7 +16,7 @@ def index(request):
         'user_type': 'faculty',
         'nav_active': 'instructor',
         'user_email': request.user.email,
-        'can_faculty_add_courses': models.Config.can_faculty_add_courses(),
+        'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
         'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date')]
     }
     return render(request, 'coursereg/instructor.html', context)
@@ -80,7 +80,7 @@ def replace_year(dt, new_year, min_dt):
 def new_course(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
         raise PermissionDenied
-    if not models.Config.can_faculty_add_courses():
+    if not models.Config.can_faculty_create_courses():
         raise PermissionDenied
     context = {
         'user_type': 'faculty',

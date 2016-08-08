@@ -22,6 +22,7 @@ def create(request):
     user = models.User.objects.get(id=user_id)
     if request.POST['origin'] == 'adviser':
         if not request.user == user.adviser: raise PermissionDenied
+        if not models.Config.can_adviser_add_courses_for_students(): raise PermissionDenied
     else:
         if not request.user == user: raise PermissionDenied
 

@@ -337,7 +337,13 @@ class Config(models.Model):
     value = models.CharField(max_length=1000)
 
     @classmethod
-    def can_faculty_add_courses(cls):
-        c = cls.objects.filter(key="can_faculty_add_courses").first()
+    def can_faculty_create_courses(cls):
+        c = cls.objects.filter(key="can_faculty_create_courses").first()
+        if c:
+            return c.value == "1" or c.value == "true"
+
+    @classmethod
+    def can_adviser_add_courses_for_students(cls):
+        c = cls.objects.filter(key="can_adviser_add_courses_for_students").first()
         if c:
             return c.value == "1" or c.value == "true"
