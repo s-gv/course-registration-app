@@ -8,6 +8,7 @@ from datetime import date, timedelta
 from django.utils import timezone
 from coursereg import models
 from django.core.exceptions import PermissionDenied
+import re
 
 @login_required
 def index(request):
@@ -78,6 +79,9 @@ def replace_year(dt, new_year, min_dt):
         return replace_year(dt, new_year+1, min_dt)
     return new_dt
 
+def get_total_credits(credit_label):
+    return sum(int(c) for c in re.split(r'[^0-9]', credit_label) if c.isdigit())
+
 @login_required
 def course_new(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
@@ -100,7 +104,7 @@ def course_new(request):
                 department=request.user.department,
                 term=term,
                 year=year,
-                num_credits=request.POST['num_credits'],
+                num_credits=get_total_credits(request.POST['credit_label']),
                 credit_label=request.POST['credit_label'],
                 auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
                 last_reg_date=last_reg_date,
@@ -158,7 +162,7 @@ def course_update(request, course_id):
             num=num,
             term=term,
             year=year,
-            num_credits=request.POST['num_credits'],
+            num_credits=get_total_credits(request.POST['credit_label']),
             credit_label=request.POST['credit_label'],
             auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
             last_reg_date=last_reg_date,
