@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='department',
             name='abbreviation',
-            field=models.CharField(default='-', max_length=100),
+            field=models.CharField(max_length=100, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='participant',

@@ -34,7 +34,7 @@ class CustomUserManager(BaseUserManager):
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
-    abbreviation = models.CharField(max_length=100, default='-')
+    abbreviation = models.CharField(max_length=100, null=True, unique=True)
     is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
