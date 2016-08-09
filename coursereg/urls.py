@@ -8,7 +8,6 @@ urlpatterns = [
     url(r'^changepasswd$', views.user.change_passwd, name='change_passwd'),
     url(r'^forgotpasswd$', views.user.forgot_passwd, name='forgot_passwd'),
     url(r'^resetpasswd/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$', views.user.reset_passwd, name='reset_passwd'),
-    url(r'^sudo/([0-9]+)$', views.user.sudo_login, name='sudo_login'),
 
     url(r'^faq$', views.common.faq, name='faq'),
     url(r'^fatal$', views.common.fatal_error, name='fatal'),

@@ -19,7 +19,7 @@ import coursereg.views
 from . import settings
 
 urlpatterns = [
-    url(r'^su/logout/$', coursereg.views.user.signout),
-    url(r'^su/', admin.site.urls),
+    url(r'^sudo/logout/$', coursereg.views.user.signout),
+    url(r'^sudo/', admin.site.urls),
     url(r'', include('coursereg.urls'))
 ]

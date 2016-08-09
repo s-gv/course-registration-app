@@ -7,4 +7,3 @@ from . import instructor
 from . import adviser
 from . import student
 from . import dcc
-from . import su

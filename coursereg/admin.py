@@ -18,6 +18,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from coursereg import utils
 from coursereg import models
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -87,10 +89,17 @@ class CustomUserAdmin(UserAdmin):
     def get_urls(self):
         urls = super(CustomUserAdmin, self).get_urls()
         my_urls = [
-            url(r'^bulkadd/$', self.admin_site.admin_view(self.bulk_add_students), name='coursereg_user_bulk_add_students'),
-            url(r'^bulkdeactivate/$', self.admin_site.admin_view(self.bulk_deactivate_students), name='coursereg_user_bulk_deactivate_students'),
+            url(r'^bulkadd$', self.admin_site.admin_view(self.bulk_add_students), name='coursereg_user_bulk_add_students'),
+            url(r'^bulkdeactivate$', self.admin_site.admin_view(self.bulk_deactivate_students), name='coursereg_user_bulk_deactivate_students'),
+            url(r'^login/(.+)$', self.admin_site.admin_view(self.sudo_login), name='coursereg_user_sudo_login'),
         ]
         return my_urls + urls
+
+    def sudo_login(self, request, user_id):
+        user = models.User.objects.get(id=user_id)
+        user.backend = settings.AUTHENTICATION_BACKENDS[0]
+        login(request, user)
+        return redirect(reverse('coursereg:index'))
 
     def bulk_add_students(self, request):
         if request.method == 'POST':
@@ -216,7 +225,7 @@ class CustomUserAdmin(UserAdmin):
     clear_dcc_review.short_description = "Clear DCC review"
 
     def login_as(self, user):
-        return format_html("<a href='{url}'>Login</a>", url=reverse('coursereg:sudo_login', args=[user.id]))
+        return format_html("<a href='{url}'>Login</a>", url=reverse('admin:coursereg_user_sudo_login', args=[user.id]))
 
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('num', 'title', 'department', 'last_reg_date', 'num_credits', 'should_count_towards_cgpa', 'auto_instructor_approve')

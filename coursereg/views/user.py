@@ -81,11 +81,3 @@ def change_passwd(request):
         else:
             messages.error(request, 'Current password is incorrect.')
         return redirect(request.POST.get('next', reverse('coursereg:index')))
-
-@login_required
-def sudo_login(request, user_id):
-    if not request.user.is_superuser: raise PermissionDenied
-    user = models.User.objects.get(id=user_id)
-    user.backend = settings.AUTHENTICATION_BACKENDS[0]
-    login(request, user)
-    return redirect(reverse('coursereg:index'))
