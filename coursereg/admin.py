@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
@@ -15,6 +16,8 @@ import csv
 from email.utils import parseaddr
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
+from coursereg import utils
+from coursereg import models
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -222,6 +225,47 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ParticipantInline]
     actions = ['clone_courses_increment_year', 'change_dates']
 
+    def get_urls(self):
+        urls = super(CourseAdmin, self).get_urls()
+        my_urls = [
+            url(r'^bulkchangedates/(.+)$', self.admin_site.admin_view(self.bulk_change_dates), name='coursereg_course_bulk_change_dates'),
+        ]
+        return my_urls + urls
+
+    def bulk_change_dates(self, request, courses):
+        course_ids = urlunquote_plus(courses).split('-')
+        if request.method == 'POST':
+            models.Course.objects.filter(pk__in=course_ids).update(
+                term=request.POST['term'],
+                year=request.POST['year'],
+                last_reg_date=utils.parse_datetime_str(request.POST['last_reg_date']),
+                last_adviser_approval_date=utils.parse_datetime_str(request.POST['last_adviser_approval_date']),
+                last_instructor_approval_date=utils.parse_datetime_str(request.POST['last_instructor_approval_date']),
+                last_conversion_date=utils.parse_datetime_str(request.POST['last_conversion_date']),
+                last_drop_date=utils.parse_datetime_str(request.POST['last_drop_date']),
+                last_drop_with_mention_date=utils.parse_datetime_str(request.POST['last_drop_with_mention_date']),
+                last_grade_date=utils.parse_datetime_str(request.POST['last_grade_date']),
+            )
+            messages.success(request, "The dates of %s courses were modified successfully." % len(course_ids))
+            return redirect(reverse('admin:coursereg_course_changelist'))
+        else:
+            context = dict(
+               self.admin_site.each_context(request),
+               title='Change course dates',
+               terms=models.Term.objects.all(),
+               courses=models.Course.objects.filter(pk__in=course_ids),
+               default_term_id=models.get_recent_term(),
+               default_year=models.get_recent_year(),
+               default_last_reg_date=utils.datetime_to_str(models.get_recent_last_reg_date()),
+               default_last_adviser_approval_date=utils.datetime_to_str(models.get_recent_last_adviser_approval_date()),
+               default_last_instructor_approval_date=utils.datetime_to_str(models.get_recent_last_instructor_approval_date()),
+               default_last_conversion_date=utils.datetime_to_str(models.get_recent_last_conversion_date()),
+               default_last_drop_date=utils.datetime_to_str(models.get_recent_last_drop_date()),
+               default_last_drop_with_mention_date=utils.datetime_to_str(models.get_recent_last_drop_with_mention_date()),
+               default_last_grade_date=utils.datetime_to_str(models.get_recent_last_grade_date()),
+            )
+            return render(request, 'admin/coursereg/course/bulk_date_change.html', context)
+
     def change_dates(self, request, queryset):
         selected_list = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
         max_courses = 50
@@ -229,7 +273,7 @@ class CourseAdmin(admin.ModelAdmin):
             self.message_user(request, 'Select fewer than %s courses to modify at a time.' % max_courses, level=messages.ERROR)
         else:
             selected = '-'.join(selected_list)
-            return redirect(reverse('coursereg:admin_course_date_change', args=[urlquote_plus(selected)]))
+            return redirect(reverse('admin:coursereg_course_bulk_change_dates', args=[urlquote_plus(selected)]))
     change_dates.short_description = 'Change dates for the selected courses'
 
     def clone_courses_increment_year(self, request, queryset):
@@ -288,17 +332,42 @@ class FaqAdmin(admin.ModelAdmin):
     list_filter = ('faq_for',)
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'abbreviation', 'is_active')
+    list_display = ('name', 'abbreviation', 'is_active', 'report_link')
     search_fields = ('name', 'abbreviation')
-    actions = ['generate_report']
 
-    def generate_report(self, request, queryset):
-        selected_list = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
-        if len(selected_list) != 1:
-            self.message_user(request, 'Select exactly one department.', level=messages.ERROR)
-        else:
-            return redirect(reverse('coursereg:admin_dept_report', args=[selected_list[0]]))
-    generate_report.short_description = 'Generate report for the selected department'
+    def get_urls(self):
+        urls = super(DepartmentAdmin, self).get_urls()
+        my_urls = [
+            url(r'^report/(.+)$', self.admin_site.admin_view(self.report_view), name='coursereg_department_report'),
+        ]
+        return my_urls + urls
+
+    def report_view(self, request, dept_id):
+        dept = models.Department.objects.get(id=dept_id)
+        from_date = models.get_recent_last_reg_date()
+        to_date = timezone.now()
+        if request.GET.get('from_date') and request.GET.get('to_date'):
+            from_date = utils.parse_datetime_str(request.GET['from_date'])
+            to_date = utils.parse_datetime_str(request.GET['to_date'])
+        participants = [p for p in models.Participant.objects.filter(
+            user__department=dept,
+            is_adviser_approved=True,
+            is_instructor_approved=True,
+            user__user_type=models.User.USER_TYPE_STUDENT,
+            course__last_reg_date__range=[from_date, to_date]
+        ).order_by('user__degree', 'user__full_name')]
+        context = dict(
+           self.admin_site.each_context(request),
+           title='Report',
+           default_from_date=utils.datetime_to_str(from_date),
+           default_to_date=utils.datetime_to_str(to_date),
+           participants=participants,
+           dept=dept
+        )
+        return render(request, 'admin/coursereg/department/report.html', context)
+
+    def report_link(self, dept):
+        return format_html("<a href='{url}'>Report</a>", url=reverse('admin:coursereg_department_report', args=[dept.id]))
 
 class DegreeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active')

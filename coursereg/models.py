@@ -21,7 +21,6 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         else:
-            print 'Setting random password'
             user.set_password(User.objects.make_random_password())
         user.save(using=self._db)
         return user
