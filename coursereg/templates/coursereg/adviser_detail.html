@@ -220,10 +220,14 @@
 </div>
 {% endblock %}
 
-{% block script %}
+{% block head %}
 {% load staticfiles %}
 <link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
 <link href="{% static 'coursereg/css/select2-bootstrap.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+{% load staticfiles %}
 <script src="{% static 'coursereg/js/select2.min.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {

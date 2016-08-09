@@ -1,5 +1,10 @@
 {% extends "admin/base_site.html" %}
 
+{% block extrastyle %}
+{% load staticfiles %}
+<link href="{% static 'coursereg/css/pikaday.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">Home</a>
@@ -68,11 +73,6 @@
 <script src="{% static 'coursereg/js/Blob.js' %}"></script>
 <script src="{% static 'coursereg/js/FileSaver.min.js' %}"></script>
 <script type='text/javascript'>
-$("<link/>", {
-    rel: "stylesheet",
-    type: "text/css",
-    href: "{% static 'coursereg/css/pikaday.css' %}"
-}).appendTo("head");
 var picker = new Pikaday({ field: $('#from_date')[0] });
 var picker2 = new Pikaday({ field: $('#to_date')[0] });
 var exportData = {
