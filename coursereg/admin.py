@@ -77,7 +77,7 @@ class CustomUserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = CustomUserCreationForm
     list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active', 'login_as')
-    list_filter = ('is_active', 'user_type', 'degree', 'is_dcc_review_pending')
+    list_filter = ('is_active', 'user_type', 'degree', 'department')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)
     readonly_fields = ('cgpa',)
@@ -280,9 +280,10 @@ class CustomUserAdmin(UserAdmin):
         return format_html("<a href='{url}'>Login</a>", url=reverse('admin:coursereg_user_sudo_login', args=[user.id]))
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('num', 'title', 'department', 'last_reg_date', 'num_credits', 'should_count_towards_cgpa', 'auto_instructor_approve')
+    list_display = ('num', 'title', 'term', 'year', 'department', 'last_reg_date', 'should_count_towards_cgpa', 'auto_instructor_approve')
     ordering = ('-last_reg_date', 'department__name', 'num', 'title')
     search_fields = ('title', 'num', 'last_reg_date')
+    list_filter = ('term', 'department')
     inlines = [ParticipantInline]
     actions = ['clone_courses_increment_year', 'change_dates']
 
