@@ -18,6 +18,7 @@ from django.contrib import admin
 import coursereg.views
 from . import settings
 
+admin.site.site_header = 'Coursereg administration'
 urlpatterns = [
     url(r'^sudo/logout/$', coursereg.views.user.signout),
     url(r'^sudo/', admin.site.urls),
