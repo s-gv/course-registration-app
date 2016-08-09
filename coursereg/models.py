@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from django.db.models import Q
 import re
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **extra_fields):
@@ -361,3 +362,10 @@ class Config(models.Model):
         if c:
             return int(c.value)
         return 60
+
+    @classmethod
+    def contact_email(cls):
+        c = cls.objects.filter(key='contact_email').first()
+        if c:
+            return c.value
+        return settings.DEFAULT_FROM_EMAIL

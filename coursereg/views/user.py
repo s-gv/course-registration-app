@@ -14,7 +14,10 @@ from django.core.exceptions import PermissionDenied
 
 def signin(request):
     if request.method == 'GET':
-        context = { "next_url": request.GET.get('next', reverse('coursereg:index'))}
+        context = {
+            "next_url": request.GET.get('next', reverse('coursereg:index')),
+            "contact_email": models.Config.contact_email()
+        }
         return render(request, 'coursereg/signin.html', context)
     else:
         user = authenticate(email=request.POST['email'], password=request.POST['password'])

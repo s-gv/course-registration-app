@@ -1,5 +1,6 @@
 [
     {"key": "can_faculty_create_courses", "value": "1"},
     {"key": "can_adviser_add_courses_for_students", "value": "1"},
-    {"key": "num_days_before_last_reg_date_course_registerable", "value": "65"}
+    {"key": "num_days_before_last_reg_date_course_registerable", "value": "65"},
+    {"key": "contact_email", "value": "webmaster@ece.iisc.ernet.in"}
 ]
