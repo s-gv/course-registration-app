@@ -196,6 +196,9 @@ def course_update(request, course_id):
             'course': course,
             'terms': models.Term.objects.filter(is_active=True),
             'coinstructor_ids': coinstructor_ids,
+            'recent_courses': models.Course.objects.filter(
+                department=request.user.department,
+                last_reg_date__gte=timezone.now()-timedelta(days=800)),
             'instructors': models.User.objects.filter(
                 is_active=True,
                 user_type=models.User.USER_TYPE_FACULTY).exclude(email=request.user.email).order_by('full_name'),

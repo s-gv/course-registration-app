@@ -117,17 +117,78 @@
 </div>
 {% endblock %}
 
-{% block script %}
+{% block head %}
 {% load staticfiles %}
 <link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
 <link href="{% static 'coursereg/css/select2-bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'coursereg/css/typeaheadjs.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+{% load staticfiles %}
 <script src="{% static 'coursereg/js/select2.min.js' %}"></script>
+<script src="{% static 'coursereg/js/typeahead.bundle.min.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $("#courseCoInstructor").select2({
             placeholder: "Search for co-instructors",
             allowClear: true,
             theme: "bootstrap"
+        });
+        var recentCourses = [
+            {% for course in recent_courses %}
+            {
+                "title": "{{ course.title }}",
+                "num": "{{ course.num }}",
+                "year": "{{ course.year }}",
+                "credit_label": "{{ course.credit_label }}"
+            },
+            {% endfor %}
+        ];
+
+        $('#courseName').typeahead({hint: true, highlight: true, minLength: 1}, {
+            name: 'title',
+            source: new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: recentCourses.map(function(c) {
+                    return c['title'];
+                }).filter(function(value, index, self) {
+                    return self.indexOf(value) === index;
+                })
+            })
+        });
+        $('#courseNum').typeahead({hint: true, highlight: true, minLength: 1}, {
+            name: 'title',
+            source: new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: recentCourses.map(function(c) {
+                    return c['num'];
+                }).filter(function(value, index, self) {
+                    return self.indexOf(value) === index;
+                })
+            })
+        });
+        $('#courseYear').typeahead({hint: true, highlight: true, minLength: 1}, {
+            name: 'year',
+            source: new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: [new Date().getFullYear(), new Date().getFullYear()+1]
+            })
+        });
+        $('#courseCreditSplit').typeahead({hint: true, highlight: true, minLength: 1}, {
+            name: 'credit_label',
+            source: new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.whitespace,
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: recentCourses.map(function(c) {
+                    return c['credit_label'];
+                }).filter(function(value, index, self) {
+                    return self.indexOf(value) === index;
+                })
+            })
         });
     });
 </script>
