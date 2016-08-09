@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='coursereg' %}">Coursereg</a>
+    &rsaquo; <a href="{% url 'admin:coursereg_user_changelist' %}">Users</a>
+    &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="fileUpload">Upload CSV file with students:</label>
+    <input type="file" name="students_csv" id="fileUpload">
+    <p>
+        {% load staticfiles %}
+        Note that the CSV file must have one e-mail per line like in this <a href="{% static 'coursereg/misc/deactivate_students_sample.csv' %}">sample CSV</a> file.
+    </p>
+    <div>
+        <input type="submit" value="Upload" name="submit">
+    </div>
+</form>
+{% endblock %}

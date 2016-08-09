@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+    <a href="{% url 'admin:coursereg_user_bulk_add_students' %}" class="addlink">Bulk Add Students</a>
+</li>
+<li>
+    <a href="{% url 'admin:coursereg_user_bulk_deactivate_students' %}" class="deletelink">Bulk Deactivate Students</a>
+</li>
+{% endblock %}

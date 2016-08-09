@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.shortcuts import render, redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
@@ -9,6 +10,11 @@ from django.core.urlresolvers import reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
 from django.utils.http import urlquote_plus, urlunquote_plus
+from django.conf.urls import url, include
+import csv
+from email.utils import parseaddr
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -73,6 +79,113 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('-date_joined',)
     inlines = [CourseInline]
     actions = ['make_inactive', 'make_active', 'clear_dcc_review', 'enable_auto_advisee_approval', 'disable_auto_advisee_approval']
+    #change_list_template = 'admin/coursereg/user/custom_user_changelist.html
+
+    def get_urls(self):
+        urls = super(CustomUserAdmin, self).get_urls()
+        my_urls = [
+            url(r'^bulkadd/$', self.admin_site.admin_view(self.bulk_add_students), name='coursereg_user_bulk_add_students'),
+            url(r'^bulkdeactivate/$', self.admin_site.admin_view(self.bulk_deactivate_students), name='coursereg_user_bulk_deactivate_students'),
+        ]
+        return my_urls + urls
+
+    def bulk_add_students(self, request):
+        if request.method == 'POST':
+            f = request.FILES['students_csv']
+            students = []
+            error = False
+            for line_num, row in enumerate(csv.reader(f), start=1):
+                error = True
+                students.append({
+                })
+                try:
+                    name, email, dept_abbr, phone, degree, sr_no, join_date, adviser_email = [ele.strip() for ele in row]
+                    students[-1]['name'] = name
+                except:
+                    messages.error(request, 'Incomplete fields in line %s. No records added.' % line_num)
+                    break
+                if '@' in parseaddr(email)[1]:
+                    students[-1]['email'] = email
+                else:
+                    messages.error(request, 'Email invalid in line %s. No records added.' % line_num)
+                    break
+                if User.objects.filter(email=email):
+                    messages.error(request, 'Email in line %s already exists. No records added.' % line_num)
+                    break
+                try:
+                    students[-1]['dept'] = Department.objects.get(abbreviation=str(dept_abbr))
+                except:
+                    messages.error(request, 'Department invalid in line %s. No records added.' % line_num)
+                    break
+                students[-1]['phone'] = phone
+                try:
+                    students[-1]['degree'] = Degree.objects.get(name=degree)
+                except:
+                    messages.error(request, 'Degree invalid in line %s. No records added.' % line_num)
+                    break
+                students[-1]['sr_no'] = sr_no
+                try:
+                    students[-1]['join_date'] = datetime.strptime(join_date, '%d %b %Y')
+                except:
+                    messages.error(request, 'Date not in expected format (ex: 01 Aug 2011) in line %s. No records added.' % line_num)
+                    break
+                try:
+                    students[-1]['adviser'] = User.objects.get(email=adviser_email)
+                except:
+                    messages.error(request, 'Adviser email invalid in line %s. Nothing added.' % line_num)
+                    break
+                error = False
+            if not error:
+                for student in students:
+                    User.objects.create_user(
+                        email=student['email'],
+                        full_name=student['name'],
+                        user_type=User.USER_TYPE_STUDENT,
+                        adviser=student['adviser'],
+                        degree=student['degree'],
+                        department=student['dept'],
+                        sr_no=student['sr_no'],
+                        telephone=student['phone'],
+                        date_joined=student['join_date']
+                    )
+                messages.success(request, "Successfully added %s students." % len(students))
+                return redirect('admin:coursereg_user_changelist')
+        context = dict(
+           self.admin_site.each_context(request),
+           title='Bulk add students'
+        )
+        return render(request, "admin/coursereg/user/bulk_add_students.html", context)
+
+    def bulk_deactivate_students(self, request):
+        if request.method == 'POST':
+            f = request.FILES['students_csv']
+            students = []
+            error = False
+            for line_num, row in enumerate(csv.reader(f), start=1):
+                error = True
+                students.append({
+                })
+                try:
+                    email = [ele.strip() for ele in row][0]
+                    u = User.objects.get(email=email)
+                    students[-1]['email'] = u.email
+                except:
+                    messages.error(request, 'Email in line %s not found. No records updated.' % line_num)
+                    break
+                if u.user_type != User.USER_TYPE_STUDENT:
+                    messages.error(request, 'Email in line %s does not belong to a student. No records updated.' % line_num)
+                    break
+                error = False
+            if not error:
+                for student in students:
+                    User.objects.filter(email=student['email']).update(is_active=False)
+                messages.success(request, "Successfully de-activated %s students." % len(students))
+                return redirect('admin:coursereg_user_changelist')
+        context = dict(
+           self.admin_site.each_context(request),
+           title='Bulk deactivate students'
+        )
+        return render(request, "admin/coursereg/user/bulk_deactivate_students.html", context)
 
     def make_inactive(self, request, queryset):
         n = queryset.update(is_active=False)

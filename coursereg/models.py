@@ -18,7 +18,11 @@ class CustomUserManager(BaseUserManager):
         user = self.model(email=email,
                           is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser, **extra_fields)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
+        else:
+            print 'Setting random password'
+            user.set_password(User.objects.make_random_password())
         user.save(using=self._db)
         return user
 
@@ -177,6 +181,9 @@ class Notification(models.Model):
     is_adviser_acknowledged = models.BooleanField(default=False)
     is_dcc_acknowledged = models.BooleanField(default=False)
     created_at = models.DateField(auto_now_add=True)
+
+    def __unicode__(self):
+        return 'For %s - %s' % (self.user, self.message)
 
 
 def get_recent_last_reg_date():

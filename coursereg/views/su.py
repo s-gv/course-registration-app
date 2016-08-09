@@ -83,3 +83,19 @@ def dept_report(request, dept_id):
         'dept': dept
     }
     return render(request, 'admin/dept_report.html', context)
+
+@login_required
+def bulk_add_students(request):
+    if not request.user.is_superuser: raise PermissionDenied
+    context = {
+        'title': 'Bulk add students',
+    }
+    return render(request, 'admin/bulk_add_students.html', context)
+
+@login_required
+def bulk_deactivate_students(request):
+    if not request.user.is_superuser: raise PermissionDenied
+    context = {
+        'title': 'Bulk deactivate students',
+    }
+    return render(request, 'admin/bulk_deactivate_students.html', context)
