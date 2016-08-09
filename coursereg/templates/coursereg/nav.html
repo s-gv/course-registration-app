@@ -12,11 +12,23 @@
         <div id="navbar" class="navbar-collapse collapse">
             <p class="navbar-text navbar-left"></p>
             <ul class="nav navbar-nav navbar-right">
-                {% if user_type == 'student' or user_type == 'dcc' %}
+                {% if user_type == 'student' %}
                     {% if nav_active == 'home' %}
                     <li class="active"><a href="{% url 'coursereg:index' %}">Home</a></li>
                     {% else %}
                     <li><a href="{% url 'coursereg:index' %}">Home</a></li>
+                    {% endif %}
+                {% endif %}
+                {% if user_type == 'dcc' %}
+                    {% if nav_active == 'report' %}
+                    <li class="active"><a href="{% url 'coursereg:dcc_report' %}">Report</a></li>
+                    {% else %}
+                    <li><a href="{% url 'coursereg:dcc_report' %}">Report</a></li>
+                    {% endif %}
+                    {% if nav_active == 'review' %}
+                    <li class="active"><a href="{% url 'coursereg:dcc_review' %}">Review</a></li>
+                    {% else %}
+                    <li><a href="{% url 'coursereg:dcc_review' %}">Review</a></li>
                     {% endif %}
                 {% endif %}
                 {% if user_type == 'faculty' %}

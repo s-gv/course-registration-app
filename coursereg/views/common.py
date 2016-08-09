@@ -18,7 +18,7 @@ def index(request):
     elif request.user.user_type == models.User.USER_TYPE_FACULTY:
         return redirect('coursereg:adviser')
     elif request.user.user_type == models.User.USER_TYPE_DCC:
-        return dcc.index(request)
+        return redirect('coursereg:dcc_report')
     else:
         messages.error(request, "User type not recognized.")
         return redirect('coursereg:fatal')

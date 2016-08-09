@@ -13,14 +13,45 @@ from django.db.models import Q, Count
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
+from coursereg import utils
+from django.utils import timezone
 
 @login_required
-def index(request):
+def report(request):
+    if not request.user.user_type == models.User.USER_TYPE_DCC:
+        raise PermissionDenied
+    from_date = models.get_recent_last_reg_date()
+    to_date = timezone.now()
+    if request.GET.get('from_date') and request.GET.get('to_date'):
+        from_date = utils.parse_datetime_str(request.GET['from_date'])
+        to_date = utils.parse_datetime_str(request.GET['to_date'])
+
+    participants = [p for p in models.Participant.objects.filter(
+        user__department=request.user.department,
+        is_adviser_approved=True,
+        is_instructor_approved=True,
+        user__user_type=models.User.USER_TYPE_STUDENT,
+        course__last_reg_date__range=[from_date, to_date]
+    ).order_by('user__degree', 'user__full_name')]
+
+    context = {
+        'user_type': 'dcc',
+        'nav_active': 'report',
+        'user_email': request.user.email,
+        'dept': request.user.department,
+        'default_from_date': utils.datetime_to_str(from_date),
+        'default_to_date': utils.datetime_to_str(to_date),
+        'participants': participants,
+    }
+    return render(request, 'coursereg/dcc_report.html', context)
+
+@login_required
+def review(request):
     if not request.user.user_type == models.User.USER_TYPE_DCC:
         raise PermissionDenied
     context = {
         'user_type': 'dcc',
-        'nav_active': 'home',
+        'nav_active': 'review',
         'faculty_approval_pending': models.Participant.objects.filter(
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
                 user__department=request.user.department,
@@ -31,7 +62,7 @@ def index(request):
             department=request.user.department).order_by('full_name')],
         'user_email': request.user.email
     }
-    return render(request, 'coursereg/dcc.html', context)
+    return render(request, 'coursereg/dcc_review.html', context)
 
 @login_required
 def detail(request, student_id):
@@ -51,6 +82,7 @@ def detail(request, student_id):
     ) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date', 'course__title')]
     context = {
         'user_type': 'dcc',
+        'nav_active': 'review',
         'user_email': request.user.email,
         'student': student,
         'participants': participants,
@@ -71,7 +103,7 @@ def approve(request, student_id):
     student.save()
     models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
-    return redirect(request.POST.get('next', reverse('coursereg:index')))
+    return redirect(request.POST.get('next', reverse('coursereg:dcc_review')))
 
 @require_POST
 @login_required
@@ -112,4 +144,4 @@ def remind(request):
     else:
         messages.success(request, 'Reminder e-mails sent.')
 
-    return redirect(request.POST.get('next', reverse('coursereg:index')))
+    return redirect('coursereg:dcc_review')

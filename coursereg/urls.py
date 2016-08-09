@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^adviser$', views.adviser.index, name='adviser'),
     url(r'^adviser/([0-9]+)$', views.adviser.detail, name='adviser_detail'),
 
+    url(r'^dcc/report$', views.dcc.report, name='dcc_report'),
+    url(r'^dcc/review$', views.dcc.review, name='dcc_review'),
     url(r'^dcc/([0-9]+)$', views.dcc.detail, name='dcc_detail'),
     url(r'^dcc/([0-9]+)/approve$', views.dcc.approve, name='dcc_approve'),
     url(r'^dcc/remind$', views.dcc.remind, name='dcc_remind'),

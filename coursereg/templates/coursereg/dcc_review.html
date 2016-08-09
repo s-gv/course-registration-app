@@ -30,14 +30,16 @@
             <table class="table table-striped">
                 {% for student in all_active_students %}
                 <tr>
+                    {% if student.is_adviser_or_instructor_pending %}
                     <td>
-                        {% if student.is_adviser_or_instructor_pending %}
                         <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
                         <span class="badge">in progress</span>
-                        {% elif student.is_dcc_review_pending %}
-                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
-                        {% endif %}
                     </td>
+                    {% elif student.is_dcc_review_pending %}
+                    <td>
+                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
