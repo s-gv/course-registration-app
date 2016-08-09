@@ -89,7 +89,8 @@ class CustomUserAdmin(UserAdmin):
     def get_urls(self):
         urls = super(CustomUserAdmin, self).get_urls()
         my_urls = [
-            url(r'^bulkadd$', self.admin_site.admin_view(self.bulk_add_students), name='coursereg_user_bulk_add_students'),
+            url(r'^bulkaddstudents$', self.admin_site.admin_view(self.bulk_add_students), name='coursereg_user_bulk_add_students'),
+            url(r'^bulkaddfaculty$', self.admin_site.admin_view(self.bulk_add_faculty), name='coursereg_user_bulk_add_faculty'),
             url(r'^bulkdeactivate$', self.admin_site.admin_view(self.bulk_deactivate_students), name='coursereg_user_bulk_deactivate_students'),
             url(r'^login/(.+)$', self.admin_site.admin_view(self.sudo_login), name='coursereg_user_sudo_login'),
         ]
@@ -100,6 +101,54 @@ class CustomUserAdmin(UserAdmin):
         user.backend = settings.AUTHENTICATION_BACKENDS[0]
         login(request, user)
         return redirect(reverse('coursereg:index'))
+
+    def bulk_add_faculty(self, request):
+        if request.method == 'POST':
+            f = request.FILES['faculty_csv']
+            faculty = []
+            error = False
+            for line_num, row in enumerate(csv.reader(f), start=1):
+                error = True
+                faculty.append({
+                })
+                try:
+                    name, email, dept_abbr = [ele.strip() for ele in row]
+                    faculty[-1]['name'] = name
+                except:
+                    messages.error(request, 'Number of fields incorrect in line %s. No records added.' % line_num)
+                    break
+                if len(name) < 3:
+                    messages.error(request, 'Name has less than 3 characters in line %s. No records added.' % line_num)
+                    break
+                if '@' in parseaddr(email)[1]:
+                    faculty[-1]['email'] = email
+                else:
+                    messages.error(request, 'Email invalid in line %s. No records added.' % line_num)
+                    break
+                if User.objects.filter(email=email):
+                    messages.error(request, 'Email in line %s already exists. No records added.' % line_num)
+                    break
+                try:
+                    faculty[-1]['dept'] = Department.objects.get(abbreviation=str(dept_abbr))
+                except:
+                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
+                    break
+                error = False
+            if not error:
+                for fac in faculty:
+                    User.objects.create_user(
+                        email=fac['email'],
+                        full_name=fac['name'],
+                        user_type=User.USER_TYPE_FACULTY,
+                        department=fac['dept']
+                    )
+                messages.success(request, "Successfully added %s faculty." % len(faculty))
+                return redirect('admin:coursereg_user_changelist')
+        context = dict(
+           self.admin_site.each_context(request),
+           title='Bulk load faculty'
+        )
+        return render(request, "admin/coursereg/user/bulk_add_faculty.html", context)
 
     def bulk_add_students(self, request):
         if request.method == 'POST':
@@ -114,7 +163,10 @@ class CustomUserAdmin(UserAdmin):
                     name, email, dept_abbr, phone, degree, sr_no, join_date, adviser_email = [ele.strip() for ele in row]
                     students[-1]['name'] = name
                 except:
-                    messages.error(request, 'Incomplete fields in line %s. No records added.' % line_num)
+                    messages.error(request, 'Number of fields incorrect in line %s. No records added.' % line_num)
+                    break
+                if len(name) < 3:
+                    messages.error(request, 'Name has less than 3 characters in line %s. No records added.' % line_num)
                     break
                 if '@' in parseaddr(email)[1]:
                     students[-1]['email'] = email
@@ -127,7 +179,7 @@ class CustomUserAdmin(UserAdmin):
                 try:
                     students[-1]['dept'] = Department.objects.get(abbreviation=str(dept_abbr))
                 except:
-                    messages.error(request, 'Department invalid in line %s. No records added.' % line_num)
+                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
                     break
                 students[-1]['phone'] = phone
                 try:
@@ -164,7 +216,7 @@ class CustomUserAdmin(UserAdmin):
                 return redirect('admin:coursereg_user_changelist')
         context = dict(
            self.admin_site.each_context(request),
-           title='Bulk add students'
+           title='Bulk load students'
         )
         return render(request, "admin/coursereg/user/bulk_add_students.html", context)
 
