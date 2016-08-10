@@ -68,17 +68,6 @@ def detail(request, course_id):
     }
     return render(request, 'coursereg/instructor_detail.html', context)
 
-def replace_year(dt, new_year, min_dt):
-    new_dt = None
-    new_year = int(new_year)
-    try:
-        new_dt = dt.replace(year=new_year)
-    except ValueError:
-        new_dt = dt + (date(new_year, 1, 1) - date(d.year, 1, 1))
-    if min_dt and new_dt < min_dt:
-        return replace_year(dt, new_year+1, min_dt)
-    return new_dt
-
 @login_required
 def course_new(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
@@ -99,7 +88,8 @@ def course_new(request):
                 department=request.user.department,
                 term=term,
                 credits=request.POST['credits'],
-                auto_instructor_approve=request.POST.get('auto_instructor_approve', False)
+                auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
+                should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
             )
             models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
             for coinstructor_id in request.POST.getlist('coinstructor'):
@@ -147,7 +137,8 @@ def course_update(request, course_id):
             num=num,
             term=term,
             credits=request.POST['credits'],
-            auto_instructor_approve=request.POST.get('auto_instructor_approve', False)
+            auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
+            should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
         )
         models.Participant.objects.filter(
             course=course,
