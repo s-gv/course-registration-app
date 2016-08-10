@@ -41,7 +41,7 @@ class UserLoginTests(TestCase):
 
     def test_was_dcc_shown_right_index_page(self):
         response = self.client.post(reverse('coursereg:signin'), {'email': 'dcc@test.com', 'password': 'dcc12345'}, follow=True)
-        self.assertTemplateUsed(response, 'coursereg/dcc.html')
+        self.assertTemplateUsed(response, 'coursereg/dcc_report.html')
 
     def test_was_superuser_shown_right_index_page(self):
         response = self.client.post(reverse('coursereg:signin'), {'email': 'admin@test.com', 'password': 'admin12345'}, follow=True)

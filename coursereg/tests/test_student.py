@@ -14,10 +14,31 @@ class StudentTests(TestCase):
         cls.ben = User.objects.create_user(email='ben@test.com', password='ben12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
-        aug_term = Term.objects.create(name='Aug-Dec')
+        aug_term = Term.objects.create(
+            name='Aug-Dec',
+            year='2016',
+            last_reg_date=tomorrow,
+            last_adviser_approval_date=tomorrow,
+            last_instructor_approval_date=tomorrow,
+            last_conversion_date=tomorrow,
+            last_drop_date=tomorrow,
+            last_drop_with_mention_date=tomorrow,
+            last_grade_date=tomorrow
+        )
+        aug_term_expired = Term.objects.create(
+            name='Aug-Dec',
+            year='2016',
+            last_reg_date=yesterday,
+            last_adviser_approval_date=yesterday,
+            last_instructor_approval_date=yesterday,
+            last_conversion_date=yesterday,
+            last_drop_date=yesterday,
+            last_drop_with_mention_date=yesterday,
+            last_grade_date=yesterday
+        )
         cls.s_grade = Grade.objects.create(name="S grade", points=7.5, should_count_towards_cgpa=True)
-        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=aug_term, last_reg_date=tomorrow)
-        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, term=aug_term, last_reg_date=yesterday)
+        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=aug_term)
+        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, term=aug_term_expired)
 
     def setUp(self):
         self.client = Client()

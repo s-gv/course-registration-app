@@ -26,8 +26,18 @@ class StudentUITests(StaticLiveServerTestCase):
         charles = User.objects.create_user(email='charles@test.com', password='charles12345', user_type=User.USER_TYPE_FACULTY)
         ben = User.objects.create_user(email='ben@ece.iisc.ernet.in', password='test12345', user_type=User.USER_TYPE_STUDENT, adviser=charles)
         tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
-        term = Term.objects.create(name='Aug-Dec')
-        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=term, last_reg_date=tomorrow)
+        term = Term.objects.create(
+            name='Aug-Dec',
+            year='2016',
+            last_reg_date=tomorrow,
+            last_adviser_approval_date=tomorrow,
+            last_instructor_approval_date=tomorrow,
+            last_conversion_date=tomorrow,
+            last_drop_date=tomorrow,
+            last_drop_with_mention_date=tomorrow,
+            last_grade_date=tomorrow
+        )
+        self.course = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=term)
         logging.disable(logging.CRITICAL)
 
     def tearDown(self):
