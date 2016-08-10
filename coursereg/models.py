@@ -208,12 +208,12 @@ class Term(models.Model):
         return '%s %s' % (self.name, self.year)
 
     def clean(self):
-        if self.default_last_reg_date <= self.default_last_adviser_approval_date:
-            if self.default_last_adviser_approval_date <= self.default_last_instructor_approval_date:
-                if self.default_last_instructor_approval_date <= self.default_last_conversion_date:
-                    if self.default_last_conversion_date <= self.default_last_drop_date:
-                        if self.default_last_drop_date <= self.default_last_drop_with_mention_date:
-                            if self.default_last_drop_with_mention_date <= self.default_last_grade_date:
+        if self.last_reg_date <= self.last_adviser_approval_date:
+            if self.last_adviser_approval_date <= self.last_instructor_approval_date:
+                if self.last_instructor_approval_date <= self.last_conversion_date:
+                    if self.last_conversion_date <= self.last_drop_date:
+                        if self.last_drop_date <= self.last_drop_with_mention_date:
+                            if self.last_drop_with_mention_date <= self.last_grade_date:
                                 return
         raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
 

@@ -128,6 +128,8 @@ def course_update(request, course_id):
             user=request.user,
             participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
         raise PermissionDenied
+    if course.is_last_grade_date_passed():
+        raise PermissionDenied
 
     if request.method == 'POST':
         term = models.Term.objects.get(id=request.POST['term'])
