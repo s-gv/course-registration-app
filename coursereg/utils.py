@@ -24,3 +24,16 @@ def parse_datetime_str(date_str):
 
 def datetime_to_str(datetime):
     return datetime.strftime('%a %b %d %Y %H:%M:%S %z (%Z)')
+
+def get_state_desc(participant):
+    if participant.is_drop:
+        return 'Dropped this course'
+    if not participant.is_adviser_approved:
+        return 'Awaiting adviser review'
+    if not participant.is_instructor_approved:
+        return 'Adviser has approved. Awaiting instructor review'
+    if participant.grade.id == models.get_default_grade():
+        return 'Registered'
+    else:
+        return participant.grade
+    return 'Unknown state'

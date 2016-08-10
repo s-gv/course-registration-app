@@ -62,15 +62,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="courseYear" class="col-sm-3 control-label">Year</label>
+                    <label for="courseCreditSplit" class="col-sm-3 control-label">Credits</label>
                     <div class="col-sm-9">
-                        <input type="number" class="form-control" id="courseYear" name="year" placeholder="2011" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="courseCreditSplit" class="col-sm-3 control-label">Credit split</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="courseCreditSplit" name="credit_label" placeholder="4:2" required>
+                        <input type="text" class="form-control" id="courseCreditSplit" name="credits" placeholder="4:2" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -127,7 +121,7 @@
                 "title": "{{ course.title }}",
                 "num": "{{ course.num }}",
                 "year": "{{ course.year }}",
-                "credit_label": "{{ course.credit_label }}"
+                "credits": "{{ course.credits }}"
             },
             {% endfor %}
         ];
@@ -156,21 +150,13 @@
                 })
             })
         });
-        $('#courseYear').typeahead({hint: true, highlight: true, minLength: 1}, {
-            name: 'year',
-            source: new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.whitespace,
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                local: [new Date().getFullYear(), new Date().getFullYear()+1]
-            })
-        });
         $('#courseCreditSplit').typeahead({hint: true, highlight: true, minLength: 1}, {
-            name: 'credit_label',
+            name: 'credits',
             source: new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.whitespace,
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 local: recentCourses.map(function(c) {
-                    return c['credit_label'];
+                    return c['credits'];
                 }).filter(function(value, index, self) {
                     return self.indexOf(value) === index;
                 })

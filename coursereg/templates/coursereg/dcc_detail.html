@@ -134,6 +134,7 @@
             <form action="{% url 'coursereg:notify' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="id" value="{{ student.id }}">
+                <input type="hidden" name="next" value="{% url 'coursereg:dcc_review' %}">
                 <div class="form-group">
                     <textarea class="form-control" rows="3" name="message" placeholder="Notification message" required></textarea>
                 </div>

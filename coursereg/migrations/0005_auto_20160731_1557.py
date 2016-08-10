@@ -30,45 +30,13 @@ class Migration(migrations.Migration):
             model_name='participant',
             name='state',
         ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_adviser_approval_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_adviser_approval_date, verbose_name='Last adviser approval date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_instructor_approval_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_instructor_approval_date, verbose_name='Last instructor approval date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_conversion_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_conversion_date, verbose_name='Last credit/audit conversion date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_drop_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_drop_date, verbose_name='Last drop date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_drop_with_mention_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_drop_with_mention_date, verbose_name='Last drop with mention date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_grade_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_grade_date, verbose_name='Last grade date'),
-        ),
-        migrations.AlterField(
+        migrations.RemoveField(
             model_name='course',
             name='last_reg_date',
-            field=models.DateTimeField(default=coursereg.models.get_recent_last_reg_date, verbose_name='Last registration date'),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
             model_name='course',
-            name='year',
-            field=models.CharField(default=coursereg.models.get_recent_year, max_length=4),
+            name='last_drop_date',
         ),
         migrations.RenameField(
             model_name='participant',
@@ -88,6 +56,26 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='course',
             name='term',
-            field=models.ForeignKey(default=coursereg.models.get_recent_term, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
+        ),
+        migrations.AlterField(
+            model_name='participant',
+            name='created_at',
+            field=models.DateTimeField(auto_now_add=True),
+        ),
+        migrations.AlterField(
+            model_name='participant',
+            name='updated_at',
+            field=models.DateTimeField(auto_now=True),
+        ),
+        migrations.AlterField(
+            model_name='department',
+            name='abbreviation',
+            field=models.CharField(max_length=100, unique=True),
+        ),
+        migrations.RenameField(
+            model_name='course',
+            old_name='new_credits',
+            new_name='credits',
         ),
     ]

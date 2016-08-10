@@ -33,7 +33,7 @@ class CustomUserManager(BaseUserManager):
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
-    abbreviation = models.CharField(max_length=100, null=True, unique=True)
+    abbreviation = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -61,6 +61,20 @@ def get_default_grade():
         default_grade = Grade.objects.create(name="Not graded", should_count_towards_cgpa=False, points=0)
     return default_grade.id
 
+def get_recent_last_reg_date():
+    ''' Legacy function needed for the first DB migration '''
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_reg_date
+    return timezone.now()
+
+def get_recent_last_drop_date():
+    ''' Legacy function needed for the first DB migration '''
+    recent_course = Course.objects.order_by('-updated_at').first()
+    if recent_course:
+        return recent_course.last_drop_date
+    return timezone.now()
+
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
     PARTICIPANT_INSTRUCTOR = 1
@@ -82,6 +96,8 @@ class Participant(models.Model):
     is_adviser_approved = models.BooleanField(default=False)
     is_instructor_approved = models.BooleanField(default=False)
     should_count_towards_cgpa = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
@@ -133,14 +149,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
                 user=self).first()
 
-    def is_grade_pending(self):
-        if self.user_type == User.USER_TYPE_STUDENT:
-            return Participant.objects.filter(
-                is_adviser_approved=True,
-                is_instructor_approved=True,
-                grade=Participant.GRADE_NA,
-                user=self).first()
-
     def cgpa(self):
         if self.user_type == User.USER_TYPE_STUDENT:
             total_credits = 0
@@ -184,76 +192,20 @@ class Notification(models.Model):
     def __unicode__(self):
         return 'For %s - %s' % (self.user, self.message)
 
-
-def get_recent_last_reg_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_reg_date
-    return timezone.now()
-
-def get_recent_last_adviser_approval_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_adviser_approval_date
-    return timezone.now()
-
-def get_recent_last_instructor_approval_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_instructor_approval_date
-    return timezone.now()
-
-def get_recent_last_conversion_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_conversion_date
-    return timezone.now()
-
-def get_recent_last_drop_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_drop_date
-    return timezone.now()
-
-def get_recent_last_drop_with_mention_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_drop_with_mention_date
-    return timezone.now()
-
-def get_recent_last_grade_date():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.last_grade_date
-    return timezone.now()
-
-def get_recent_term():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.term.id
-    else:
-        default_term = Term.objects.create(name="Summer", is_active=True)
-        return default_term.id
-
-def get_recent_year():
-    recent_course = Course.objects.order_by('-updated_at').first()
-    if recent_course:
-        return recent_course.year
-    return str(timezone.now().year)
-
 class Term(models.Model):
     name = models.CharField(max_length=100)
+    year = models.CharField(max_length=4)
+    last_reg_date = models.DateTimeField(default=timezone.now)
+    last_adviser_approval_date = models.DateTimeField(default=timezone.now)
+    last_instructor_approval_date = models.DateTimeField(default=timezone.now)
+    last_conversion_date = models.DateTimeField(default=timezone.now)
+    last_drop_date = models.DateTimeField(default=timezone.now)
+    last_drop_with_mention_date = models.DateTimeField(default=timezone.now)
+    last_grade_date = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
-    default_last_reg_date = models.DateTimeField(verbose_name="Deafult last registration date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_adviser_approval_date = models.DateTimeField(verbose_name="Deafult last adviser approval date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_instructor_approval_date = models.DateTimeField(verbose_name="Deafult last instructor approval date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_conversion_date = models.DateTimeField(verbose_name="Deafult last credit/audit conversion date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_drop_date = models.DateTimeField(verbose_name="Deafult last drop date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_drop_with_mention_date = models.DateTimeField(verbose_name="Deafult last drop with mention date", help_text="Note: Year field is ignored", default=timezone.now)
-    default_last_grade_date = models.DateTimeField(verbose_name="Deafult last grade date", help_text="Note: Year field is ignored", default=timezone.now)
 
     def __unicode__(self):
-        return self.name
+        return '%s %s' % (self.name, self.year)
 
     def clean(self):
         if self.default_last_reg_date <= self.default_last_adviser_approval_date:
@@ -270,60 +222,44 @@ class Course(models.Model):
     num = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    term = models.ForeignKey(Term, default=get_recent_term)
-    year = models.CharField(max_length=4, default=get_recent_year)
-    num_credits = models.IntegerField(default=3, verbose_name="Number of credits")
-    credit_label = models.CharField(max_length=100, default='', verbose_name="Credit split (ex: 3:0)", blank=True)
+    term = models.ForeignKey(Term)
+    credits = models.CharField(max_length=100, default='', verbose_name="Credits (ex: 3:0)")
     should_count_towards_cgpa = models.BooleanField(default=True)
     auto_adviser_approve = models.BooleanField(default=False)
     auto_instructor_approve = models.BooleanField(default=False)
-    last_reg_date = models.DateTimeField(verbose_name="Last registration date", default=get_recent_last_reg_date)
-    last_adviser_approval_date = models.DateTimeField(verbose_name="Last adviser approval date", default=get_recent_last_adviser_approval_date)
-    last_instructor_approval_date = models.DateTimeField(verbose_name="Last instructor approval date", default=get_recent_last_instructor_approval_date)
-    last_conversion_date = models.DateTimeField(verbose_name="Last credit/audit conversion date", default=get_recent_last_conversion_date)
-    last_drop_date = models.DateTimeField(verbose_name="Last drop date", default=get_recent_last_drop_date)
-    last_drop_with_mention_date = models.DateTimeField(verbose_name="Last drop with mention date", default=get_recent_last_drop_with_mention_date)
-    last_grade_date = models.DateTimeField(verbose_name="Last grade date", default=get_recent_last_grade_date)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def get_num_credits():
+        return sum(int(c) for c in re.split(r'[^0-9]', self.credits) if c.isdigit())
+
     def is_start_reg_date_passed(self):
-        return timezone.now() > self.last_reg_date-timedelta(
+        return timezone.now() > self.term.last_reg_date-timedelta(
             days=Config.num_days_before_last_reg_date_course_registerable())
 
     def is_last_reg_date_passed(self):
-        return timezone.now() > self.last_reg_date
+        return timezone.now() > self.term.last_reg_date
 
     def is_last_adviser_approval_date_passed(self):
-        return timezone.now() > self.last_adviser_approval_date
+        return timezone.now() > self.term.last_adviser_approval_date
 
     def is_last_instructor_approval_date_passed(self):
-        return timezone.now() > self.last_instructor_approval_date
+        return timezone.now() > self.term.last_instructor_approval_date
 
     def is_last_conversion_date_passed(self):
-        return timezone.now() > self.last_conversion_date
+        return timezone.now() > self.term.last_conversion_date
 
     def is_last_drop_date_passed(self):
-        return timezone.now() > self.last_drop_date
+        return timezone.now() > self.term.last_drop_date
 
     def is_last_grade_date_passed(self):
-        return timezone.now() > self.last_grade_date
+        return timezone.now() > self.term.last_grade_date
 
     def is_instructor_review_pending(self):
         return Participant.objects.filter(course=self, is_adviser_approved=True, is_instructor_approved=False).first()
 
     def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s %s)' % (self.term, self.year)
-
-    def clean(self):
-        if self.last_reg_date <= self.last_adviser_approval_date:
-            if self.last_adviser_approval_date <= self.last_instructor_approval_date:
-                if self.last_instructor_approval_date <= self.last_conversion_date:
-                    if self.last_conversion_date <= self.last_drop_date:
-                        if self.last_drop_date <= self.last_drop_with_mention_date:
-                            if self.last_drop_with_mention_date <= self.last_grade_date:
-                                return
-        raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
+        return self.num + ' ' + self.title + ' (%s)' % self.term
 
 class Faq(models.Model):
     FAQ_STUDENT = 0

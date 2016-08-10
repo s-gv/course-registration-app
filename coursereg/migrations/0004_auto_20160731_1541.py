@@ -5,12 +5,13 @@ from __future__ import unicode_literals
 from django.db import migrations
 import re
 from datetime import timedelta
+from django.utils import timezone
 
 def separate_dept_abbreviation(apps, schema_editor):
     Department = apps.get_model("coursereg", "Department")
     for dept in Department.objects.all():
         combined_name = dept.name
-        abbreviation = ''
+        abbreviation = '-'
         dept_name_without_abbreviation = combined_name
         r = re.match(r'([A-Za-z0-9\s]+[^\s])\s*\((.+)\)\s*$', combined_name)
         if r:
@@ -21,7 +22,7 @@ def separate_dept_abbreviation(apps, schema_editor):
         dept.is_active = True
         dept.save()
 
-def migrate_term(Term, term):
+def migrate_term(Term, term, last_reg_date, last_drop_date):
     TERM_AUG = 0
     TERM_JAN = 1
     TERM_SUMMER = 2
@@ -34,30 +35,41 @@ def migrate_term(Term, term):
         (TERM_OTHER, "Other"),
     )
 
-    new_term = Term.objects.filter(name=TERM_CHOICES[term][1]).first()
+    name = TERM_CHOICES[term][1]
+    year = str(last_reg_date.year)
+    new_term = Term.objects.filter(
+        name=name,
+        year=year,
+        last_reg_date=last_reg_date,
+        last_drop_date=last_drop_date
+    ).first()
     if not new_term:
-        new_term = Term.objects.create(name=TERM_CHOICES[term][1], is_active=True)
+        new_term = Term.objects.create(
+            name=name,
+            year=year,
+            last_reg_date=last_reg_date,
+            last_adviser_approval_date=last_reg_date,
+            last_instructor_approval_date=last_reg_date,
+            last_conversion_date=last_drop_date,
+            last_drop_date=last_drop_date,
+            last_drop_with_mention_date=last_drop_date,
+            last_grade_date=last_reg_date + timedelta(days=150),
+            is_active=True
+        )
     return new_term
 
 def migrate_course_table(apps, schema_editor):
     Course = apps.get_model("coursereg", "Course")
     Term = apps.get_model("coursereg", "Term")
     for course in Course.objects.all():
-        course.new_term = migrate_term(Term, course.term)
-        course.year = str(course.last_reg_date.year)
-        course.num_credits = course.credits
-        course.credit_label = '%s:0' % course.credits
+        course.new_term = migrate_term(Term, course.term, course.last_reg_date, course.last_drop_date)
+        course.new_credits = '%s:0' % course.credits
         course.should_count_towards_cgpa = True
         course.auto_instructor_approve = False
         course.auto_adviser_approve = False
         if course.credits == 0:
             course.auto_instructor_approve = True
             course.should_count_towards_cgpa = False
-        course.last_adviser_approval_date = course.last_reg_date
-        course.last_instructor_approval_date = course.last_reg_date
-        course.last_conversion_date = course.last_drop_date
-        course.last_drop_with_mention_date = course.last_drop_date
-        course.last_grade_date = course.last_reg_date + timedelta(days=150)
         course.save()
 
 def migrate_grade(Participant, Grade, grade):
@@ -103,6 +115,8 @@ def migrate_participant_table(apps, schema_editor):
         participant.is_drop_mentioned = False
         participant.new_grade = migrate_grade(Participant, Grade, participant.grade)
         participant.should_count_towards_cgpa = participant.course.should_count_towards_cgpa
+        participant.created_at = timezone.now()
+        participant.updated_at = timezone.now()
         participant.save()
 
 

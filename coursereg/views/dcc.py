@@ -8,7 +8,7 @@ from django.contrib import messages
 from datetime import timedelta
 from coursereg import models
 from django.contrib.auth import update_session_auth_hash
-from student import get_desc
+from coursereg import utils
 from django.db.models import Q, Count
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
@@ -20,7 +20,7 @@ from django.utils import timezone
 def report(request):
     if not request.user.user_type == models.User.USER_TYPE_DCC:
         raise PermissionDenied
-    from_date = models.get_recent_last_reg_date()
+    from_date = timezone.now()
     to_date = timezone.now()
     if request.GET.get('from_date') and request.GET.get('to_date'):
         from_date = utils.parse_datetime_str(request.GET['from_date'])
@@ -31,7 +31,7 @@ def report(request):
         is_adviser_approved=True,
         is_instructor_approved=True,
         user__user_type=models.User.USER_TYPE_STUDENT,
-        course__last_reg_date__range=[from_date, to_date]
+        course__term__last_reg_date__range=[from_date, to_date]
     ).order_by('user__degree', 'user__full_name')]
 
     context = {
@@ -77,9 +77,9 @@ def detail(request, student_id):
         p.is_credit,
         not p.is_credit,
         p.is_drop,
-        p.course, get_desc(p),
+        p.course, utils.get_state_desc(p),
         not p.is_adviser_approved
-    ) for p in models.Participant.objects.filter(user=student).order_by('-course__last_reg_date', 'course__title')]
+    ) for p in models.Participant.objects.filter(user=student).order_by('-course__term__last_reg_date', 'course__title')]
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
@@ -103,7 +103,7 @@ def approve(request, student_id):
     student.save()
     models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
-    return redirect(request.POST.get('next', reverse('coursereg:dcc_review')))
+    return redirect('coursereg:dcc_review')
 
 @require_POST
 @login_required

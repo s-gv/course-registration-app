@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=100)),
                 ('points', models.DecimalField(decimal_places=3, default=Decimal('0.00'), max_digits=10)),
                 ('should_count_towards_cgpa', models.BooleanField(default=True)),
+                ('is_active', models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
@@ -29,42 +30,16 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
+                ('year', models.CharField(max_length=4)),
+                ('last_reg_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_adviser_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_instructor_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_conversion_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_drop_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_drop_with_mention_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_grade_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('is_active', models.BooleanField(default=True)),
             ],
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_adviser_approval_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last adviser approval date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_conversion_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last credit/audit conversion date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_drop_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last drop date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_drop_with_mention_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last drop with mention date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_grade_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last grade date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_instructor_approval_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last instructor approval date'),
-        ),
-        migrations.AddField(
-            model_name='term',
-            name='default_last_reg_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='Note: Year field is ignored', verbose_name='Deafult last registration date'),
         ),
         migrations.AddField(
             model_name='course',
@@ -78,38 +53,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='course',
-            name='credit_label',
-            field=models.CharField(blank=True, default='', max_length=100, verbose_name='Credit split (ex: 3:0)'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='last_adviser_approval_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last adviser approval date'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='last_instructor_approval_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last instructor approval date'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='last_conversion_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last credit/audit conversion date'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='last_drop_with_mention_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last drop with mention date'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='last_grade_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last grade date'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='num_credits',
-            field=models.IntegerField(default=3, verbose_name='Number of credits'),
+            name='new_credits',
+            field=models.CharField(default='', max_length=100, verbose_name='Credits (ex: 3:0)'),
         ),
         migrations.AddField(
             model_name='course',
@@ -118,8 +63,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='course',
-            name='year',
-            field=models.CharField(default='', max_length=4),
+            name='new_term',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
         migrations.AddField(
             model_name='department',
@@ -146,27 +91,21 @@ class Migration(migrations.Migration):
             name='should_count_towards_cgpa',
             field=models.BooleanField(default=True),
         ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_drop_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last drop date'),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='last_reg_date',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Last registration date'),
-        ),
         migrations.AddField(
             model_name='participant',
             name='new_grade',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
         ),
         migrations.AddField(
-            model_name='course',
-            name='new_term',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
+            model_name='participant',
+            name='created_at',
+            field=models.DateTimeField(auto_now_add=True, null=True),
         ),
-
+        migrations.AddField(
+            model_name='participant',
+            name='updated_at',
+            field=models.DateTimeField(auto_now=True, null=True),
+        ),
         migrations.AddField(
             model_name='degree',
             name='is_active',
@@ -174,16 +113,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='department',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='grade',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='term',
             name='is_active',
             field=models.BooleanField(default=True),
         ),

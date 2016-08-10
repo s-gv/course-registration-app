@@ -19,7 +19,7 @@ def index(request):
         'nav_active': 'instructor',
         'user_email': request.user.email,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
-        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__last_reg_date')]
+        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date')]
     }
     return render(request, 'coursereg/instructor.html', context)
 
@@ -79,9 +79,6 @@ def replace_year(dt, new_year, min_dt):
         return replace_year(dt, new_year+1, min_dt)
     return new_dt
 
-def get_total_credits(credit_label):
-    return sum(int(c) for c in re.split(r'[^0-9]', credit_label) if c.isdigit())
-
 @login_required
 def course_new(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
@@ -91,28 +88,18 @@ def course_new(request):
 
     if request.method == 'POST':
         term = models.Term.objects.get(id=request.POST['term'])
-        year = str(request.POST['year'])
         num = request.POST['num']
-        course = models.Course.objects.filter(num=num, term=term, year=year).first()
+        course = models.Course.objects.filter(num=num, term=term).first()
         if course:
             messages.error(request, "%s already exists." % course)
         else:
-            last_reg_date = replace_year(term.default_last_reg_date, year, None)
             course = models.Course.objects.create(
                 title=request.POST['name'],
                 num=num,
                 department=request.user.department,
                 term=term,
-                year=year,
-                num_credits=get_total_credits(request.POST['credit_label']),
-                credit_label=request.POST['credit_label'],
-                auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
-                last_reg_date=last_reg_date,
-                last_adviser_approval_date=replace_year(term.default_last_adviser_approval_date, year, last_reg_date),
-                last_instructor_approval_date=replace_year(term.default_last_instructor_approval_date, year, last_reg_date),
-                last_conversion_date=replace_year(term.default_last_conversion_date, year, last_reg_date),
-                last_drop_date=replace_year(term.default_last_drop_date, year, last_reg_date),
-                last_grade_date=replace_year(term.default_last_grade_date, year, last_reg_date)
+                credits=request.POST['credits'],
+                auto_instructor_approve=request.POST.get('auto_instructor_approve', False)
             )
             models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
             for coinstructor_id in request.POST.getlist('coinstructor'):
@@ -129,10 +116,10 @@ def course_new(request):
             'user_type': 'faculty',
             'nav_active': 'instructor',
             'user_email': request.user.email,
-            'terms': models.Term.objects.filter(is_active=True),
+            'terms': models.Term.objects.filter(is_active=True, year__in=[timezone.now().year, timezone.now().year+1]),
             'recent_courses': models.Course.objects.filter(
                 department=request.user.department,
-                last_reg_date__gte=timezone.now()-timedelta(days=800)),
+                term__last_reg_date__gte=timezone.now()-timedelta(days=800)),
             'instructors': models.User.objects.filter(
                 is_active=True,
                 user_type=models.User.USER_TYPE_FACULTY).exclude(email=request.user.email).order_by('full_name'),
@@ -154,23 +141,13 @@ def course_update(request, course_id):
 
     if request.method == 'POST':
         term = models.Term.objects.get(id=request.POST['term'])
-        year = str(request.POST['year'])
         num = request.POST['num']
-        last_reg_date = replace_year(term.default_last_reg_date, year, None)
         models.Course.objects.filter(id=course_id).update(
             title=request.POST['name'],
             num=num,
             term=term,
-            year=year,
-            num_credits=get_total_credits(request.POST['credit_label']),
-            credit_label=request.POST['credit_label'],
-            auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
-            last_reg_date=last_reg_date,
-            last_adviser_approval_date=replace_year(term.default_last_adviser_approval_date, year, last_reg_date),
-            last_instructor_approval_date=replace_year(term.default_last_instructor_approval_date, year, last_reg_date),
-            last_conversion_date=replace_year(term.default_last_conversion_date, year, last_reg_date),
-            last_drop_date=replace_year(term.default_last_drop_date, year, last_reg_date),
-            last_grade_date=replace_year(term.default_last_grade_date, year, last_reg_date)
+            credits=request.POST['credits'],
+            auto_instructor_approve=request.POST.get('auto_instructor_approve', False)
         )
         models.Participant.objects.filter(
             course=course,
@@ -194,11 +171,11 @@ def course_update(request, course_id):
             'nav_active': 'instructor',
             'user_email': request.user.email,
             'course': course,
-            'terms': models.Term.objects.filter(is_active=True),
+            'terms': models.Term.objects.filter(is_active=True, year__in=[timezone.now().year, timezone.now().year+1]),
             'coinstructor_ids': coinstructor_ids,
             'recent_courses': models.Course.objects.filter(
                 department=request.user.department,
-                last_reg_date__gte=timezone.now()-timedelta(days=800)),
+                term__last_reg_date__gte=timezone.now()-timedelta(days=800)),
             'instructors': models.User.objects.filter(
                 is_active=True,
                 user_type=models.User.USER_TYPE_FACULTY).exclude(email=request.user.email).order_by('full_name'),

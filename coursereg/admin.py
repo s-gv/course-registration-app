@@ -37,7 +37,7 @@ class CourseInline(admin.TabularInline):
     show_change_link = True
     raw_id_fields = ('course',)
     fields = ('course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
-    ordering = ('-course__last_reg_date',)
+    ordering = ('-course__term__last_reg_date',)
 
 class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
@@ -280,102 +280,19 @@ class CustomUserAdmin(UserAdmin):
         return format_html("<a href='{url}'>Login</a>", url=reverse('admin:coursereg_user_sudo_login', args=[user.id]))
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('num', 'title', 'term', 'year', 'department', 'last_reg_date', 'should_count_towards_cgpa', 'auto_instructor_approve')
-    ordering = ('-last_reg_date', 'department__name', 'num', 'title')
-    search_fields = ('title', 'num', 'last_reg_date')
-    list_filter = ('term', 'department')
+    list_display = ('num', 'title', 'term', 'department', 'should_count_towards_cgpa', 'auto_instructor_approve')
+    ordering = ('-term__last_reg_date', 'department__name', 'num', 'title')
+    search_fields = ('title', 'num', 'term__name', 'term__year')
+    list_filter = ('department', 'auto_adviser_approve', 'auto_instructor_approve', 'should_count_towards_cgpa')
+    raw_id_fields = ('term',)
     inlines = [ParticipantInline]
-    actions = ['clone_courses_increment_year', 'change_dates']
-
-    def get_urls(self):
-        urls = super(CourseAdmin, self).get_urls()
-        my_urls = [
-            url(r'^bulkchangedates/(.+)$', self.admin_site.admin_view(self.bulk_change_dates), name='coursereg_course_bulk_change_dates'),
-        ]
-        return my_urls + urls
-
-    def bulk_change_dates(self, request, courses):
-        course_ids = urlunquote_plus(courses).split('-')
-        if request.method == 'POST':
-            models.Course.objects.filter(pk__in=course_ids).update(
-                term=request.POST['term'],
-                year=request.POST['year'],
-                last_reg_date=utils.parse_datetime_str(request.POST['last_reg_date']),
-                last_adviser_approval_date=utils.parse_datetime_str(request.POST['last_adviser_approval_date']),
-                last_instructor_approval_date=utils.parse_datetime_str(request.POST['last_instructor_approval_date']),
-                last_conversion_date=utils.parse_datetime_str(request.POST['last_conversion_date']),
-                last_drop_date=utils.parse_datetime_str(request.POST['last_drop_date']),
-                last_drop_with_mention_date=utils.parse_datetime_str(request.POST['last_drop_with_mention_date']),
-                last_grade_date=utils.parse_datetime_str(request.POST['last_grade_date']),
-            )
-            messages.success(request, "The dates of %s courses were modified successfully." % len(course_ids))
-            return redirect(reverse('admin:coursereg_course_changelist'))
-        else:
-            context = dict(
-               self.admin_site.each_context(request),
-               title='Change course dates',
-               terms=models.Term.objects.all(),
-               courses=models.Course.objects.filter(pk__in=course_ids),
-               default_term_id=models.get_recent_term(),
-               default_year=models.get_recent_year(),
-               default_last_reg_date=utils.datetime_to_str(models.get_recent_last_reg_date()),
-               default_last_adviser_approval_date=utils.datetime_to_str(models.get_recent_last_adviser_approval_date()),
-               default_last_instructor_approval_date=utils.datetime_to_str(models.get_recent_last_instructor_approval_date()),
-               default_last_conversion_date=utils.datetime_to_str(models.get_recent_last_conversion_date()),
-               default_last_drop_date=utils.datetime_to_str(models.get_recent_last_drop_date()),
-               default_last_drop_with_mention_date=utils.datetime_to_str(models.get_recent_last_drop_with_mention_date()),
-               default_last_grade_date=utils.datetime_to_str(models.get_recent_last_grade_date()),
-            )
-            return render(request, 'admin/coursereg/course/bulk_date_change.html', context)
-
-    def change_dates(self, request, queryset):
-        selected_list = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
-        max_courses = 50
-        if len(selected_list) > max_courses:
-            self.message_user(request, 'Select fewer than %s courses to modify at a time.' % max_courses, level=messages.ERROR)
-        else:
-            selected = '-'.join(selected_list)
-            return redirect(reverse('admin:coursereg_course_bulk_change_dates', args=[urlquote_plus(selected)]))
-    change_dates.short_description = 'Change dates for the selected courses'
-
-    def clone_courses_increment_year(self, request, queryset):
-        def add_one_year(d):
-            new_d = None
-            try:
-                new_d = d.replace(year=d.year+1)
-            except ValueError:
-                new_d = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
-            return new_d
-        n = 0
-        for course in queryset:
-            if not Course.objects.filter(num=course.num,
-                    last_reg_date__gte=add_one_year(course.last_reg_date)-timedelta(days=15),
-                    last_reg_date__lte=add_one_year(course.last_reg_date)+timedelta(days=15)):
-                n += 1
-                old_course_id = course.id
-                course.pk = None
-                course.last_reg_date = add_one_year(course.last_reg_date)
-                course.last_conversion_date = add_one_year(course.last_conversion_date)
-                course.last_drop_date = add_one_year(course.last_drop_date)
-                course.last_drop_with_mention_date = add_one_year(course.last_drop_with_mention_date)
-                course.last_grade_date = add_one_year(course.last_grade_date)
-                course.save()
-                for participant in Participant.objects.filter(course__id=old_course_id, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
-                    Participant.objects.create(
-                        user=participant.user,
-                        course=course,
-                        participant_type=participant.participant_type
-                    )
-        self.message_user(request, "Cloned %s courses" % n)
-    clone_courses_increment_year.short_description = "Clone selected courses and increment year"
-
 
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade')
-    ordering = ('-course__last_reg_date', 'user__full_name')
-    search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__last_reg_date')
+    ordering = ('-course__term__last_reg_date', 'user__full_name')
+    search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__term__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'course__last_reg_date', 'is_adviser_approved', 'is_instructor_approved')
+    list_filter = ('participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved')
     actions = ['adviser_approve', 'instructor_approve']
 
     def adviser_approve(self, request, queryset):
@@ -406,7 +323,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def report_view(self, request, dept_id):
         dept = models.Department.objects.get(id=dept_id)
-        from_date = models.get_recent_last_reg_date()
+        from_date = timezone.now()
         to_date = timezone.now()
         if request.GET.get('from_date') and request.GET.get('to_date'):
             from_date = utils.parse_datetime_str(request.GET['from_date'])
@@ -416,7 +333,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             is_adviser_approved=True,
             is_instructor_approved=True,
             user__user_type=models.User.USER_TYPE_STUDENT,
-            course__last_reg_date__range=[from_date, to_date]
+            course__term__last_reg_date__range=[from_date, to_date]
         ).order_by('user__degree', 'user__full_name')]
         context = dict(
            self.admin_site.each_context(request),
@@ -451,7 +368,35 @@ class GradeAdmin(admin.ModelAdmin):
     list_display = ('name', 'points', 'should_count_towards_cgpa', 'is_active')
 
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active')
+    list_display = ('name', 'year', 'last_reg_date', 'is_active')
+    search_fields = ('name', 'year')
+    actions = ['clone_terms_increment_year']
+
+    def clone_terms_increment_year(self, request, queryset):
+        def add_one_year(d):
+            new_d = None
+            try:
+                new_d = d.replace(year=d.year+1)
+            except ValueError:
+                new_d = d + (date(d.year + 1, 1, 1) - date(d.year, 1, 1))
+            return new_d
+        n = 0
+        for term in queryset:
+            if not Term.objects.filter(name=term.name, year=str(int(term.year)+1)):
+                n += 1
+                old_term_id = term.id
+                term.pk = None
+                term.year = str(int(term.year)+1)
+                term.last_reg_date = add_one_year(term.last_reg_date)
+                term.last_adviser_approval_date = add_one_year(term.last_adviser_approval_date)
+                term.last_instructor_approval_date = add_one_year(term.last_instructor_approval_date)
+                term.last_conversion_date = add_one_year(term.last_conversion_date)
+                term.last_drop_date = add_one_year(term.last_drop_date)
+                term.last_drop_with_mention_date = add_one_year(term.last_drop_with_mention_date)
+                term.last_grade_date = add_one_year(term.last_grade_date)
+                term.save()
+        self.message_user(request, "Cloned %s terms" % n)
+    clone_terms_increment_year.short_description = "Clone selected terms and increment year"
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Course, CourseAdmin)
