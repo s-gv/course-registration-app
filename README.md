@@ -30,6 +30,7 @@ Install it, create a database and a user. For the user, set the client encoding 
 - Set-up a production-grade webserver such as `gunicorn` to run on start-up and configure a reverse proxy like `nginx` to proxy requests to it.
 - Set-up the server to serve static files at `/static/*` from `<proj_root>/bheemboy/coursereg/static/*`.
 - Optionally, set-up a cron job to run `python manage.py clear_expired_requests` once a day to notify participants and delete enrolment requests past their due date.
+- Optionally, set-up a cron job to run `python manage.py send_faculty_reminder` once a day to notify Faculty to take action on any outstanding requests.
 
 Notes for devs
 --------------

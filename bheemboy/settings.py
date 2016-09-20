@@ -126,9 +126,10 @@ AUTH_USER_MODEL = 'coursereg.User'
 
 LOGIN_URL = '/signin'
 
-DEFAULT_FROM_EMAIL = 'admin@localhost'
+#DEFAULT_FROM_EMAIL = 'admin@localhost'
+DEFAULT_FROM_EMAIL = 'courseregadmin@ece.iisc.ernet.in'
 
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = 'ece.iisc.ernet.in'
 EMAIL_TIMEOUT = 3
 
 
