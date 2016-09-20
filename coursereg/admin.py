@@ -26,7 +26,7 @@ class ParticipantInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
+    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa', 'comment')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -36,7 +36,7 @@ class CourseInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
+    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa', 'comment')
     ordering = ('-course__term__last_reg_date',)
 
 class CustomUserCreationForm(UserCreationForm):
@@ -288,7 +288,7 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ParticipantInline]
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade')
+    list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade', 'comment')
     ordering = ('-course__term__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__term__last_reg_date')
     raw_id_fields = ('user', 'course')

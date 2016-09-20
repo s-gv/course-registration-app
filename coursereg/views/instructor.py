@@ -31,21 +31,14 @@ def detail(request, course_id):
     if not models.Participant.objects.filter(course=course,
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
         raise PermissionDenied
-    reg_requests = [
-        (p.is_credit, p.id, p.user)
-        for p in models.Participant.objects.filter(course=course,
-                                                   is_adviser_approved=True,
-                                                   is_instructor_approved=False)]
-    crediting = models.Participant.objects.filter(course=course,
-                                                  is_credit=True,
-                                                  is_drop=False,
-                                                  is_adviser_approved=True,
-                                                  is_instructor_approved=True)
-    auditing = models.Participant.objects.filter(course=course,
-                                                 is_credit=False,
+
+    reg_requests = models.Participant.objects.filter(course=course,
+                                                     is_adviser_approved=True,
+                                                     is_instructor_approved=False)
+    enrolled = models.Participant.objects.filter(course=course,
                                                  is_drop=False,
                                                  is_adviser_approved=True,
-                                                 is_instructor_approved=True)
+                                                 is_instructor_approved=True).order_by('-registration_type')
     dropped = models.Participant.objects.filter(course=course,
                                                 is_drop=True,
                                                 is_adviser_approved=True,
@@ -57,14 +50,13 @@ def detail(request, course_id):
         'user_email': request.user.email,
         'course': course,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
-        'registration_requests': reg_requests,
-        'crediting': crediting,
-        'auditing': auditing,
+        'reg_requests': reg_requests,
+        'enrolled': enrolled,
         'dropped': dropped,
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants_for_export': models.Participant.objects.filter(course=course,
                                         is_adviser_approved=True,
-                                        is_instructor_approved=True).order_by('is_drop', '-is_credit')
+                                        is_instructor_approved=True).order_by('is_drop', '-registration_type')
     }
     return render(request, 'coursereg/instructor_detail.html', context)
 

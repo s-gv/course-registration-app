@@ -43,7 +43,7 @@ def create(request):
                 user_id=user_id,
                 course_id=course_id,
                 participant_type=models.Participant.PARTICIPANT_STUDENT,
-                is_credit=(reg_type == 'credit'),
+                registration_type=models.RegistrationType.objects.get(pk=reg_type),
                 should_count_towards_cgpa=True,
                 is_adviser_approved=adviser_approve,
                 is_instructor_approved=adviser_approve and course.auto_instructor_approve

@@ -71,21 +71,12 @@ def detail(request, student_id):
     student = models.User.objects.get(id=student_id)
     if not student or student.department != request.user.department:
         raise PermissionDenied
-    participants = [(
-        p.id,
-        p.should_count_towards_cgpa,
-        p.is_credit,
-        not p.is_credit,
-        p.is_drop,
-        p.course, utils.get_state_desc(p),
-        not p.is_adviser_approved
-    ) for p in models.Participant.objects.filter(user=student).order_by('-course__term__last_reg_date', 'course__title')]
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
         'user_email': request.user.email,
         'student': student,
-        'participants': participants,
+        'participants': models.Participant.objects.filter(user=student).order_by('-course__term__last_reg_date'),
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
             for n in models.Notification.objects.filter(user=student, is_dcc_acknowledged=False).order_by('-created_at')],
     }

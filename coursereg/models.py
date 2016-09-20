@@ -97,18 +97,38 @@ class Participant(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
-    registration_type = models.ForeignKey('RegistrationType', on_delete=models.CASCADE)
+    registration_type = models.ForeignKey('RegistrationType', null=True, on_delete=models.CASCADE)
     is_drop = models.BooleanField(default=False)
     grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, default=get_default_grade)
     is_adviser_approved = models.BooleanField(default=False)
     is_instructor_approved = models.BooleanField(default=False)
     should_count_towards_cgpa = models.BooleanField(default=True)
-    comment = models.CharField(max_length=300, default='')
+    comment = models.CharField(max_length=300, default='', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
+
+    def get_status_desc(self):
+        if self.is_drop:
+            return 'Dropped this course'
+        if not self.is_adviser_approved:
+            return 'Awaiting adviser review'
+        if not self.is_instructor_approved:
+            return 'Adviser has approved. Awaiting instructor review'
+        if self.grade.id == get_default_grade():
+            return 'Registered'
+        else:
+            return self.grade
+        return 'Unknown state'
+
+    def get_reg_type_desc(self):
+        if self.is_drop:
+            return 'Drop'
+        else:
+            return self.registration_type
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_STUDENT = 0
@@ -219,8 +239,7 @@ class Term(models.Model):
             if self.last_adviser_approval_date <= self.last_instructor_approval_date:
                 if self.last_instructor_approval_date <= self.last_conversion_date:
                     if self.last_conversion_date <= self.last_drop_date:
-                        if self.last_drop_date <= self.last_drop_with_mention_date:
-                            if self.last_drop_with_mention_date <= self.last_grade_date:
+                            if self.last_drop_date <= self.last_grade_date:
                                 return
         raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
 

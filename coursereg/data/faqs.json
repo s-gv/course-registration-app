@@ -2,7 +2,7 @@
     {
         "faq_for": "student",
         "question": "How does this course registration platform work?",
-        "answer": "Discuss with your adviser and apply for courses you want to take. Your request will be approved first by your adviser and then by the course instructor. Finally, the department will review all the courses you have taken."
+        "answer": "Discuss with your adviser and apply for courses you want to take. Your request will be approved first by your adviser and then by the course instructor. Finally, the department may review all the courses you have taken."
     },
     {
         "faq_for": "student",
@@ -10,14 +10,14 @@
         "answer": "Please inform the administrator of the missing course."
     },
     {
-        "faq_for": "student",
-        "question": "How do I drop a course?",
-        "answer": "Ask your adviser to log in to this website and drop the course you no longer wish to continue."
+        "faq_for": "faculty",
+        "question": "How does this course registration platform work?",
+        "answer": "Students apply for courses they want to take. The request has to be approved by the adviser and then by the course instructor. Finally, the department may review all the courses."
     },
     {
-        "faq_for": "faculty",
-        "question": "How do I cancel a course?",
-        "answer": "Please ask the administrator to delete the course."
+        "faq_for": "dcc",
+        "question": "How does this course registration platform work?",
+        "answer": "Students apply for courses they want to take. The request has to be approved by the adviser and then by the course instructor. Finally, the department may review all the courses."
     },
     {
         "faq_for": "dcc",

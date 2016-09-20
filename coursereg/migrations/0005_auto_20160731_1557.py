@@ -48,11 +48,6 @@ class Migration(migrations.Migration):
             name='grade',
             field=models.ForeignKey(blank=True, default=coursereg.models.get_default_grade, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
         ),
-        migrations.AlterField(
-            model_name='participant',
-            name='registration_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='coursereg.RegistrationType'),
-        ),
         migrations.RenameField(
             model_name='course',
             old_name='new_term',

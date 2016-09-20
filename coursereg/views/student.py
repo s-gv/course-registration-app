@@ -21,10 +21,9 @@ def index(request):
     participants = [(
         p.id,
         p.should_count_towards_cgpa,
-        p.is_credit,
-        not p.is_credit,
-        p.is_drop,
-        p.course, utils.get_state_desc(p),
+        p.get_reg_type_desc(),
+        p.course,
+        p.get_status_desc(),
         not p.course.is_last_reg_date_passed() and (not p.is_adviser_approved or p.user.adviser.auto_advisee_approve)
     ) for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date', 'course__title')]
 
@@ -32,6 +31,7 @@ def index(request):
         'user_type': 'student',
         'nav_active': 'home',
 		'user_email': request.user.email,
+        'reg_types': models.RegistrationType.objects.filter(is_active=True),
         'user_id': request.user.id,
         'participants': participants,
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)

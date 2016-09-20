@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='participant',
             name='comment',
-            field=models.CharField(default='', max_length=300),
+            field=models.CharField(default='', max_length=300, blank=True),
         ),
         migrations.AddField(
             model_name='participant',

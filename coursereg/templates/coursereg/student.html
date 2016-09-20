@@ -49,12 +49,15 @@
                             {% endfor %}
                         </select>
                     </label>
+                    {% for reg_type in reg_types %}
                     <label class="radio-inline">
-                        <input type="radio" name="reg_type" value="credit" checked>Credit
+                        {% if forloop.counter0 == 0 %}
+                        <input type="radio" name="reg_type" value="{{ reg_type.id }}" checked>{{ reg_type }}
+                        {% else %}
+                        <input type="radio" name="reg_type" value="{{ reg_type.id }}">{{ reg_type }}
+                        {% endif %}
                     </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="reg_type" value="audit">Audit
-                    </label>
+                    {% endfor %}
                 </div>
                 <input type="hidden" name="user_id" value="{{ user_id }}">
                 <input type="hidden" name="origin" value="student">
@@ -85,35 +88,16 @@
                 <h3 class="panel-title">Registered Courses</h3>
             </div>
             <ul class="list-group">
-                {% for participant_id, should_count_towards_cgpa, is_credit, is_audit, is_drop, course, desc, deleteable in participants %}
+                {% for participant_id, should_count_towards_cgpa, reg_desc, course, desc, deleteable in participants %}
                 <li class="list-group-item">
-                    {% if is_drop %}
-                    <div title="Dropped" class="audit-bg pull-left">D</div>
-                    {% elif is_audit  %}
-                    <div title="Audit" class="audit-bg pull-left">A</div>
-                    {% elif is_credit %}
-                    <div title="Credit" class="credit-bg pull-left">C</div>
-                    {% endif %}
-
-                    <div title="Remove" class="pull-right" style="width:30px; margin-top: 8px;">
-                        {% if deleteable %}
-                        <form action="{% url 'coursereg:participants_delete' participant_id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-xs btn-circle">
-                                <small><span class="glyphicon glyphicon-remove"></span></small>
-                            </button>
-                        </form>
-                        {% endif %}
-                    </div>
-
-                    <div class="row courserow">
+                    <div class="row">
                         <div class="col-md-5">
                             {% if not should_count_towards_cgpa %}
                             <p class="text-muted">
                             {% else %}
                             <p>
                             {% endif %}
-                                {{ course }}
+                                {{ course }} <span class="badge">{{ reg_desc }}</span>
                             </p>
                         </div>
                         <div class="col-md-6">
@@ -121,24 +105,22 @@
                                 {{ desc }}
                             </p>
                         </div>
+                        <div class="col-md-1">
+                            <div title="Remove" class="pull-right" style="width:30px;">
+                                {% if deleteable %}
+                                <form action="{% url 'coursereg:participants_delete' participant_id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-xs btn-circle">
+                                        <small><span class="glyphicon glyphicon-remove"></span></small>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </li>
                 {% endfor %}
             </ul>
-        </div>
-    </div>
-    <div class="row top-buffer-1">
-        <div class="col-md-1 col-xs-3">
-            <div title="Credit" class="credit-bg">C</div>
-            <div>Credit</div>
-        </div>
-        <div class="col-md-1 col-xs-3">
-            <div title="Credit" class="audit-bg">A</div>
-            <div style="margin-left:2px;">Audit</div>
-        </div>
-        <div class="col-md-1 col-xs-3">
-            <div title="Credit" class="audit-bg">D</div>
-            <div style="margin-left:3px;">Drop</div>
         </div>
     </div>
 </div>

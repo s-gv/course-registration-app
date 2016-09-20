@@ -76,79 +76,24 @@
                 <h3 class="panel-title">Courses</h3>
             </div>
             <ul class="list-group">
-                {% for participant, desc in participants %}
+                {% for participant in participants %}
                 <li class="list-group-item">
                     <div class="row">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
-                                <div class="col-md-4 col-xs-12">
+                                <div class="col-md-6 col-xs-12">
                                     {% if participant.should_count_towards_cgpa %}
                                     <p>
                                     {% else %}
                                     <p class="text-muted">
                                     {% endif %}
-                                        {{ participant.course }}
+                                        {{ participant.course }} <span class="badge">{{ participant.get_reg_type_desc }}</span>
                                     </p>
                                 </div>
                                 <div class="col-md-4 col-xs-12">
                                     <p class="text-muted">
-                                        {{ desc }}
+                                        {{ participant.get_status_desc }}
                                     </p>
-                                </div>
-                                <div class="col-md-2 col-xs-12">
-                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                        <input type="hidden" name="origin" value="adviser">
-                                        <input type="hidden" name="action" value="state_change">
-                                        <div class="form-group">
-                                            {% if participant.course.is_drop_date_passed %}
-                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()" disabled>
-                                                {% if participant.is_drop %}
-                                                <option value="drop" selected>Drop</option>
-                                                {% elif participant.is_credit %}
-                                                <option value="credit" selected>Credit</option>
-                                                {% else %}
-                                                <option value="audit" selected>Audit</option>
-                                                {% endif %}
-                                            </select>
-                                            {% elif participant.course.is_last_conversion_date_passed %}
-                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
-                                                {% if participant.is_drop %}
-                                                    <option value="drop" selected>Drop</option>
-                                                    {% if participant.is_credit %}
-                                                    <option value="credit">Credit</option>
-                                                    {% else %}
-                                                    <option value="audit">Audit</option>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <option value="drop">Drop</option>
-                                                    {% if participant.is_credit %}
-                                                    <option value="credit" selected>Credit</option>
-                                                    {% else %}
-                                                    <option value="audit" selected>Audit</option>
-                                                    {% endif %}
-                                                {% endif %}
-                                            </select>
-                                            {% else %}
-                                            <select class="form-control input-sm" name="state" onchange="this.form.submit()">
-                                                {% if participant.is_drop %}
-                                                <option value="credit">Credit</option>
-                                                <option value="audit">Audit</option>
-                                                <option value="drop" selected>Drop</option>
-                                                {% elif participant.is_credit %}
-                                                <option value="credit" selected>Credit</option>
-                                                <option value="audit">Audit</option>
-                                                <option value="drop">Drop</option>
-                                                {% else %}
-                                                <option value="credit">Credit</option>
-                                                <option value="audit" selected>Audit</option>
-                                                <option value="drop">Drop</option>
-                                                {% endif %}
-                                            </select>
-                                            {% endif %}
-                                        </div>
-                                    </form>
                                 </div>
                                 <div class="col-md-2 col-xs-12">
                                     {% if not participant.course.is_last_adviser_approval_date_passed or not participant.is_instructor_approved %}

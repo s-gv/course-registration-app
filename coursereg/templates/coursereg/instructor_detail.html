@@ -44,41 +44,37 @@
     </div>
     {% endfor %}
     {% endif %}
-    {% if registration_requests %}
+    {% if reg_requests %}
     <div class="row top-buffer-1">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Registration requests</h3>
             </div>
             <ul class="list-group">
-                {% for is_credit, pid, user in registration_requests %}
+                {% for participant in reg_requests %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
                                 <div class="col-md-3 col-xs-12">
-                                    {{ user.full_name }}
-                                    {% if is_credit %}
-                                    <span class="badge alert-info">Credit</span>
-                                    {% else %}
-                                    <span class="badge">Audit</span>
-                                    {% endif %}
+                                    {{ participant.user.full_name }}
+                                    <span class="badge">{{ participant.registration_type }}</span>
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    {{ user.email }}
+                                    {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.department.abbreviation }}
+                                    {{ participant.user.department.abbreviation }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
-                                    {{ user.degree }}
+                                    {{ participant.user.degree }}
                                 </div>
                                 <div class="col-md-3 col-xs-12">
-                                    {{ user.sr_no }}
+                                    {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-2 col-xs-12">
-                                    <form action="{% url 'coursereg:participants_update' pid %}" method="post">
+                                    <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="next" value="{{ request.path }}">
                                         <input type="hidden" name="origin" value="instructor">
@@ -110,14 +106,14 @@
     </div>
     {% endif %}
     {% endif %}
-    {% if crediting %}
+    {% if enrolled %}
     <div class="row top-buffer-1">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Credit</h3>
+                <h3 class="panel-title">Enrolled</h3>
             </div>
             <ul class="list-group">
-                {% for participant in crediting %}
+                {% for participant in enrolled %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
@@ -125,66 +121,7 @@
                             <div class="row">
                                 <div class="col-md-2 col-xs-12">
                                     {{ participant.user.full_name }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.email }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.department.abbreviation }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.degree }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.sr_no }}
-                                </div>
-                                <div class="col-md-1">
-                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                        <input type="hidden" name="origin" value="instructor">
-                                        <input type="hidden" name="action" value="grade">
-                                        <div class="form-group">
-                                            {% if participant.course.is_last_grade_date_passed %}
-                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()" disabled>
-                                            {% else %}
-                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
-                                            {% endif %}
-                                                {% for grade in grades %}
-                                                {% if participant.grade == grade %}
-                                                <option value="{{ grade.id }}" selected>{{ grade }}</option>
-                                                {% else %}
-                                                <option value="{{ grade.id }}">{{ grade }}</option>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
-    {% if auditing %}
-    <div class="row top-buffer-1">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Audit</h3>
-            </div>
-            <ul class="list-group">
-                {% for participant in auditing %}
-                <li class="list-group-item">
-                    <div class="pull-left">{{ forloop.counter }}</div>
-                    <div class="row requestrow">
-                        <div class="col-md-12 col-xs-11">
-                            <div class="row">
-                                <div class="col-md-2 col-xs-12">
-                                    {{ participant.user.full_name }}
+                                    <span class="badge">{{ participant.registration_type }}</span>
                                 </div>
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
@@ -275,7 +212,7 @@
         </div>
     </div>
     {% endif %}
-    {% if not crediting and not auditing and not dropped and not registration_requests %}
+    {% if not enrolled and not dropped and not reg_requests %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <h2><small>No students have applied for this course.</small></h2>
@@ -305,10 +242,8 @@
                 "{{ participant.user.sr_no }}",
                 {% if participant.is_drop %}
                 "Drop",
-                {% elif participant.is_credit %}
-                "Credit",
                 {% else %}
-                "Audit",
+                "{{ participant.registration_type }}",
                 {% endif %}
                 "{{ participant.grade }}",
             ],
@@ -319,7 +254,7 @@
         var $btn = $(this).button('loading');
         $.getScript("{% static 'coursereg/js/pdfmake.min.js' %}", function() {
             $.getScript("{% static 'coursereg/js/vfs_fonts.js' %}", function() {
-                var columnNames = ['#', 'Name', 'Email', 'Program', 'Dept', 'SR No.', 'Status', 'Grade'];
+                var columnNames = ['#', 'Name', 'Email', 'Program', 'Dept', 'SR No.', 'Enrollment', 'Grade'];
                 var headerRow = columnNames.map(function(title) {
                     return {
                         'text': title,
