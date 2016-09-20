@@ -36,8 +36,16 @@ class Migration(migrations.Migration):
                 ('last_instructor_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_conversion_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_drop_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('last_drop_with_mention_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_grade_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('is_active', models.BooleanField(default=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='RegistrationType',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=100)),
+                ('should_count_towards_cgpa', models.BooleanField(default=True)),
                 ('is_active', models.BooleanField(default=True)),
             ],
         ),
@@ -73,17 +81,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='participant',
-            name='is_credit',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='participant',
             name='is_drop',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='participant',
-            name='is_drop_mentioned',
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
@@ -93,8 +91,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='participant',
+            name='registration_type',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.RegistrationType'),
+        ),
+        migrations.AddField(
+            model_name='participant',
             name='new_grade',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
+        ),
+        migrations.AddField(
+            model_name='participant',
+            name='comment',
+            field=models.CharField(default='', max_length=300),
         ),
         migrations.AddField(
             model_name='participant',

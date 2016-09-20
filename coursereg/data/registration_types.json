@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Credit",
+        "should_count_towards_cgpa": true,
+        "is_active": true
+    },
+    {
+        "name": "Audit",
+        "should_count_towards_cgpa": false,
+        "is_active": true
+    }
+]

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
-from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade, Term
+from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade, Term, RegistrationType
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 from django.core.urlresolvers import reverse
@@ -26,7 +26,7 @@ class ParticipantInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
+    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -36,7 +36,7 @@ class CourseInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
+    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa')
     ordering = ('-course__term__last_reg_date',)
 
 class CustomUserCreationForm(UserCreationForm):
@@ -288,11 +288,11 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ParticipantInline]
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade')
+    list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade')
     ordering = ('-course__term__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__term__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'is_credit', 'is_drop', 'is_drop_mentioned', 'is_adviser_approved', 'is_instructor_approved')
+    list_filter = ('participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved')
     actions = ['adviser_approve', 'instructor_approve']
 
     def adviser_approve(self, request, queryset):
@@ -367,6 +367,9 @@ class ConfigAdmin(admin.ModelAdmin):
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('name', 'points', 'should_count_towards_cgpa', 'is_active')
 
+class RegistrationTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'should_count_towards_cgpa', 'is_active')
+
 class TermAdmin(admin.ModelAdmin):
     list_display = ('name', 'year', 'last_reg_date', 'is_active')
     search_fields = ('name', 'year')
@@ -392,7 +395,6 @@ class TermAdmin(admin.ModelAdmin):
                 term.last_instructor_approval_date = add_one_year(term.last_instructor_approval_date)
                 term.last_conversion_date = add_one_year(term.last_conversion_date)
                 term.last_drop_date = add_one_year(term.last_drop_date)
-                term.last_drop_with_mention_date = add_one_year(term.last_drop_with_mention_date)
                 term.last_grade_date = add_one_year(term.last_grade_date)
                 term.save()
         self.message_user(request, "Cloned %s terms" % n)
@@ -408,3 +410,4 @@ admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Config, ConfigAdmin)
 admin.site.register(Grade, GradeAdmin)
 admin.site.register(Term, TermAdmin)
+admin.site.register(RegistrationType, RegistrationTypeAdmin)

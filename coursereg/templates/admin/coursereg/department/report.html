@@ -56,10 +56,8 @@
         <td>
             {% if participant.is_drop %}
             Drop
-            {% elif participant.is_credit %}
-            Credit
             {% else %}
-            Audit
+            {{ participant.registration_type }}
             {% endif %}
         </td>
         <td>{{ participant.grade }}</td>
@@ -89,10 +87,8 @@ var exportData = {
             "{{ participant.course }}",
             {% if participant.is_drop %}
             "Drop",
-            {% elif participant.is_credit %}
-            "Credit",
             {% else %}
-            "Audit",
+            "{{ participant.registration_type }}",
             {% endif %}
             "{{ participant.grade }}",
         ],

@@ -75,6 +75,14 @@ def get_recent_last_drop_date():
         return recent_course.last_drop_date
     return timezone.now()
 
+class RegistrationType(models.Model):
+    name = models.CharField(max_length=100)
+    should_count_towards_cgpa = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return self.name
+
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
     PARTICIPANT_INSTRUCTOR = 1
@@ -89,13 +97,13 @@ class Participant(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
-    is_credit = models.BooleanField(default=True)
+    registration_type = models.ForeignKey('RegistrationType', on_delete=models.CASCADE)
     is_drop = models.BooleanField(default=False)
-    is_drop_mentioned = models.BooleanField(default=False)
     grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, default=get_default_grade)
     is_adviser_approved = models.BooleanField(default=False)
     is_instructor_approved = models.BooleanField(default=False)
     should_count_towards_cgpa = models.BooleanField(default=True)
+    comment = models.CharField(max_length=300, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -153,8 +161,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.user_type == User.USER_TYPE_STUDENT:
             total_credits = 0
             total_grade_points = 0
-            for p in Participant.objects.filter(user=self, is_credit=True).exclude(is_drop=False).exclude(should_count_towards_cgpa=False):
-                if p.course.should_count_towards_cgpa and p.grade and p.grade.should_count_towards_cgpa:
+            for p in Participant.objects.filter(user=self).exclude(is_drop=False).exclude(should_count_towards_cgpa=False):
+                if p.registration_type.should_count_towards_cgpa and p.course.should_count_towards_cgpa and p.grade and p.grade.should_count_towards_cgpa:
                     total_credits += p.course.credits
                     total_grade_points += p.grade.points * p.course.credits
             if total_credits > 0:
@@ -200,7 +208,6 @@ class Term(models.Model):
     last_instructor_approval_date = models.DateTimeField(default=timezone.now)
     last_conversion_date = models.DateTimeField(default=timezone.now)
     last_drop_date = models.DateTimeField(default=timezone.now)
-    last_drop_with_mention_date = models.DateTimeField(default=timezone.now)
     last_grade_date = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
 

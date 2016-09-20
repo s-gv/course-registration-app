@@ -8,7 +8,6 @@
         "last_instructor_approval_date": "Aug 25 2016 23:59:59 GMT+0530",
         "last_conversion_date": "Aug 30 2016 23:59:59 GMT+0530",
         "last_drop_date": "Oct 15 2016 23:59:59 GMT+0530",
-        "last_drop_with_mention_date": "Nov 15 2016 23:59:59 GMT+0530",
         "last_grade_date": "Dec 15 2016 23:59:59 GMT+0530"
     },
     {
@@ -20,7 +19,6 @@
         "last_instructor_approval_date": "Jan 25 2016 23:59:59 GMT+0530",
         "last_conversion_date": "Jan 30 2016 23:59:59 GMT+0530",
         "last_drop_date": "Mar 15 2016 23:59:59 GMT+0530",
-        "last_drop_with_mention_date": "Mar 30 2016 23:59:59 GMT+0530",
         "last_grade_date": "May 10 2016 23:59:59 GMT+0530"
     },
     {
@@ -32,7 +30,6 @@
         "last_instructor_approval_date": "May 25 2016 23:59:59 GMT+0530",
         "last_conversion_date": "May 30 2016 23:59:59 GMT+0530",
         "last_drop_date": "Jun 15 2016 23:59:59 GMT+0530",
-        "last_drop_with_mention_date": "Jun 30 2016 23:59:59 GMT+0530",
         "last_grade_date": "Jul 30 2016 23:59:59 GMT+0530"
     }
 ]

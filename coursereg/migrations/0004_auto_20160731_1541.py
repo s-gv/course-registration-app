@@ -52,7 +52,6 @@ def migrate_term(Term, term, last_reg_date, last_drop_date):
             last_instructor_approval_date=last_reg_date,
             last_conversion_date=last_drop_date,
             last_drop_date=last_drop_date,
-            last_drop_with_mention_date=last_drop_date,
             last_grade_date=last_reg_date + timedelta(days=150),
             is_active=True
         )
@@ -102,6 +101,29 @@ def migrate_grade(Participant, Grade, grade):
         )
     return ng
 
+def migrate_participant_state(Participant, RegistrationType, participant):
+    STATE_CREDIT = 1
+    STATE_AUDIT = 2
+
+    if participant.state == STATE_AUDIT:
+        reg_type = RegistrationType.objects.filter(name='Audit').first()
+        if not reg_type:
+            reg_type = RegistrationType.objects.create(
+                name='Audit',
+                should_count_towards_cgpa=False,
+                is_active=True
+            )
+        return reg_type
+    else:
+        reg_type = RegistrationType.objects.filter(name='Credit').first()
+        if not reg_type:
+            reg_type = RegistrationType.objects.create(
+                name='Credit',
+                should_count_towards_cgpa=True,
+                is_active=True
+            )
+        return reg_type
+
 def migrate_participant_table(apps, schema_editor):
     STATE_CREDIT = 1
     STATE_AUDIT = 2
@@ -109,8 +131,9 @@ def migrate_participant_table(apps, schema_editor):
 
     Participant = apps.get_model("coursereg", "Participant")
     Grade = apps.get_model("coursereg", "Grade")
+    RegistrationType = apps.get_model("coursereg", "RegistrationType")
     for participant in Participant.objects.all():
-        participant.is_credit = (participant.state != STATE_AUDIT)
+        participant.registration_type = migrate_participant_state(Participant, RegistrationType, participant)
         participant.is_drop = (participant.state == STATE_DROP)
         participant.is_drop_mentioned = False
         participant.new_grade = migrate_grade(Participant, Grade, participant.grade)
