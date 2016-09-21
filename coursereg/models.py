@@ -107,6 +107,15 @@ class Participant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def adviser(self):
+	for p in User.objects.filter(email=self.user.email):
+	  return p.adviser
+
+    def instructor(self):
+	if self.participant_type == 0: # student
+	  for p in Participant.objects.filter(course=self.course,participant_type=1): 
+	    return p.user.email
+
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
 
