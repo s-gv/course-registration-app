@@ -35,6 +35,7 @@ def notify(request):
     if not user or user.department != request.user.department:
         raise PermissionDenied
     user.is_dcc_review_pending = True
+    user.is_dcc_sent_notification = True
     user.save()
     models.Notification.objects.create(
         user=user,

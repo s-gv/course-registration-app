@@ -60,6 +60,21 @@ def review(request):
             user_type=models.User.USER_TYPE_STUDENT,
             is_active=True,
             department=request.user.department).order_by('full_name')],
+        'all_active_students_PhD': [student for student in models.User.objects.filter(
+            user_type=models.User.USER_TYPE_STUDENT,
+            is_active=True,
+	    degree=1,
+            department=request.user.department).order_by('full_name')],
+        'all_active_students_MTech': [student for student in models.User.objects.filter(
+            user_type=models.User.USER_TYPE_STUDENT,
+            is_active=True,
+	    degree=2,
+            department=request.user.department).order_by('full_name')],
+        'all_active_students_MTechRes': [student for student in models.User.objects.filter(
+            user_type=models.User.USER_TYPE_STUDENT,
+            is_active=True,
+	    degree=3,
+            department=request.user.department).order_by('full_name')],
         'user_email': request.user.email
     }
     return render(request, 'coursereg/dcc_review.html', context)
@@ -91,6 +106,7 @@ def approve(request, student_id):
     if not student or student.department != request.user.department:
         raise PermissionDenied
     student.is_dcc_review_pending = False
+    student.is_dcc_approved_registration = True
     student.save()
     models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)
