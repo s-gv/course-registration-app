@@ -52,6 +52,7 @@ def review(request):
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
+        'user_email': request.user.email,
         'Degree': [degree for degree in models.Degree.objects.all().order_by('name')],
         'faculty_approval_pending': models.Participant.objects.filter(
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
