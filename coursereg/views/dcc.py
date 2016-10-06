@@ -52,6 +52,7 @@ def review(request):
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
+        'Degree': [degree for degree in models.Degree.objects.all().order_by('name')],
         'faculty_approval_pending': models.Participant.objects.filter(
                 Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
                 user__department=request.user.department,
@@ -59,24 +60,8 @@ def review(request):
         'all_active_students': [student for student in models.User.objects.filter(
             user_type=models.User.USER_TYPE_STUDENT,
             is_active=True,
-            department=request.user.department).order_by('full_name')],
-        'all_active_students_PhD': [student for student in models.User.objects.filter(
-            user_type=models.User.USER_TYPE_STUDENT,
-            is_active=True,
-	    degree=1,
-            department=request.user.department).order_by('full_name')],
-        'all_active_students_MTech': [student for student in models.User.objects.filter(
-            user_type=models.User.USER_TYPE_STUDENT,
-            is_active=True,
-	    degree=2,
-            department=request.user.department).order_by('full_name')],
-        'all_active_students_MTechRes': [student for student in models.User.objects.filter(
-            user_type=models.User.USER_TYPE_STUDENT,
-            is_active=True,
-	    degree=3,
-            department=request.user.department).order_by('full_name')],
-        'user_email': request.user.email
-    }
+            department=request.user.department).order_by('degree','full_name')],
+            }
     return render(request, 'coursereg/dcc_review.html', context)
 
 @login_required

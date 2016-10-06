@@ -113,7 +113,7 @@ class Participant(models.Model):
 
     def instructor(self):
 	if self.participant_type == 0: # student
-	  for p in Participant.objects.filter(course=self.course,participant_type=1): 
+	  for p in Participant.objects.filter(course=self.course,participant_type=1):
 	    return p.user.email
 
     def __unicode__(self):
@@ -253,7 +253,6 @@ class Term(models.Model):
                             if self.last_drop_date <= self.last_grade_date:
                                 return
         raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
-
 
 class Course(models.Model):
     num = models.CharField(max_length=100)

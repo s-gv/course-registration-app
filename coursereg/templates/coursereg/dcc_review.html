@@ -40,7 +40,7 @@
 			{% if student.is_dcc_sent_notification %}
                         <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
                         <span class="label label-danger">Notified</span>
-			{% else %}	
+			{% else %}
                         <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
                    	{% endif %}
                     </td>
@@ -62,91 +62,36 @@
         </div>
     </div>
     {% endif %}
-    <div class="row">
+
+<div class="container" id="maincontainer">
+
+{% for degree in Degree %}
+    <div class="row top-buffer-1">
         <div class="col-md-12">
-            <h2>All active students</h2>
+            <h2>All {{degree}} students</h2>
+            		  <table class="table table-striped">
+                      {% for student in all_active_students %}
+                        <tr>
+                          {% if student.degree == degree %}
+                            {% if student.is_dcc_approved_registration %}
+          			               <td>
+          			                    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
+          			                       ({{ student.email }})
+          			                    <span class="label label-success">Registered</span>
+          			               </td>
+                            {% else %}
+          			              <td>
+          			                   <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
+          			                      ({{ student.email }})
+          			              </td>
+          			            {% endif %}
+                        {% endif %}
+                      </tr>
+                    {% endfor %}
+                </table>
         </div>
     </div>
-    <div class="row">
-	<div class="col-md-12">
-	<button data-toggle="collapse" type="button" data-target="#PhD" class="btn btn-secondary">Ph.D.</button>
-	<div id="PhD" class=collapse>
-		<div class="col-md-8">
-		    <table class="table table-striped">
-		    {% for student in all_active_students_PhD %}
-		    <tr>
-			{% if student.is_dcc_approved_registration %}
-			<td>
-			    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-			    ({{ student.email }})
-			    <span class="label label-success">Registered</span>
-			</td>
-			{% else %}
-			<td>
-			    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-			    ({{ student.email }})
-			</td>
-			{% endif %}
-		    </tr>
-		    {% endfor %}
-		    </table>
-		</div>
-	    </div>
-	</div>
-    </div>
-    <div class="row">
-	<div class="col-md-12">
-	<button data-toggle="collapse" type="button" data-target="#MTech" class="btn btn-primary">M.Tech.</button>
-	<div id="MTech" class=collapse>
-		<div class="col-md-8">
-		    <table class="table table-striped">
-		    {% for student in all_active_students_MTech %}
-		    <tr>
-			{% if student.is_dcc_approved_registration %}
-			<td>
-			    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-			    ({{ student.email }})
-			    <span class="label label-success">Registered</span>
-			</td>
-			{% else %}
-			<td>
-			    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-			    ({{ student.email }})
-			</td>
-			{% endif %}
-		    </tr>
-		    {% endfor %}
-		    </table>
-		</div>
-	    </div>
-	</div>
-    </div>
-    <div class="row">
-	<div class="col-md-12">
-	<button data-toggle="collapse" type="button" data-target="#MTechRes" class="btn btn-secondary">M.Tech.(Research)</button>
-	<div id="MTechRes" class=collapse>
-		<div class="col-md-8">
-		    <table class="table table-striped">
-		    {% for student in all_active_students_MTechRes %}
-		    <tr>
-			{% if student.is_dcc_approved_registration %}
-		        <td>
-		            <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-		            ({{ student.email }})
-		            <span class="label label-success">Registered</span>
-		        </td>
-			{% else %}
-		        <td>
-		            <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-		            ({{ student.email }})
-		        </td>
-			{% endif %}
-		    </tr>
-		    {% endfor %}
-		    </table>
-		</div>
-	    </div>
-	</div>
-    </div>
+{% endfor %}
 </div>
+
 {% endblock %}
