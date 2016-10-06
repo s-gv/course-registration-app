@@ -26,7 +26,7 @@ class ParticipantInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa', 'adviser','instructor','comment')
+    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa','comment')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
