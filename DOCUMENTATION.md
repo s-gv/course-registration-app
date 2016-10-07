@@ -1,11 +1,18 @@
 # Coursereg
 - [Overview](#overview)
+- [Features](#features)
 - [Dependencies](#dependencies)
 - [How to deploy](#how-to-deploy)
 - [Management commands](#management-commands)
+- [DB Schema](#db-schema)
+- [URLs](#urls)
+- [Misc](#misc)
 
 ## Overview
-Coursereg is a webapp for managing course registrations. 
+Coursereg is a webapp for managing course registrations.
+
+## Features
+TODO
 
 ## Dependencies
 - Python 2.7
@@ -29,3 +36,12 @@ Coursereg is a webapp for managing course registrations.
 - To bulk load academic terms in `<project_root>/coursereg/data/terms.json`, run `python manage.py loadterms --datafile coursereg/data/terms.json`.
 - To bulk load registration types in `<project_root>/coursereg/data/registration_types.json`, run `python manage.py loadregtypes --datafile coursereg/data/registration_types.json`. Note that you must have at least one registration type for the application to operate properly.
 - To bulk load configs in `<project_root>/coursereg/data/configs.json`, run `python manage.py loadconfigs --datafile coursereg/data/configs.json`.
+
+## DB Schema
+TODO
+
+## URLS
+TODO
+
+## Misc
+TODO
