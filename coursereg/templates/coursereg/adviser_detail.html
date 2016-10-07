@@ -90,25 +90,66 @@
                                         {{ participant.course }} <span class="badge">{{ participant.get_reg_type_desc }}</span>
                                     </p>
                                 </div>
-                                <div class="col-md-4 col-xs-12">
+                                <div class="col-md-5 col-xs-12">
                                     <p class="text-muted">
                                         {{ participant.get_status_desc }}
                                     </p>
                                 </div>
-                                <div class="col-md-2 col-xs-12">
-                                    {% if not participant.course.is_last_adviser_approval_date_passed or not participant.is_instructor_approved %}
-                                    <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                        <input type="hidden" name="origin" value="adviser">
-                                        {% if not participant.is_adviser_approved and not participant.course.is_last_adviser_approval_date_passed %}
-                                        <button type="submit" class="btn btn-xs btn-success" name="action" value="approve">Approve</button>
-                                        <button type="submit" class="btn btn-xs btn-danger" name="action" value="delete" style="margin-left: 20px;">Delete</button>
-                                        {% else %}
-                                        <button type="submit" class="btn btn-xs btn-danger" name="action" value="delete">Delete</button>
+                                <div class="col-md-1 col-xs-12">
+                                    <div title="Options" class="pull-right" style="width:30px;">
+                                        {% if not participant.course.is_last_drop_date_passed %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle btn-circle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <span class="glyphicon glyphicon-option-vertical"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                {% if not participant.course.is_last_conversion_date_passed %}
+                                                    <form id="switchForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}"method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
+                                                        <input type="hidden" name="origin" value="adviser">
+                                                        <input type="hidden" name="action" value="reg_type_change">
+                                                        <input type="hidden" name="reg_type" value="0">
+                                                    </form>
+                                                    {% for reg_type in reg_types %}
+                                                    {% if reg_type != participant.registration_type %}
+                                                        <li><a href="#" onclick="$('#switchForm{{ participant.id }} input[name=reg_type]').val('{{ reg_type.id }}'); $('#switchForm{{ participant.id }}').submit()">Switch to {{ reg_type }}</a></li>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if not participant.course.is_last_adviser_approval_date_passed %}
+                                                    <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
+                                                    </form>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit()">Cancel registration</a></li>
+                                                {% elif not participant.course.is_last_drop_date_passed %}
+                                                    <form id="dropForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
+                                                        <input type="hidden" name="origin" value="adviser">
+                                                        {% if participant.is_drop %}
+                                                        <input type="hidden" name="action" value="undrop">
+                                                        {% else %}
+                                                        <input type="hidden" name="action" value="drop">
+                                                        {% endif %}
+                                                    </form>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li>
+                                                        <a href="#" onclick="$('#dropForm{{ participant.id }}').submit()">
+                                                        {% if participant.is_drop %}
+                                                        Undo drop
+                                                        {% else %}
+                                                        Drop course
+                                                        {% endif %}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
                                         {% endif %}
-                                    </form>
-                                    {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
