@@ -27,11 +27,35 @@
 }
 
 .btn-circle {
-  width: 20px;
-  height: 20px;
-  line-height: 10px; /* adjust line height to align vertically*/
+  width: 30px;
+  height: 30px;
+  line-height: 15px; /* adjust line height to align vertically*/
   padding:0;
   border-radius: 50%;
+}
+
+.btn-circle {
+  border-color: #fff;
+}
+.btn-circle:hover,
+.btn-circle:focus,
+.btn-circle:active,
+.btn-circle.active {
+  border-color: #fff;
+}
+.btn-circle.disabled:hover,
+.btn-circle.disabled:focus,
+.btn-circle.disabled:active,
+.btn-circle.disabled.active,
+.btn-circle[disabled]:hover,
+.btn-circle[disabled]:focus,
+.btn-circle[disabled]:active,
+.btn-circle[disabled].active,
+fieldset[disabled] .btn-circle:hover,
+fieldset[disabled] .btn-circle:focus,
+fieldset[disabled] .btn-circle:active,
+fieldset[disabled] .btn-circle.active {
+  border-color: #fff;
 }
 
 .credit-bg {

@@ -104,6 +104,7 @@ class Participant(models.Model):
     is_instructor_approved = models.BooleanField(default=False)
     should_count_towards_cgpa = models.BooleanField(default=True)
     comment = models.CharField(max_length=300, default='', blank=True)
+    lock_from_student = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -207,17 +208,22 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.full_name.strip()
 
+    def __unicode__(self):
+        return '%s (%s)' % (self.full_name, self.email)
+
 class Notification(models.Model):
     ORIGIN_ADVISER = 0
     ORIGIN_INSTRUCTOR = 1
     ORIGIN_DCC = 2
     ORIGIN_OTHER = 3
+    ORIGIN_STUDENT = 4
 
     ORIGIN_CHOICES = (
         (ORIGIN_ADVISER, 'Adviser'),
         (ORIGIN_INSTRUCTOR, 'Instructor'),
         (ORIGIN_DCC, 'DCC'),
-        (ORIGIN_OTHER, 'Other')
+        (ORIGIN_OTHER, 'Other'),
+        (ORIGIN_STUDENT, 'Student')
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

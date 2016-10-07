@@ -145,6 +145,49 @@ def update(request, participant_id):
                 send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+    elif request.POST['origin'] == 'student':
+        if not request.user == participant.user: raise PermissionDenied
+        if participant.lock_from_student:
+            messages.error(request, "Account privileges restricted. Contact the administrator for more information.")
+        else:
+            if request.POST['action'] == 'reg_type_change':
+                reg_type = models.RegistrationType.objects.get(pk=request.POST['reg_type'])
+                if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
+                participant.registration_type = reg_type
+                participant.save()
+                msg = 'Registration for %s by %s has changed to %s.' % (participant.course, participant.user, reg_type)
+                models.Notification.objects.create(user=participant.user,
+                                                   origin=models.Notification.ORIGIN_STUDENT,
+                                                   message=msg)
+                try:
+                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                except:
+                    messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+            if request.POST['action'] == 'drop':
+                if participant.course.is_last_drop_date_passed(): raise PermissionDenied
+                participant.is_drop = True
+                participant.save()
+                msg = '%s dropped by %s.' % (participant.course, participant.user)
+                models.Notification.objects.create(user=participant.user,
+                                                   origin=models.Notification.ORIGIN_STUDENT,
+                                                   message=msg)
+                try:
+                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                except:
+                    messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+            if request.POST['action'] == 'undrop':
+                if participant.course.is_last_drop_date_passed(): raise PermissionDenied
+                participant.is_drop = False
+                participant.save()
+                msg = 'Drop request for %s by %s cancelled.' % (participant.course, participant.user)
+                models.Notification.objects.create(user=participant.user,
+                                                   origin=models.Notification.ORIGIN_STUDENT,
+                                                   message=msg)
+                try:
+                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                except:
+                    messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @require_POST
@@ -184,12 +227,7 @@ def approve_all(request):
 @login_required
 def delete(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
-    student = participant.user
-    if not participant.user == request.user: raise PermissionDenied
-    if participant.is_adviser_approved and not student.adviser.auto_advisee_approve: raise PermissionDenied
-    if participant.user.adviser.auto_advisee_approve and participant.is_instructor_approved:
-        student.is_dcc_review_pending = True
-        student.save()
+    if not request.user == participant.user: raise PermissionDenied
     if participant.course.is_last_reg_date_passed(): raise PermissionDenied
     participant.delete()
     return redirect(request.GET.get('next', reverse('coursereg:index')))
