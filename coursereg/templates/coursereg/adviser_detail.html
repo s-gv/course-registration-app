@@ -147,12 +147,21 @@
                             {% endfor %}
                         </select>
                     </label>
+                    {% for reg_type in reg_types %}
                     <label class="radio-inline">
+                        {% if forloop.counter0 == 0 %}
+                        <input type="radio" name="reg_type" value="{{ reg_type.id }}" checked>{{ reg_type }}
+                        {% else %}
+                        <input type="radio" name="reg_type" value="{{ reg_type.id }}">{{ reg_type }}
+                        {% endif %}
+                    </label>
+                    {% endfor %}
+                    <!--label class="radio-inline">
                         <input type="radio" name="reg_type" value="credit" checked>Credit
                     </label>
                     <label class="radio-inline">
                         <input type="radio" name="reg_type" value="audit">Audit
-                    </label>
+                    </label-->
                 </div>
                 <input type="hidden" name="next" value="{{ request.path }}">
                 <input type="hidden" name="user_id" value="{{ student.id }}">

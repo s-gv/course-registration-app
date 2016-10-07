@@ -127,6 +127,8 @@ class Participant(models.Model):
             return 'Awaiting adviser review'
         if not self.is_instructor_approved:
             return 'Adviser has approved. Awaiting instructor review'
+	else:
+	    return 'Awaiting final DCC approval'
         if self.grade.id == get_default_grade():
             return 'Registered'
         else:

@@ -32,6 +32,7 @@ def detail(request, student_id):
         'nav_active': 'adviser',
         'user_email': request.user.email,
         'student': student,
+        'reg_types': models.RegistrationType.objects.filter(is_active=True),
         'can_adviser_add_courses_for_students': models.Config.can_adviser_add_courses_for_students(),
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
             for n in models.Notification.objects.filter(user=student, is_adviser_acknowledged=False).order_by('-created_at')],
