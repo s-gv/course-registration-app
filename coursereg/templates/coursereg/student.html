@@ -91,28 +91,32 @@
                 {% for participant in participants %}
                 <li class="list-group-item">
                     <div class="row">
-                        <div class="col-md-6">
-                            {% if not partificipant.should_count_towards_cgpa %}
-                            <p class="text-muted">
-                            {% else %}
-                            <p>
-                            {% endif %}
-                                {{ participant.course }} <span class="badge">{{ participant.registration_type }}</span>
-                            </p>
+                        <div class="col-md-11 col-xs-10">
+                            <div class="row">
+                                <div class="col-md-6 col-xs-12">
+                                    {% if participant.should_count_towards_cgpa %}
+                                    <p>
+                                    {% else %}
+                                    <p class="text-muted">
+                                    {% endif %}
+                                        {{ participant.course }} <span class="badge">{{ participant.get_reg_type_desc }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 col-xs-12">
+                                    <p class="text-muted">
+                                        {{ participant.get_status_desc }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-5">
-                            <p class="text-muted">
-                                {{ participant.get_status_desc }}
-                            </p>
-                        </div>
-                        <div class="col-md-1">
+                        <div class="col-md-1 col-xs-2">
                             <div title="Options" class="pull-right" style="width:30px;">
                                 {% if not participant.course.is_last_drop_date_passed %}
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle btn-circle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                         <span class="glyphicon glyphicon-option-vertical"></span>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                                         {% if not participant.course.is_last_conversion_date_passed %}
                                             <form id="switchForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}"method="POST">
                                                 {% csrf_token %}
