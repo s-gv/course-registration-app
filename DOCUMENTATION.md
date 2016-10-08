@@ -4,20 +4,25 @@
 - [Dependencies](#dependencies)
 - [How to deploy](#how-to-deploy)
 - [Management commands](#management-commands)
+- [Config options](#config-options)
 - [DB Schema](#db-schema)
 - [URLs](#urls)
 - [Misc](#misc)
 
 ## Overview
-Coursereg is a webapp for managing course registrations. 
-TODO: description of how it works and a link to a YouTube screencast.
+Coursereg is a webapp for managing course registrations at academic institutions. Students can register for courses on the Coursereg website. The registrations can be reviewed by the student's adviser, the relevant course instructor, and department admins. After the registration is complete, students can opt to change the registration type (Credit, Audit, etc.) or drop the course within the specified date. On completion of the course, instructors can assign grades on this platform.
+
+There are four types of users in this platform: (1) Student (2) Faculty (3) Department admin (4) Superuser. Faculty have two roles: (1) Adviser (2) Instructor. They can review courses taken by their advisees and have access to a list of students who have applied for a course they are instructing. A department admin has access to every course taken by a student in a department and can generate reports for the entire department. The superuser has full database access and can login as any other user in the system. 
+
+TODO: A YouTube screencast.
 
 ## Features
 - E-mail notification is sent when a course is dropped.
-- Admin can bulk upload users from a CSV file.
-- Admin can login as any user.
+- Bulk upload users from a CSV file.
+- Superuser can login as any user.
 - Department-wise report in CSV/PDF.
 - Faculty can export registered students in CSV/PDF.
+- Layout is mobile friendly.
 
 TODO: Rest of features worth mentioning.
 
@@ -64,12 +69,27 @@ TODO: Rest of the tables
 
 ## URLS
 - `/participants/<participant_id>/delete`
-  - If the user signed in is authorized, the participant row with ID `<participant_id>` is deleted.
+  - Participant row with ID `<participant_id>` is deleted if the user signed in is authorized to perform the action.
   - POST only. 
   - Parameters: 
     - `next` (optional) - URL to re-direct to. Defaults to the index page.
-  
+
+TODO: Rest of URLs
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
 - A fatal error occurs if a user with `user_type` NULL logs in. Always assign `user_type` when creating users.
+
+## Config options
+These options can be configured by the superuser in the admin interface.
+
+- Key: `can_faculty_create_courses`
+  - Value: `1` to permit course creation by faculty
+  - Value: `0` to disable course creation by faculty
+- Key: `can_adviser_add_courses_for_students`
+  - Value: `1` to permit faculty to add courses on behalf of their advisees
+  - Value: `0` to not allow faculty to add courses for their advisees
+- Key: `contact_email`
+  - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
+- Key: `num_days_before_last_reg_date_course_registerable`
+  - Value: An integer number of days before the last registration date that students can begin registering for courses (ex: `60`).
