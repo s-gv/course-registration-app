@@ -82,6 +82,8 @@ Tables with sample rows:
 TODO: Rest of the tables
 
 ## URLS
+Note: These URLs may change in even minor revisions and are not to be used as a public API.
+
 - `/participants/<participant_id>/delete`
   - Participant row with ID `<participant_id>` is deleted if the user signed in is authorized to perform the action.
   - POST only. 
