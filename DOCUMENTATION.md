@@ -63,7 +63,12 @@ Tables with sample rows:
 TODO: Rest of the tables
 
 ## URLS
-TODO
+- `/participants/<participant_id>/delete`
+  - If the user signed in is authorized, the participant row with ID `<participant_id>` is deleted.
+  - POST only. 
+  - Parameters: 
+    - `next` (optional) - URL to re-direct to. Defaults to the index page.
+  
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
