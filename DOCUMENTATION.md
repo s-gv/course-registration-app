@@ -9,10 +9,17 @@
 - [Misc](#misc)
 
 ## Overview
-Coursereg is a webapp for managing course registrations.
+Coursereg is a webapp for managing course registrations. 
+TODO: description of how it works and a link to a YouTube screencast.
 
 ## Features
-TODO
+- E-mail notification is sent when a course is dropped.
+- Admin can bulk upload users from a CSV file.
+- Admin can login as any user.
+- Department-wise report in CSV/PDF.
+- Faculty can export registered students in CSV/PDF.
+
+TODO: Rest of features worth mentioning.
 
 ## Dependencies
 - Python 2.7
@@ -38,10 +45,26 @@ TODO
 - To bulk load configs in `<project_root>/coursereg/data/configs.json`, run `python manage.py loadconfigs --datafile coursereg/data/configs.json`.
 
 ## DB Schema
-TODO
+Tables with sample rows:
+
+### Department
+|                Name                  | Abbreviation | is_active |
+|--------------------------------------|:-------------|:----------|
+| Electrical Communication Engineering |      ECE     |   True    |
+| Center for Neuroscience              |      CNS     |   True    |
+
+### Degree
+| Name  | is_active |
+|-------|:----------|
+| PhD   |   True    |
+| MTech |   True    |
+| ME    |   False   |
+
+TODO: Rest of the tables
 
 ## URLS
 TODO
 
 ## Misc
-TODO
+- At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
+- A fatal error occurs if a user with `user_type` NULL logs in. Always assign `user_type` when creating users.
