@@ -49,6 +49,20 @@ TODO: Rest of features worth mentioning.
 - To bulk load registration types in `<project_root>/coursereg/data/registration_types.json`, run `python manage.py loadregtypes --datafile coursereg/data/registration_types.json`. Note that you must have at least one registration type for the application to operate properly.
 - To bulk load configs in `<project_root>/coursereg/data/configs.json`, run `python manage.py loadconfigs --datafile coursereg/data/configs.json`.
 
+## Config options
+These options can be configured by the superuser in the admin interface.
+
+- Key: `can_faculty_create_courses`
+  - Value: `1` to permit course creation by faculty
+  - Value: `0` to disable course creation by faculty
+- Key: `can_adviser_add_courses_for_students`
+  - Value: `1` to permit faculty to add courses on behalf of their advisees
+  - Value: `0` to not allow faculty to add courses for their advisees
+- Key: `contact_email`
+  - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
+- Key: `num_days_before_last_reg_date_course_registerable`
+  - Value: An integer number of days before the last registration date that students can begin registering for courses (ex: `60`).
+
 ## DB Schema
 Tables with sample rows:
 
@@ -79,17 +93,3 @@ TODO: Rest of URLs
 ## Misc
 - At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
 - A fatal error occurs if a user with `user_type` NULL logs in. Always assign `user_type` when creating users.
-
-## Config options
-These options can be configured by the superuser in the admin interface.
-
-- Key: `can_faculty_create_courses`
-  - Value: `1` to permit course creation by faculty
-  - Value: `0` to disable course creation by faculty
-- Key: `can_adviser_add_courses_for_students`
-  - Value: `1` to permit faculty to add courses on behalf of their advisees
-  - Value: `0` to not allow faculty to add courses for their advisees
-- Key: `contact_email`
-  - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
-- Key: `num_days_before_last_reg_date_course_registerable`
-  - Value: An integer number of days before the last registration date that students can begin registering for courses (ex: `60`).
