@@ -94,4 +94,4 @@ TODO: Rest of URLs
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
-- A fatal error occurs if a user with `user_type` NULL logs in. Always assign `user_type` when creating users.
+- A fatal error occurs if a student with `adviser` NULL logs in. Always assign `adviser` when creating student users.
