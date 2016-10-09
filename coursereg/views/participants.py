@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
+from django.contrib.sites.shortcuts import get_current_site
 
 @require_POST
 @login_required
@@ -20,6 +21,7 @@ def create(request):
     reg_type = request.POST['reg_type']
 
     user = models.User.objects.get(id=user_id)
+    site_url = get_current_site(request).domain
     if request.POST['origin'] == 'adviser':
         if not request.user == user.adviser: raise PermissionDenied
         if not models.Config.can_adviser_add_courses_for_students(): raise PermissionDenied
@@ -52,12 +54,12 @@ def create(request):
                 participant.is_adviser_approved = True
                 participant.is_instructor_approved = course.auto_instructor_approve
                 participant.save()
-                msg = 'Applied for %s.' % participant.course
+                msg = 'You have been enrolled in %s.\n\nVisit http://%s to review course registrations.' % (participant.course, site_url)
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_ADVISER,
                                                    message=msg)
                 try:
-                    send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
+                    send_mail('New course application', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
             else:
@@ -69,6 +71,7 @@ def create(request):
 @login_required
 def update(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
+    site_url = get_current_site(request).domain
     if request.POST['origin'] == 'instructor':
         if not models.Participant.objects.filter(course=participant.course,
                 user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
@@ -83,13 +86,13 @@ def update(request, participant_id):
             student.save()
         elif request.POST['action'] == 'reject':
             if participant.is_instructor_approved: raise PermissionDenied
-            msg = 'Application for %s has been rejected by the course instructor.' % participant.course
+            msg = 'Your application for %s has been rejected by the course instructor.\n\nVisit http://%s to review course registrations.' % (participant.course, site_url)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_INSTRUCTOR,
                                                message=msg)
             participant.delete()
             try:
-                send_mail('Coursereg notification', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
+                send_mail('Course application decision', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         elif request.POST['action'] == 'grade':
@@ -103,36 +106,36 @@ def update(request, participant_id):
             if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
             participant.registration_type = reg_type
             participant.save()
-            msg = 'Registration for %s by %s has changed to %s.' % (participant.course, participant.user, reg_type)
+            msg = 'Your registration for %s has changed to %s.\n\nVisit http://%s to review course registrations.' % (participant.course, reg_type, site_url)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             try:
-                send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
+                send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         if request.POST['action'] == 'drop':
             if participant.course.is_last_drop_date_passed(): raise PermissionDenied
             participant.is_drop = True
             participant.save()
-            msg = '%s dropped by %s.' % (participant.course, participant.user)
+            msg = 'You have dropped the course %s.\n\nVisit http://%s to review course registrations.' % (participant.course, site_url)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             try:
-                send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
+                send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         if request.POST['action'] == 'undrop':
             if participant.course.is_last_drop_date_passed(): raise PermissionDenied
             participant.is_drop = False
             participant.save()
-            msg = 'Drop request for %s by %s cancelled.' % (participant.course, participant.user)
+            msg = 'Drop request for %s is cancelled.\n\nVisit http://%s to review course registrations.' % (participant.course, site_url)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
             try:
-                send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
+                send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         if request.POST['action'] == 'disable_student_edits':
@@ -151,36 +154,36 @@ def update(request, participant_id):
                 if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
                 participant.registration_type = reg_type
                 participant.save()
-                msg = 'Registration for %s by %s has changed to %s.' % (participant.course, participant.user, reg_type)
+                msg = 'Registration for %s by %s has changed to %s.\n\nVisit http://%s to review course registrations.' % (participant.course, participant.user, reg_type)
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_STUDENT,
                                                    message=msg)
                 try:
-                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                    send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
             if request.POST['action'] == 'drop':
                 if participant.course.is_last_drop_date_passed(): raise PermissionDenied
                 participant.is_drop = True
                 participant.save()
-                msg = '%s dropped by %s.' % (participant.course, participant.user)
+                msg = '%s has dropped %s.\n\nVisit http://%s to review course registrations.' % (participant.user, participant.course, site_url)
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_STUDENT,
                                                    message=msg)
                 try:
-                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                    send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
             if request.POST['action'] == 'undrop':
                 if participant.course.is_last_drop_date_passed(): raise PermissionDenied
                 participant.is_drop = False
                 participant.save()
-                msg = 'Drop request for %s by %s cancelled.' % (participant.course, participant.user)
+                msg = 'Drop request for %s by %s cancelled.\n\nVisit http://%s to review course registrations.' % (participant.course, participant.user, site_url)
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_STUDENT,
                                                    message=msg)
                 try:
-                    send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                    send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
                 except:
                     messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
 
