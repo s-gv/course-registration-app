@@ -287,6 +287,96 @@ class CourseAdmin(admin.ModelAdmin):
     raw_id_fields = ('term',)
     inlines = [ParticipantInline]
 
+    def get_urls(self):
+        urls = super(CourseAdmin, self).get_urls()
+        my_urls = [
+            url(r'^bulkaddcourses$', self.admin_site.admin_view(self.bulk_add_courses), name='coursereg_course_bulk_add_courses'),
+        ]
+        return my_urls + urls
+
+    def bulk_add_courses(self, request):
+        if request.method == 'POST':
+            f = request.FILES['courses_csv']
+            courses = []
+            error = False
+            for line_num, row in enumerate(csv.reader(f), start=1):
+                error = True
+                courses.append({})
+                if len(row) < 7:
+                    messages.error(request, 'Number of fields insufficient in line %s. No records added.' % line_num)
+                    break
+                num, title, credits, term_name, term_year, dept_abbr, should_count_towards_cgpa = [ele.strip() for ele in row[:7]]
+                instructor_emails = [ele.strip() for ele in row[7:]]
+                if len(num) > 1:
+                    courses[-1]['num'] = num
+                else:
+                    messages.error(request, 'Course number in line %s is too short. No records added.' % line_num)
+                    break
+                if len(title) > 3:
+                    courses[-1]['title'] = title
+                else:
+                    messages.error(request, 'Course title in line %s is too short. No records added.' % line_num)
+                    break
+                if len(credits) > 0:
+                    courses[-1]['credits'] = credits
+                else:
+                    messages.error(request, 'Course credits in line %s is too short. No records added.' % line_num)
+                    break
+                try:
+                    courses[-1]['term'] = Term.objects.filter(name=term_name, year=term_year).first()
+                    assert courses[-1]['term'] is not None
+                except:
+                    messages.error(request, 'Course term in line %s not found. No records added.' % line_num)
+                    break
+                try:
+                    courses[-1]['dept'] = Department.objects.get(abbreviation=dept_abbr)
+                except:
+                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
+                    break
+                if should_count_towards_cgpa.lower() == 'true' or should_count_towards_cgpa == '1':
+                    courses[-1]['should_count_towards_cgpa'] = True
+                elif should_count_towards_cgpa.lower() == 'false' or should_count_towards_cgpa == '0':
+                    courses[-1]['should_count_towards_cgpa'] = False
+                else:
+                    messages.error(request, 'Field should_count_towards_cgpa in line %s should be boolean (true/false). No records added.' % line_num)
+                    break
+                if Course.objects.filter(num=num, title=title, credits=credits, term=courses[-1]['term'], department=courses[-1]['dept']):
+                    messages.error(request, 'Course in line %s already exists. No records added.' % line_num)
+                    break
+                courses[-1]['instructors'] = []
+                try:
+                    for instructor_email in instructor_emails:
+                        if instructor_email:
+                            instructor = User.objects.get(email=instructor_email)
+                            courses[-1]['instructors'].append(instructor)
+                except:
+                    messages.error(request, 'Instructor %s in line %s not found. No records added.' % (instructor_email, line_num))
+                    break
+                error = False
+            if not error:
+                for course in courses:
+                    c = Course.objects.create(
+                        num=course['num'],
+                        title=course['title'],
+                        credits=course['credits'],
+                        department=course['dept'],
+                        term=course['term'],
+                        should_count_towards_cgpa=course['should_count_towards_cgpa']
+                    )
+                    for instructor in course['instructors']:
+                        Participant.objects.create(
+                            user=instructor,
+                            course=c,
+                            participant_type=Participant.PARTICIPANT_INSTRUCTOR
+                        )
+                messages.success(request, "Successfully added %s courses." % len(courses))
+                return redirect('admin:coursereg_course_changelist')
+        context = dict(
+           self.admin_site.each_context(request),
+           title='Bulk load courses'
+        )
+        return render(request, "admin/coursereg/course/bulk_add_courses.html", context)
+
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade', 'adviser', 'instructor','comment')
     ordering = ('-course__term__last_reg_date', 'user__full_name')
