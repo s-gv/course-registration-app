@@ -303,7 +303,7 @@ class Course(models.Model):
         return Participant.objects.filter(course=self, is_adviser_approved=True, is_instructor_approved=False).first()
 
     def __unicode__(self):
-        return self.num + ' ' + self.title + ' (%s)' % self.term
+        return self.num + ' ' + self.title + ' (%s, %s)' % (self.credits, self.term)
 
 class Faq(models.Model):
     FAQ_STUDENT = 0
