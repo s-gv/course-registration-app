@@ -117,13 +117,32 @@
                                                         <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
                                                         <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="action" value="reg_type_change">
-                                                        <input type="hidden" name="reg_type" value="0">
+                                                        <input type="hidden" name="reg_type" value="">
                                                     </form>
                                                     {% for reg_type in reg_types %}
                                                     {% if reg_type != participant.registration_type %}
                                                         <li><a href="#" onclick="$('#switchForm{{ participant.id }} input[name=reg_type]').val('{{ reg_type.id }}'); $('#switchForm{{ participant.id }}').submit()">Switch to {{ reg_type }}</a></li>
                                                     {% endif %}
                                                     {% endfor %}
+                                                {% endif %}
+                                                {% if not participant.lock_from_student %}
+                                                    <form id="studentEditForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
+                                                        <input type="hidden" name="origin" value="adviser">
+                                                        <input type="hidden" name="action" value="disable_student_edits">
+                                                    </form>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit()">Disable student edits</a></li>
+                                                {% else %}
+                                                    <form id="studentEditForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
+                                                        <input type="hidden" name="origin" value="adviser">
+                                                        <input type="hidden" name="action" value="enable_student_edits">
+                                                    </form>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit()">Enable student edits</a></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_adviser_approval_date_passed %}
                                                     <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">

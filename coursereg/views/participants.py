@@ -135,10 +135,16 @@ def update(request, participant_id):
                 send_mail('Coursereg', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.email])
             except:
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+        if request.POST['action'] == 'disable_student_edits':
+            participant.lock_from_student = True
+            participant.save()
+        if request.POST['action'] == 'enable_student_edits':
+            participant.lock_from_student = False
+            participant.save()
     elif request.POST['origin'] == 'student':
         if not request.user == participant.user: raise PermissionDenied
         if participant.lock_from_student:
-            messages.error(request, "Account privileges restricted. Contact the administrator for more information.")
+            messages.error(request, "Permission denied.")
         else:
             if request.POST['action'] == 'reg_type_change':
                 reg_type = models.RegistrationType.objects.get(pk=request.POST['reg_type'])
@@ -219,11 +225,16 @@ def delete(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
     if request.user == participant.user:
         # Student requested deletion
-        if request.participant.course.is_last_reg_date_passed(): raise PermissionDenied
+        if participant.course.is_last_reg_date_passed(): raise PermissionDenied
+        if participant.lock_from_student:
+            messages.error(request, "Permission denied.")
+        else:
+            participant.delete()
     elif request.user == participant.user.adviser:
         # Adviser requested deletion
         if participant.course.is_last_adviser_approval_date_passed(): raise PermissionDenied
+        participant.delete()
     else:
         raise PermissionDenied
-    participant.delete()
+
     return redirect(request.POST.get('next', reverse('coursereg:index')))
