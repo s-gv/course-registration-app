@@ -100,13 +100,17 @@
                                     </div>
                                 </div>
                                 <div class="col-md-1 col-xs-2">
-                                    <div title="Options" class="pull-right" style="width:30px;">
+                                    <div title="Options" class="pull-right">
                                         {% if not participant.course.is_last_drop_date_passed %}
                                         <div class="dropdown">
-                                            <button class="btn btn-default dropdown-toggle btn-circle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <button class="btn btn-default dropdown-toggle hidden-xs" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                Actions
+                                                <span class="caret"></span>
+                                            </button>
+                                            <button class="btn btn-default dropdown-toggle btn-circle visible-xs-block" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                 <span class="glyphicon glyphicon-option-vertical"></span>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <ul class="dropdown-menu dropdown-menu-right">
                                                 {% if not participant.course.is_last_conversion_date_passed %}
                                                     <form id="switchForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}"method="POST">
                                                         {% csrf_token %}
