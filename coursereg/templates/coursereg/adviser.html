@@ -35,7 +35,7 @@
                         <a href="{% url 'coursereg:adviser_detail' student.id %}">
                             {{ student.full_name }}
                             {% if student.is_adviser_review_pending %}
-                            <span class="badge">pending</span>
+                            <span class="badge">new</span>
                             {% endif %}
                         </a>
                         {% else %}

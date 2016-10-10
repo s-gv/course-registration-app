@@ -44,14 +44,14 @@
     </div>
     {% endfor %}
     {% endif %}
-    {% if reg_requests %}
+    {% if participants %}
     <div class="row top-buffer-1">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Registration requests</h3>
+                <h3 class="panel-title">Enrolled students</h3>
             </div>
             <ul class="list-group">
-                {% for participant in reg_requests %}
+                {% for participant in participants %}
                 <li class="list-group-item">
                     <div class="pull-left">{{ forloop.counter }}</div>
                     <div class="row requestrow">
@@ -59,69 +59,7 @@
                             <div class="row">
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.full_name }}
-                                    <span class="badge">{{ participant.registration_type }}</span>
-                                </div>
-                                <div class="col-md-2 col-xs-12">
-                                    {{ participant.user.email }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.department.abbreviation }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.degree }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.sr_no }}
-                                </div>
-                                <div class="col-md-2 col-xs-12">
-                                    <form action="{% url 'coursereg:participants_update' participant.id %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                        <input type="hidden" name="origin" value="instructor">
-                                        {% if not course.is_last_instructor_approval_date_passed %}
-                                        <button type="submit" class="btn btn-xs btn-success" name="action" value="approve">Approve</button>
-                                        {% endif %}
-                                        <button type="submit" class="btn btn-xs btn-danger" name="action" value="reject" style="margin-left: 15px;">Reject</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% if not course.is_last_instructor_approval_date_passed %}
-    <div class="row">
-        <div class="col-md-4">
-            <form action="{% url 'coursereg:participants_approve_all' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                <input type="hidden" name="course_id" value="{{ course.id }}">
-                <input type="hidden" name="origin" value="instructor">
-                <button type="submit" class="btn btn-success">Approve all</button>
-            </form>
-        </div>
-    </div>
-    {% endif %}
-    {% endif %}
-    {% if enrolled %}
-    <div class="row top-buffer-1">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Enrolled</h3>
-            </div>
-            <ul class="list-group">
-                {% for participant in enrolled %}
-                <li class="list-group-item">
-                    <div class="pull-left">{{ forloop.counter }}</div>
-                    <div class="row requestrow">
-                        <div class="col-md-12 col-xs-11">
-                            <div class="row">
-                                <div class="col-md-2 col-xs-12">
-                                    {{ participant.user.full_name }}
-                                    <span class="badge">{{ participant.registration_type }}</span>
+                                    <span class="badge">{{ participant.get_reg_type_desc }}</span>
                                 </div>
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
@@ -135,28 +73,49 @@
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.sr_no }}
                                 </div>
-                                <div class="col-md-1">
-                                    <form class="form-inline" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="next" value="{{ request.path }}">
-                                        <input type="hidden" name="origin" value="instructor">
-                                        <input type="hidden" name="action" value="grade">
-                                        <div class="form-group">
-                                            {% if participant.course.is_last_grade_date_passed %}
-                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()" disabled>
-                                            {% else %}
-                                            <select class="form-control input-sm" name="grade" onchange="this.form.submit()">
-                                            {% endif %}
-                                                {% for grade in grades %}
-                                                {% if participant.grade == grade %}
-                                                <option value="{{ grade.id }}" selected>{{ grade }}</option>
+                                <div class="col-md-1 col-xs-12">
+                                    <div title="Options" style="margin-left:-10px;">
+                                        {% if not participant.course.is_last_grade_date_passed %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                {% if participant.grade %}
+                                                {{ participant.grade }}
                                                 {% else %}
-                                                <option value="{{ grade.id }}">{{ grade }}</option>
+                                                Actions
                                                 {% endif %}
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                {% if not participant.course.is_last_instructor_approval_date_passed %}
+                                                <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="origin" value="instructor">
+                                                    <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
+                                                </form>
+                                                <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit()">Reject application</a></li>
+                                                {% endif %}
+                                                <li role="separator" class="divider"></li>
+                                                <form id="gradeForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="origin" value="instructor">
+                                                    <input type="hidden" name="action" value="grade">
+                                                    <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
+                                                    <input type="hidden" name="grade" value="null">
+                                                </form>
+                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }}').submit()">Not graded</a></li>
+                                                {% for grade in grades %}
+                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }} input[name=grade]').val('{{ grade.id }}'); $('#gradeForm{{ participant.id }}').submit()">{{ grade }}</a></li>
                                                 {% endfor %}
-                                            </select>
+                                            </ul>
                                         </div>
-                                    </form>
+                                        {% else %}
+                                            {% if participant.grade %}
+                                            {{ participant.grade }}
+                                            {% else %}
+                                            Not graded
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -166,53 +125,15 @@
             </ul>
         </div>
     </div>
-    {% endif %}
-    {% if dropped %}
-    <div class="row top-buffer-1">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Dropped</h3>
-            </div>
-            <ul class="list-group">
-                {% for participant in dropped %}
-                <li class="list-group-item">
-                    <div class="pull-left">{{ forloop.counter }}</div>
-                    <div class="row requestrow">
-                        <div class="col-md-12 col-xs-11">
-                            <div class="row">
-                                <div class="col-md-2 col-xs-12">
-                                    {{ participant.user.full_name }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.email }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.department.abbreviation }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.degree }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.sr_no }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
-    {% if participants_for_export %}
+
     <div class="row top-buffer-1">
         <div class="col-md-12 col-xs-12">
             <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
             <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
         </div>
     </div>
-    {% endif %}
-    {% if not enrolled and not dropped and not reg_requests %}
+
+    {% else %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <h2><small>No students have applied for this course.</small></h2>
@@ -232,7 +153,7 @@
         'fileNameWithoutExt': courseName.replace(/\s/g, '_').replace(/[^A-Za-z0-9_]/g, '') + '_Students',
         'columnNames': ['Name', 'Email', 'Program', 'Department', 'SrNo', 'Enrollment', 'Grade'],
         'rows': [
-            {% for participant in participants_for_export %}
+            {% for participant in participants %}
             [
                 "{{ forloop.counter }}",
                 "{{ participant.user.full_name }}",

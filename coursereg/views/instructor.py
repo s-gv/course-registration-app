@@ -19,7 +19,7 @@ def index(request):
         'nav_active': 'instructor',
         'user_email': request.user.email,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
-        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date')]
+        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date', '-course__is_instructor_review_pending')]
     }
     return render(request, 'coursereg/instructor.html', context)
 
@@ -32,17 +32,11 @@ def detail(request, course_id):
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
         raise PermissionDenied
 
-    reg_requests = models.Participant.objects.filter(course=course,
-                                                     is_adviser_approved=True,
-                                                     is_instructor_approved=False)
-    enrolled = models.Participant.objects.filter(course=course,
-                                                 is_drop=False,
-                                                 is_adviser_approved=True,
-                                                 is_instructor_approved=True).order_by('-registration_type')
-    dropped = models.Participant.objects.filter(course=course,
-                                                is_drop=True,
-                                                is_adviser_approved=True,
-                                                is_instructor_approved=True)
+    course.is_instructor_review_pending = False
+    course.save()
+
+    if not course.is_last_adviser_approval_date_passed():
+        messages.warning(request, 'Students can still apply for this course! Please review applications after the last date for applying (%s).' % course.term.last_adviser_approval_date)
 
     context = {
         'user_type': 'faculty',
@@ -50,13 +44,9 @@ def detail(request, course_id):
         'user_email': request.user.email,
         'course': course,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
-        'reg_requests': reg_requests,
-        'enrolled': enrolled,
-        'dropped': dropped,
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
-        'participants_for_export': models.Participant.objects.filter(course=course,
-                                        is_adviser_approved=True,
-                                        is_instructor_approved=True).order_by('is_drop', '-registration_type')
+        'participants': models.Participant.objects.filter(course=course,
+                            participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type')
     }
     return render(request, 'coursereg/instructor_detail.html', context)
 
@@ -80,7 +70,6 @@ def course_new(request):
                 department=request.user.department,
                 term=term,
                 credits=request.POST['credits'],
-                auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
                 should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
             )
             models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
@@ -131,7 +120,6 @@ def course_update(request, course_id):
             num=num,
             term=term,
             credits=request.POST['credits'],
-            auto_instructor_approve=request.POST.get('auto_instructor_approve', False),
             should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
         )
         models.Participant.objects.filter(

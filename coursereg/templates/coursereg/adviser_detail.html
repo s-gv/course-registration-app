@@ -147,6 +147,7 @@
                                                 {% if not participant.course.is_last_adviser_approval_date_passed %}
                                                     <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">
                                                         {% csrf_token %}
+                                                        <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
                                                     </form>
                                                     <li role="separator" class="divider"></li>
@@ -184,19 +185,6 @@
                 </li>
                 {% endfor %}
             </ul>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            {% if student.is_adviser_review_pending %}
-            <form action="{% url 'coursereg:participants_approve_all' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                <input type="hidden" name="student_id" value="{{ student.id }}">
-                <input type="hidden" name="origin" value="adviser">
-                <button type="submit" class="btn btn-success">Approve all</button>
-            </form>
-            {% endif %}
         </div>
     </div>
     {% endif %}

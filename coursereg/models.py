@@ -114,16 +114,13 @@ class Participant(models.Model):
     def get_status_desc(self):
         if self.is_drop:
             return 'Dropped this course'
-        if self.user.is_dcc_review_pending:
-            return 'Awaiting final DCC Approval'
         if self.grade == None:
-            if self.user.is_dcc_review_pending:
-                return 'Registered'
-            else:
+            if self.user.is_dcc_review_pending or self.user.is_adviser_review_pending:
                 return 'In progress'
+            else:
+                return 'Registered'
         else:
             return self.grade
-        return 'Unknown state'
 
     def get_reg_type_desc(self):
         if self.is_drop:
@@ -240,12 +237,14 @@ class Term(models.Model):
         return '%s %s' % (self.name, self.year)
 
     def clean(self):
-        if self.last_reg_date <= self.last_adviser_approval_date:
-            if self.last_adviser_approval_date <= self.last_instructor_approval_date:
-                if self.last_instructor_approval_date <= self.last_conversion_date:
-                    if self.last_conversion_date <= self.last_drop_date:
-                            if self.last_drop_date <= self.last_grade_date:
-                                return
+        if self.start_reg_date <= self.last_reg_date:
+            if self.last_reg_date <= self.last_adviser_approval_date:
+                if self.last_adviser_approval_date <= self.last_instructor_approval_date:
+                    if self.last_cancellation_date <= self.last_conversion_date:
+                        if self.last_instructor_approval_date <= self.last_conversion_date:
+                            if self.last_conversion_date <= self.last_drop_date:
+                                    if self.last_drop_date <= self.last_grade_date:
+                                        return
         raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
 
 class Course(models.Model):
@@ -267,6 +266,9 @@ class Course(models.Model):
 
     def is_last_reg_date_passed(self):
         return timezone.now() > self.term.last_reg_date
+
+    def is_last_cancellation_date_passed(self):
+        return timezone.now() > self.term.last_cancellation_date
 
     def is_last_adviser_approval_date_passed(self):
         return timezone.now() > self.term.last_adviser_approval_date
