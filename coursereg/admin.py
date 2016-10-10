@@ -401,7 +401,7 @@ class DepartmentAdmin(admin.ModelAdmin):
             user__department=dept,
             user__user_type=models.User.USER_TYPE_STUDENT,
             course__term__last_reg_date__range=[from_date, to_date]
-        ).order_by('user__degree', 'user__full_name')]
+        ).order_by('user__degree', 'is_drop', 'registration_type', 'user__full_name')]
         context = dict(
            self.admin_site.each_context(request),
            title='Report',
