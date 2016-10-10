@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-sys.path.append('/home/bhargava/git/bheemboy/courseRegrWebSite/courseRegrEnv/lib/python2.7/site-packages')
 
 
 if __name__ == "__main__":
