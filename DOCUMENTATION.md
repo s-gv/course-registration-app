@@ -6,25 +6,22 @@
 - [Management commands](#management-commands)
 - [Config options](#config-options)
 - [DB Schema](#db-schema)
-- [URLs](#urls)
 - [Misc](#misc)
 
 ## Overview
 Coursereg is a webapp for managing course registrations at academic institutions. Students can register for courses on the Coursereg website. The registrations can be reviewed by the student's adviser, the relevant course instructor, and department admins. After the registration is complete, students can opt to change the registration type (Credit, Audit, etc.) or drop the course within the specified date. On completion of the course, instructors can assign grades.
 
-There are four types of users in this webapp: (1) Student (2) Faculty (3) Department admin (4) Superuser. Faculty have two roles: (1) Adviser (2) Instructor. They can review courses taken by their advisees and have access to a list of students who have applied for a course they are instructing. A department admin has access to every course taken by a student in a department and can generate reports for the entire department. The superuser has full database access and can login as any other user in the system. 
+There are four types of users in this webapp: (1) Student (2) Faculty (3) Department admin (4) Superuser. Faculty have two roles: (1) Adviser (2) Instructor. They can review courses taken by their advisees and have access to a list of students who have applied for a course they are instructing. A department admin has access to every course taken by a student in a department and can generate reports for the entire department. The superuser has full database access and can login as any other user in the system.
 
 TODO: A YouTube screencast.
 
 ## Features
 - E-mail notification is sent when a course is dropped.
-- Bulk upload users from a CSV file.
+- Bulk upload users, courses from a CSV file.
 - Superuser can login as any user.
 - Department-wise report in CSV/PDF.
-- Faculty can export registered students in CSV/PDF.
+- Faculty can export registered students to PDF/CSV.
 - Layout is mobile friendly.
-
-TODO: Rest of features worth mentioning.
 
 ## Dependencies
 - Python 2.7
@@ -60,8 +57,6 @@ These options can be configured by the superuser in the admin interface.
   - Value: `0` to not allow faculty to add courses for their advisees
 - Key: `contact_email`
   - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
-- Key: `num_days_before_last_reg_date_course_registerable`
-  - Value: An integer number of days before the last registration date that students can begin registering for courses (ex: `60`).
 
 ## DB Schema
 Tables with sample rows:
@@ -79,19 +74,35 @@ Tables with sample rows:
 | MTech |   True    |
 | ME    |   False   |
 
-TODO: Rest of the tables
+### Grade
+|  Name   | Points | should_count_towards_cgpa | is_active |
+|---------|--------|---------------------------|-----------|
+| S grade |  8.0   |        True               |  True     |
+| A grade |  7.0   |        True               |  True     |
 
-## URLS
-Note: These URLs may change in even minor revisions and are not to be used as a public API.
+### RegistrationType
+|   Name   | should_count_towards_cgpa | is_active |
+|----------|---------------------------|-----------|
+|  Credit  |          True             |   True    |
+|  Audit   |          True             |   True    |
 
-- `/participants/<participant_id>/delete`
-  - Participant row with ID `<participant_id>` is deleted if the user signed in is authorized to perform the action.
-  - POST only. 
-  - Parameters: 
-    - `next` (optional) - URL to re-direct to. Defaults to the index page.
+### Faq
+|  faq_for  |          question        |          answer           |
+|-----------|--------------------------|---------------------------|
+|  STUDENT  | Question from student?   | Sample answer             |
+|  FACULTY  | Question from faculty?   | Sample answer 2           |
 
-TODO: Rest of URLs
+### Config
+|        key          |          value         |
+|---------------------|------------------------|
+|  contact_email      |    admin@example.com   |
+
+### Notification
+|      user       |  origin  |          message          | is_student_acknowledged | is_adviser_acknowledged | is_dcc_acknowledged | created_at |
+|-----------------|----------|---------------------------|-------------------------|-------------------------|---------------------|------------|
+|  user1@abc.com  | ADVISER  | Enrolled for Course X     |           False         |          False          |        False        |  8/7/2016  |
+|  user2@abc.com  | DCC      | Too few courses           |           False         |          False          |        False        |  8/9/2016  |
 
 ## Misc
-- At least one registration type (ex: Credit, Audit) must be added by the admin before other users login.
+- At least one registration type (ex: Credit, Audit) and Degree (ex: PhD, ME) must be added by the admin before students can login and register for courses.
 - A fatal error occurs if a student with `adviser` NULL logs in. Always assign `adviser` when creating student users.
