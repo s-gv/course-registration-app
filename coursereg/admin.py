@@ -36,7 +36,7 @@ class CourseInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'grade', 'should_count_towards_cgpa', 'comment')
+    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'grade', 'should_count_towards_cgpa', 'lock_from_student')
     ordering = ('-course__term__last_reg_date',)
 
 class CustomUserCreationForm(UserCreationForm):
@@ -65,13 +65,13 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'cgpa', 'telephone', 'is_active', 'is_dcc_review_pending', 'auto_advisee_approve')}),
+        (None, {'fields': ('full_name', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'cgpa', 'telephone', 'is_active', 'is_dcc_review_pending', 'is_adviser_review_pending')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'full_name', 'password1', 'password2', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'auto_advisee_approve', 'date_joined')}
+            'fields': ('email', 'full_name', 'password1', 'password2', 'department', 'user_type', 'adviser', 'degree', 'sr_no', 'telephone', 'date_joined')}
         ),
     )
     form = UserChangeForm
@@ -461,6 +461,7 @@ class TermAdmin(admin.ModelAdmin):
                 term.last_reg_date = add_one_year(term.last_reg_date)
                 term.last_adviser_approval_date = add_one_year(term.last_adviser_approval_date)
                 term.last_instructor_approval_date = add_one_year(term.last_instructor_approval_date)
+                term.last_cancellation_date = add_one_year(term.last_cancellation_date)
                 term.last_conversion_date = add_one_year(term.last_conversion_date)
                 term.last_drop_date = add_one_year(term.last_drop_date)
                 term.last_grade_date = add_one_year(term.last_grade_date)

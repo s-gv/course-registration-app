@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
                 ('last_reg_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_adviser_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_instructor_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('last_cancellation_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_conversion_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_drop_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_grade_date', models.DateTimeField(default=django.utils.timezone.now)),
@@ -64,6 +65,11 @@ class Migration(migrations.Migration):
             model_name='course',
             name='should_count_towards_cgpa',
             field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='course',
+            name='is_instructor_review_pending',
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='participant',
@@ -104,6 +110,11 @@ class Migration(migrations.Migration):
             model_name='degree',
             name='is_active',
             field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='is_adviser_review_pending',
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='department',

@@ -114,14 +114,13 @@ class Participant(models.Model):
     def get_status_desc(self):
         if self.is_drop:
             return 'Dropped this course'
-        if not self.is_adviser_approved:
-            return 'Awaiting adviser review'
-        if not self.is_instructor_approved:
-            return 'Adviser has approved. Awaiting instructor review'
-	if self.user.is_dcc_review_pending:
-	    return 'Awaiting final DCC Approval'
-        if (self.grade.id == get_default_grade() and (not self.user.is_dcc_review_pending)):
-            return 'Registered'
+        if self.user.is_dcc_review_pending:
+            return 'Awaiting final DCC Approval'
+        if self.grade == None:
+            if self.user.is_dcc_review_pending:
+                return 'Registered'
+            else:
+                return 'In progress'
         else:
             return self.grade
         return 'Unknown state'
@@ -156,6 +155,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     sr_no = models.CharField(max_length=200, default='-')
     telephone = models.CharField(max_length=100, default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
+    is_adviser_review_pending = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -164,10 +164,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-
-    def is_adviser_review_pending(self):
-        if self.user_type == User.USER_TYPE_STUDENT:
-            return Participant.objects.filter(user=self, is_adviser_approved=False).first()
 
     def is_instructor_review_pending(self):
         if self.user_type == User.USER_TYPE_STUDENT:
@@ -234,6 +230,7 @@ class Term(models.Model):
     last_reg_date = models.DateTimeField(default=timezone.now)
     last_adviser_approval_date = models.DateTimeField(default=timezone.now)
     last_instructor_approval_date = models.DateTimeField(default=timezone.now)
+    last_cancellation_date = models.DateTimeField(default=timezone.now)
     last_conversion_date = models.DateTimeField(default=timezone.now)
     last_drop_date = models.DateTimeField(default=timezone.now)
     last_grade_date = models.DateTimeField(default=timezone.now)
@@ -258,6 +255,7 @@ class Course(models.Model):
     term = models.ForeignKey(Term)
     credits = models.CharField(max_length=100, default='', verbose_name="Credits (ex: 3:0)")
     should_count_towards_cgpa = models.BooleanField(default=True)
+    is_instructor_review_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -265,8 +263,7 @@ class Course(models.Model):
         return sum(int(c) for c in re.split(r'[^0-9]', self.credits) if c.isdigit())
 
     def is_start_reg_date_passed(self):
-        return timezone.now() > self.term.last_reg_date-timedelta(
-            days=Config.num_days_before_last_reg_date_course_registerable())
+        return timezone.now() > self.term.start_reg_date
 
     def is_last_reg_date_passed(self):
         return timezone.now() > self.term.last_reg_date
@@ -285,9 +282,6 @@ class Course(models.Model):
 
     def is_last_grade_date_passed(self):
         return timezone.now() > self.term.last_grade_date
-
-    def is_instructor_review_pending(self):
-        return Participant.objects.filter(course=self, is_adviser_approved=True, is_instructor_approved=False).first()
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s, %s)' % (self.credits, self.term)
