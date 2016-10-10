@@ -23,14 +23,6 @@ class Migration(migrations.Migration):
             name='term',
         ),
         migrations.RemoveField(
-            model_name='participant',
-            name='grade',
-        ),
-        migrations.RemoveField(
-            model_name='participant',
-            name='state',
-        ),
-        migrations.RemoveField(
             model_name='course',
             name='last_reg_date',
         ),
@@ -38,25 +30,42 @@ class Migration(migrations.Migration):
             model_name='course',
             name='last_drop_date',
         ),
-        migrations.RenameField(
-            model_name='participant',
-            old_name='new_grade',
-            new_name='grade',
-        ),
         migrations.AlterField(
-            model_name='participant',
-            name='grade',
-            field=models.ForeignKey(blank=True, default=coursereg.models.get_default_grade, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Grade'),
+            model_name='course',
+            name='new_term',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
         migrations.RenameField(
             model_name='course',
             old_name='new_term',
             new_name='term',
         ),
-        migrations.AlterField(
+        migrations.RenameField(
             model_name='course',
-            name='term',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
+            old_name='new_credits',
+            new_name='credits',
+        ),
+
+        migrations.RemoveField(
+            model_name='participant',
+            name='state',
+        ),
+        migrations.RemoveField(
+            model_name='participant',
+            name='is_adviser_approved',
+        ),
+        migrations.RemoveField(
+            model_name='participant',
+            name='is_instructor_approved',
+        ),
+        migrations.RemoveField(
+            model_name='participant',
+            name='grade',
+        ),
+        migrations.RenameField(
+            model_name='participant',
+            old_name='new_grade',
+            new_name='grade',
         ),
         migrations.AlterField(
             model_name='participant',
@@ -73,9 +82,10 @@ class Migration(migrations.Migration):
             name='abbreviation',
             field=models.CharField(max_length=100, unique=True),
         ),
-        migrations.RenameField(
-            model_name='course',
-            old_name='new_credits',
-            new_name='credits',
+        migrations.AlterField(
+            model_name='notification',
+            name='origin',
+            field=models.IntegerField(choices=[(0, 'Adviser'), (1, 'Instructor'), (2, 'DCC'), (3, 'Other'), (4, 'Student')], default=2),
         ),
+
     ]

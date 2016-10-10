@@ -31,6 +31,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
                 ('year', models.CharField(max_length=4)),
+                ('start_reg_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_reg_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_adviser_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
                 ('last_instructor_approval_date', models.DateTimeField(default=django.utils.timezone.now)),
@@ -51,23 +52,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='course',
-            name='auto_instructor_approve',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='auto_adviser_approve',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='course',
             name='new_credits',
             field=models.CharField(default='', max_length=100, verbose_name='Credits (ex: 3:0)'),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='should_count_towards_cgpa',
-            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='course',
@@ -75,9 +61,14 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='coursereg.Term'),
         ),
         migrations.AddField(
-            model_name='department',
-            name='abbreviation',
-            field=models.CharField(max_length=100, null=True, unique=True),
+            model_name='course',
+            name='should_count_towards_cgpa',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='participant',
+            name='lock_from_student',
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='participant',
@@ -101,11 +92,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='participant',
-            name='comment',
-            field=models.CharField(default='', max_length=300, blank=True),
-        ),
-        migrations.AddField(
-            model_name='participant',
             name='created_at',
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
@@ -125,8 +111,8 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='auto_advisee_approve',
-            field=models.BooleanField(default=False),
+            model_name='department',
+            name='abbreviation',
+            field=models.CharField(max_length=100, null=True, unique=True),
         ),
     ]

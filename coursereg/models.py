@@ -55,12 +55,6 @@ class Grade(models.Model):
     def __unicode__(self):
         return self.name
 
-def get_default_grade():
-    default_grade = Grade.objects.filter(name="Not graded", should_count_towards_cgpa=False, is_active=True).first()
-    if not default_grade:
-        default_grade = Grade.objects.create(name="Not graded", should_count_towards_cgpa=False, points=0)
-    return default_grade.id
-
 def get_recent_last_reg_date():
     ''' Legacy function needed for the first DB migration '''
     recent_course = Course.objects.order_by('-updated_at').first()
@@ -99,11 +93,8 @@ class Participant(models.Model):
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
     registration_type = models.ForeignKey('RegistrationType', null=True, on_delete=models.CASCADE)
     is_drop = models.BooleanField(default=False)
-    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, default=get_default_grade)
-    is_adviser_approved = models.BooleanField(default=False)
-    is_instructor_approved = models.BooleanField(default=False)
+    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, null=True)
     should_count_towards_cgpa = models.BooleanField(default=True)
-    comment = models.CharField(max_length=300, default='', blank=True)
     lock_from_student = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -165,9 +156,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     sr_no = models.CharField(max_length=200, default='-')
     telephone = models.CharField(max_length=100, default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
-    is_dcc_sent_notification = models.BooleanField(default=False)
-    is_dcc_approved_registration = models.BooleanField(default=False)
-    auto_advisee_approve = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -242,6 +230,7 @@ class Notification(models.Model):
 class Term(models.Model):
     name = models.CharField(max_length=100)
     year = models.CharField(max_length=4)
+    start_reg_date = models.DateTimeField(default=timezone.now)
     last_reg_date = models.DateTimeField(default=timezone.now)
     last_adviser_approval_date = models.DateTimeField(default=timezone.now)
     last_instructor_approval_date = models.DateTimeField(default=timezone.now)
@@ -269,8 +258,6 @@ class Course(models.Model):
     term = models.ForeignKey(Term)
     credits = models.CharField(max_length=100, default='', verbose_name="Credits (ex: 3:0)")
     should_count_towards_cgpa = models.BooleanField(default=True)
-    auto_adviser_approve = models.BooleanField(default=False)
-    auto_instructor_approve = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

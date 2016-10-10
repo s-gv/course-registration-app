@@ -47,6 +47,7 @@ def migrate_term(Term, term, last_reg_date, last_drop_date):
         new_term = Term.objects.create(
             name=name,
             year=year,
+            start_reg_date=last_reg_date - timedelta(days=90),
             last_reg_date=last_reg_date,
             last_adviser_approval_date=last_reg_date,
             last_instructor_approval_date=last_reg_date,
@@ -64,10 +65,7 @@ def migrate_course_table(apps, schema_editor):
         course.new_term = migrate_term(Term, course.term, course.last_reg_date, course.last_drop_date)
         course.new_credits = '%s:0' % course.credits
         course.should_count_towards_cgpa = True
-        course.auto_instructor_approve = False
-        course.auto_adviser_approve = False
         if course.credits == 0:
-            course.auto_instructor_approve = True
             course.should_count_towards_cgpa = False
         course.save()
 
@@ -89,13 +87,17 @@ def migrate_grade(Participant, Grade, grade):
         (GRADE_D, 'D grade'),
         (GRADE_F, 'F grade'),
     )
+
+    if grade == GRADE_NA:
+        return None
+
     GRADE_POINTS = [0, 8.0, 7.0, 6.0, 5.0, 4.0, 0.0]
     new_grade_name = GRADE_CHOICES[grade][1]
     ng = Grade.objects.filter(name=new_grade_name).first()
     if not ng:
         ng = Grade.objects.create(
             name=new_grade_name,
-            should_count_towards_cgpa=(grade != GRADE_NA),
+            should_count_towards_cgpa=True,
             points=GRADE_POINTS[grade],
             is_active=True
         )
@@ -135,7 +137,6 @@ def migrate_participant_table(apps, schema_editor):
     for participant in Participant.objects.all():
         participant.registration_type = migrate_participant_state(Participant, RegistrationType, participant)
         participant.is_drop = (participant.state == STATE_DROP)
-        participant.is_drop_mentioned = False
         participant.new_grade = migrate_grade(Participant, Grade, participant.grade)
         participant.should_count_towards_cgpa = participant.course.should_count_towards_cgpa
         participant.created_at = timezone.now()

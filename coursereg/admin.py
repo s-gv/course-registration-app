@@ -26,7 +26,7 @@ class ParticipantInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('user',)
-    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa','comment')
+    fields = ('user', 'participant_type', 'registration_type', 'is_drop', 'grade', 'should_count_towards_cgpa', 'lock_from_student')
     ordering = ('-participant_type',)
 
 class CourseInline(admin.TabularInline):
@@ -36,7 +36,7 @@ class CourseInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     raw_id_fields = ('course',)
-    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'grade', 'should_count_towards_cgpa', 'comment')
+    fields = ('course', 'participant_type', 'registration_type', 'is_drop', 'grade', 'should_count_towards_cgpa', 'comment')
     ordering = ('-course__term__last_reg_date',)
 
 class CustomUserCreationForm(UserCreationForm):
@@ -83,7 +83,7 @@ class CustomUserAdmin(UserAdmin):
     readonly_fields = ('cgpa',)
     ordering = ('-date_joined',)
     inlines = [CourseInline]
-    actions = ['make_inactive', 'make_active', 'clear_dcc_review', 'enable_auto_advisee_approval', 'disable_auto_advisee_approval']
+    actions = ['make_inactive', 'make_active', 'clear_dcc_review']
     #change_list_template = 'admin/coursereg/user/custom_user_changelist.html
 
     def get_urls(self):
@@ -261,16 +261,6 @@ class CustomUserAdmin(UserAdmin):
         self.message_user(request, "%s users marked as active." % n)
     make_active.short_description = "Make selected users active"
 
-    def enable_auto_advisee_approval(self, request, queryset):
-        n = queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=True)
-        self.message_user(request, "Auto advisee approval enabled for %s users." % n)
-    enable_auto_advisee_approval.short_description = "Enable auto advisee approval for selected faculty"
-
-    def disable_auto_advisee_approval(self, request, queryset):
-        n = queryset.filter(user_type=User.USER_TYPE_FACULTY).update(auto_advisee_approve=False)
-        self.message_user(request, "Auto advisee approval disabled for %s users." % n)
-    disable_auto_advisee_approval.short_description = "Disable auto advisee approval for selected faculty"
-
     def clear_dcc_review(self, request, queryset):
         n = queryset.update(is_dcc_review_pending=False)
         self.message_user(request, "DCC review cleared for %s users." % n)
@@ -280,10 +270,10 @@ class CustomUserAdmin(UserAdmin):
         return format_html("<a href='{url}'>Login</a>", url=reverse('admin:coursereg_user_sudo_login', args=[user.id]))
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('num', 'title', 'term', 'department', 'should_count_towards_cgpa', 'auto_instructor_approve')
+    list_display = ('num', 'title', 'credits', 'term', 'department', 'should_count_towards_cgpa')
     ordering = ('-term__last_reg_date', 'department__name', 'num', 'title')
     search_fields = ('title', 'num', 'term__name', 'term__year')
-    list_filter = ('department', 'auto_adviser_approve', 'auto_instructor_approve', 'should_count_towards_cgpa')
+    list_filter = ('department', 'should_count_towards_cgpa')
     raw_id_fields = ('term',)
     inlines = [ParticipantInline]
 
@@ -378,22 +368,11 @@ class CourseAdmin(admin.ModelAdmin):
         return render(request, "admin/coursereg/course/bulk_add_courses.html", context)
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved', 'should_count_towards_cgpa', 'grade', 'adviser', 'instructor','comment')
+    list_display = ('user', 'course', 'participant_type', 'registration_type', 'is_drop', 'should_count_towards_cgpa', 'lock_from_student', 'grade')
     ordering = ('-course__term__last_reg_date', 'user__full_name')
     search_fields = ('user__email', 'user__full_name', 'course__title', 'course__num', 'course__term__last_reg_date')
     raw_id_fields = ('user', 'course')
-    list_filter = ('participant_type', 'registration_type', 'is_drop', 'is_adviser_approved', 'is_instructor_approved')
-    actions = ['adviser_approve', 'instructor_approve']
-
-    def adviser_approve(self, request, queryset):
-        n = queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_adviser_approved=True)
-        self.message_user(request, 'Adviser approved %s enrollment requests' % n)
-    adviser_approve.short_description = 'Adviser approve selected students'
-
-    def instructor_approve(self, request, queryset):
-        n = queryset.filter(participant_type=Participant.PARTICIPANT_STUDENT).update(is_instructor_approved=True)
-        self.message_user(request, 'Instructor approved %s enrollment requests' % n)
-    instructor_approve.short_description = 'Instructor approve selected students'
+    list_filter = ('participant_type', 'registration_type', 'is_drop')
 
 class FaqAdmin(admin.ModelAdmin):
     list_display = ('question', 'faq_for')
@@ -420,8 +399,6 @@ class DepartmentAdmin(admin.ModelAdmin):
             to_date = utils.parse_datetime_str(request.GET['to_date'])
         participants = [p for p in models.Participant.objects.filter(
             user__department=dept,
-            is_adviser_approved=True,
-            is_instructor_approved=True,
             user__user_type=models.User.USER_TYPE_STUDENT,
             course__term__last_reg_date__range=[from_date, to_date]
         ).order_by('user__degree', 'user__full_name')]
@@ -480,6 +457,7 @@ class TermAdmin(admin.ModelAdmin):
                 old_term_id = term.id
                 term.pk = None
                 term.year = str(int(term.year)+1)
+                term.start_reg_date = add_one_year(term.start_reg_date)
                 term.last_reg_date = add_one_year(term.last_reg_date)
                 term.last_adviser_approval_date = add_one_year(term.last_adviser_approval_date)
                 term.last_instructor_approval_date = add_one_year(term.last_instructor_approval_date)
