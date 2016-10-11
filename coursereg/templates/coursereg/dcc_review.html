@@ -2,93 +2,27 @@
 
 {% block body %}
 {% include "coursereg/nav.html" %}
+
 <div class="container" id="maincontainer">
-    {% if messages %}
-    {% for message in messages %}
+{% for degree in degrees %}
     <div class="row top-buffer-1">
-        <div class="col-md-12">
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-            <div class="alert alert-danger" role="alert">{{ message }}</div>
-            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
-            <div class="alert alert-warning" role="alert">{{ message }}</div>
-            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-            <div class="alert alert-success" role="alert">{{ message }}</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endfor %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Review pending</h2>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-md-12">
             <table class="table table-striped">
+                <caption>{{ degree }} students</caption>
+                <tbody>
                 {% for student in all_active_students %}
-                <tr>
-                    {% if student.is_adviser_or_instructor_pending %}
-                    <td>
-                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
-                        <span class="label label-primary">in progress</span>
-                    </td>
-                    {% elif student.is_dcc_review_pending %}
-                    <td>
-			{% if student.is_dcc_sent_notification %}
-                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
-                        <span class="label label-danger">Notified</span>
-			{% else %}
-                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a> ({{ student.email }})
-                   	{% endif %}
-                    </td>
+                    {% if student.degree == degree %}
+                        <tr><td>
+                            <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
+                            ({{ student.email }})
+                            {% if student.is_dcc_review_pending %}
+                                <span class="badge">new</span>
+                            {% endif %}
+                        </tr></td>
                     {% endif %}
-                </tr>
                 {% endfor %}
+                </tbody>
             </table>
-        </div>
-    </div>
-    {% if faculty_approval_pending %}
-    <div class="row">
-        <div class="col-md-12">
-            <form class="form-inline" action="{% url 'coursereg:dcc_remind' %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" id="sendReminder" class="btn btn-default btn-sm">
-                    Send reminder e-mail to faculty with pending approvals
-                </button>
-            </form>
-        </div>
-    </div>
-    {% endif %}
-
-<div class="container" id="maincontainer">
-
-{% for degree in Degree %}
-    <div class="row top-buffer-1">
-        <div class="col-md-12">
-            <h2>{{degree}} students</h2>
-            		  <table class="table table-striped">
-                      {% for student in all_active_students %}
-                        <tr>
-                          {% if student.degree == degree %}
-                            {% if student.is_dcc_approved_registration %}
-          			               <td>
-          			                    <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-          			                       ({{ student.email }})
-          			                    <span class="label label-success">Registered</span>
-          			               </td>
-                            {% else %}
-          			              <td>
-          			                   <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-          			                      ({{ student.email }})
-          			              </td>
-          			            {% endif %}
-                        {% endif %}
-                      </tr>
-                    {% endfor %}
-                </table>
         </div>
     </div>
 {% endfor %}

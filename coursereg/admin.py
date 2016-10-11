@@ -76,7 +76,7 @@ class CustomUserAdmin(UserAdmin):
     )
     form = UserChangeForm
     add_form = CustomUserCreationForm
-    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'cgpa', 'date_joined', 'is_active', 'login_as')
+    list_display = ('email', 'full_name', 'user_type', 'degree', 'department', 'telephone', 'date_joined', 'is_active', 'login_as')
     list_filter = ('is_active', 'user_type', 'degree', 'department')
     search_fields = ('email', 'full_name')
     raw_id_fields = ('adviser',)

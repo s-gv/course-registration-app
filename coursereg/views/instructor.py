@@ -36,7 +36,7 @@ def detail(request, course_id):
     course.save()
 
     if not course.is_last_adviser_approval_date_passed():
-        messages.warning(request, 'Students can still apply for this course! Please review applications after the last date for applying (%s).' % course.term.last_adviser_approval_date)
+        messages.warning(request, 'Registration for this course is still open. Please review applications after the last date for applying (%s).' % course.term.last_adviser_approval_date)
 
     context = {
         'user_type': 'faculty',
