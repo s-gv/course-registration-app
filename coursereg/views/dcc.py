@@ -87,6 +87,7 @@ def approve(request, student_id):
     if not student or student.department != request.user.department:
         raise PermissionDenied
     student.is_dcc_review_pending = False
+    student.is_dcc_sent_notification = False
     student.save()
     models.Notification.objects.filter(user=student).update(is_dcc_acknowledged=True)
     messages.success(request, 'Courses registered by %s approved.' % student.full_name)

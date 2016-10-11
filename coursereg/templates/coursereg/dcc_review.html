@@ -4,6 +4,23 @@
 {% include "coursereg/nav.html" %}
 
 <div class="container" id="maincontainer">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 {% for degree in degrees %}
     <div class="row top-buffer-1">
         <div class="col-md-12">
@@ -15,7 +32,9 @@
                         <tr><td>
                             <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
                             ({{ student.email }})
-                            {% if student.is_dcc_review_pending %}
+                            {% if student.is_dcc_sent_notification %}
+                                <span class="badge">notified</span>
+                            {% elif student.is_dcc_review_pending %}
                                 <span class="badge">new</span>
                             {% endif %}
                         </tr></td>

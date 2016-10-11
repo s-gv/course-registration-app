@@ -117,6 +117,11 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
+            model_name='user',
+            name='is_dcc_sent_notification',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
             model_name='department',
             name='is_active',
             field=models.BooleanField(default=True),

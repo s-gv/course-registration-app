@@ -51,7 +51,7 @@ def migrate_term(Term, term, last_reg_date, last_drop_date):
             last_reg_date=last_reg_date,
             last_adviser_approval_date=last_reg_date,
             last_instructor_approval_date=last_reg_date,
-            last_cancellation_date=last_instructor_approval_date + timedelta(days=3),
+            last_cancellation_date=last_reg_date + timedelta(days=5),
             last_conversion_date=last_drop_date,
             last_drop_date=last_drop_date,
             last_grade_date=last_reg_date + timedelta(days=150),
