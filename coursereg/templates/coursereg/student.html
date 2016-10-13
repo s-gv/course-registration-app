@@ -2,6 +2,7 @@
 
 {% block body %}
 {% include "coursereg/nav.html" %}
+
 <div class="container" id="maincontainer">
     <div class="row">
         <div class="col-md-12">
@@ -45,7 +46,7 @@
                         <select class="form-control" id="course_select_box" name="course_id">
                             <option value="">No courses available</option>
                             {% for course in courses %}
-                                <option value="{{ course.id }}">{{ course }}</option>
+                                <option value="{{ course.id }}" title="Timings: {{course.timings}}">{{ course }}</option>
                             {% endfor %}
                         </select>
                     </label>
@@ -95,9 +96,9 @@
                             <div class="row">
                                 <div class="col-md-6 col-xs-12">
                                     {% if participant.should_count_towards_cgpa %}
-                                    <p>
+                                    <p title="Timings: {{participant.course.timings}}">
                                     {% else %}
-                                    <p class="text-muted">
+                                    <p title="Timings: {{participant.course.timings}}" class="text-muted">
                                     {% endif %}
                                         {{ participant.course }} <span class="badge">{{ participant.get_reg_type_desc }}</span>
                                     </p>

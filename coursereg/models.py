@@ -258,6 +258,7 @@ class Course(models.Model):
     is_instructor_review_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    timings = models.CharField(max_length=100, default='Not fixed yet')
 
     def get_num_credits():
         return sum(int(c) for c in re.split(r'[^0-9]', self.credits) if c.isdigit())

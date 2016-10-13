@@ -72,6 +72,12 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="courseCreditSplit" class="col-sm-3 control-label">Timings</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="courseTime" name="timings" value="{{ course.timings }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="courseCoInstructor" class="col-sm-3 control-label">Co-instructors</label>
                     <div class="col-sm-9">
                         <select id="courseCoInstructor" name="coinstructor" class="form-control" multiple="multiple">

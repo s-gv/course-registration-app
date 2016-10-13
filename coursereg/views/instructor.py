@@ -120,6 +120,7 @@ def course_update(request, course_id):
             num=num,
             term=term,
             credits=request.POST['credits'],
+            timings=request.POST['timings'],
             should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
         )
         models.Participant.objects.filter(
