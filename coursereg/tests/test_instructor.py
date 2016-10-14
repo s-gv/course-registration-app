@@ -32,8 +32,7 @@ class InstructorTests(TestCase):
 	cls.credit = RegistrationType.objects.create(name='Credit',should_count_towards_cgpa=True,is_active=True)
 	cls.audit = RegistrationType.objects.create(name='Audit',should_count_towards_cgpa=False,is_active=True)
 	cls.participant = Participant.objects.create(user=charles, course=cls.course,
-            participant_type=Participant.PARTICIPANT_INSTRUCTOR, registration_type=cls.credit, grade=cls.s_grade,
-            is_adviser_approved=True, is_instructor_approved=True)
+	participant_type=Participant.PARTICIPANT_INSTRUCTOR, registration_type=cls.credit, grade=cls.s_grade)
         
     def setUp(self):
         self.client = Client()
@@ -42,40 +41,27 @@ class InstructorTests(TestCase):
     def tearDown(self):
         logging.disable(logging.NOTSET)
 
-    def test_instructor_approve(self):
-	participant = Participant.objects.create(user=self.ben, course=self.course,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=False)
-        self.client.login(email='charles@test.com', password='charles12345')
-        response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
-                {'action': 'approve', 'origin': 'instructor'}, follow=True)
-	self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course,is_instructor_approved=True))
-#        self.assertEqual(response.status_code, 403)
+    def test_instructor_approve_credit(self):
+		participant = Participant.objects.create(user=self.ben, course=self.course,
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
+		self.client.login(email='charles@test.com', password='charles12345')
+		response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
+                {'action': 'reg_type_change', 'origin': 'instructor','reg_type': '1'}, follow=True)
+		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course,registration_type = '1'))
 
+    def test_instructor_approve_audit(self):
+		participant = Participant.objects.create(user=self.ben, course=self.course,
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
+		self.client.login(email='charles@test.com', password='charles12345')
+		response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
+                {'action': 'reg_type_change', 'origin': 'instructor','reg_type': '2'}, follow=True)
+		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course))
+		
     def test_instructor_reject(self):
-        participant = Participant.objects.create(user=self.ben, course=self.course,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=False)
-        self.client.login(email='charles@test.com', password='charles12345')
-        response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
-                {'action': 'reject', 'origin': 'instructor'}, follow=True)
-        self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course))
-
-    def test_instructor_approve_all(self):
-	participant = Participant.objects.create(user=self.ben, course=self.course,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=False)
-	participant = Participant.objects.create(user=self.alyssa, course=self.course,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=False)
-	participant = Participant.objects.create(user=self.rama, course=self.course,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=False)
-        self.client.login(email='charles@test.com', password='charles12345')
-        response = self.client.post(reverse('coursereg:participants_approve_all'),
-                {'course_id': self.course.id, 'origin': 'instructor'}, follow=True)
-	self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course,is_instructor_approved=True))
-	self.assertTrue(Participant.objects.filter(user=self.alyssa, course=self.course,is_instructor_approved=True))
-	self.assertTrue(Participant.objects.filter(user=self.rama, course=self.course,is_instructor_approved=True))
-	#self.assertEqual(response.status_code, 403)
+		participant = Participant.objects.create(user=self.ben, course=self.course,
+			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
+		self.client.login(email='charles@test.com', password='charles12345')
+		response = self.client.post(reverse('coursereg:participants_delete',args=[participant.id]),
+			{'origin': 'instructor'}, follow=True)
+		self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course))
 
