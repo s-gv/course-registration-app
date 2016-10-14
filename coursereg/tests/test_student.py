@@ -18,6 +18,7 @@ class StudentTests(TestCase):
             name='Aug-Dec',
             year='2016',
             last_reg_date=tomorrow,
+            last_cancellation_date=tomorrow, 
             last_adviser_approval_date=tomorrow,
             last_instructor_approval_date=tomorrow,
             last_conversion_date=tomorrow,
@@ -29,6 +30,7 @@ class StudentTests(TestCase):
             name='Aug-Dec',
             year='2016',
             last_reg_date=yesterday,
+            last_cancellation_date=yesterday,
             last_adviser_approval_date=yesterday,
             last_instructor_approval_date=yesterday,
             last_conversion_date=yesterday,
@@ -37,8 +39,8 @@ class StudentTests(TestCase):
             last_grade_date=yesterday
         )
         cls.s_grade = Grade.objects.create(name="S grade", points=7.5, should_count_towards_cgpa=True)
-        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=aug_term)
-        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, term=aug_term_expired)
+        cls.course_tomorrow = Course.objects.create(num='E0-232', title='Course Name', department=dept, term=aug_term, timings ='Not fixed yet')
+        cls.course_yesterday = Course.objects.create(num='E0-211', title='Noname', department=dept, term=aug_term_expired, timings ='Not fixed yet')
 	cls.credit = RegistrationType.objects.create(name='Credit',should_count_towards_cgpa=True,is_active=True)
 	cls.audit = RegistrationType.objects.create(name='Audit',should_count_towards_cgpa=False,is_active=True)
 
@@ -76,41 +78,38 @@ class StudentTests(TestCase):
 		self.client.login(email='ben@test.com', password='ben12345')
 		response = self.client.post(reverse('coursereg:participants_create'),
 			{'course_id': self.course_tomorrow.id, 'reg_type': 1, 'user_id': self.ben.id, 'origin': 'student'}, follow=True)
-		#self.assertTrue(any([p[5] == self.course_tomorrow for p in response.context['participants']]))
-		# Check with sagar
+		#self.assertTrue(any([p[5] == self.course_tomorrow for p in response.context['participants']])
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
 
     def test_was_course_removed(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=False, is_instructor_approved=False)
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
-        self.client.post(reverse('coursereg:participants_delete', args=[participant.id]), follow=True)
+        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]),{'origin': 'student'}, follow=True)
+        #self.assertEqual(response.status_code, 403)
         self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
         
     def test_was_student_not_able_to_delete_course_after_adviser_approval(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=True)
+        participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade, lock_from_student=True)
         self.client.login(email='ben@test.com', password='ben12345')
-        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]), follow=True)
+        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]),{'origin': 'student'}, follow=True)
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
 
     def test_was_student_not_able_to_delete_approved_course_after_last_reg_date(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=True)
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
-        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]), follow=True)
+        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]),{'origin': 'student'}, follow=True)
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
 
     def test_could_student_delete_graded_course(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
-            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,
-            is_adviser_approved=True, is_instructor_approved=True)
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
-        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]), follow=True)
+        response = self.client.post(reverse('coursereg:participants_delete', args=[participant.id]),{'origin': 'student'}, follow=True)
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
+
