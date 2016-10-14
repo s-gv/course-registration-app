@@ -187,6 +187,7 @@ def delete(request, participant_id):
         if participant.course.is_last_cancellation_date_passed(): raise PermissionDenied
         if participant.lock_from_student:
             messages.error(request, "Permission denied.")
+            raise PermissionDenied
         participant.delete()
         student = participant.user
         student.is_adviser_review_pending = True
