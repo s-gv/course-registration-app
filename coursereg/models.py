@@ -96,17 +96,10 @@ class Participant(models.Model):
     grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, null=True)
     should_count_towards_cgpa = models.BooleanField(default=True)
     lock_from_student = models.BooleanField(default=False)
+    is_adviser_reviewed = models.BooleanField(default=False)
+    is_instructor_reviewed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def adviser(self):
-	for p in User.objects.filter(email=self.user.email):
-	  return p.adviser
-
-    def instructor(self):
-	if self.participant_type == 0: # student
-	  for p in Participant.objects.filter(course=self.course,participant_type=1):
-	    return p.user.email
 
     def __unicode__(self):
         return self.user.email + " in %s - %s" % (self.course.num, self.course.title)
@@ -115,10 +108,7 @@ class Participant(models.Model):
         if self.is_drop:
             return 'Dropped this course'
         if self.grade == None:
-            if self.user.is_dcc_review_pending or self.user.is_adviser_review_pending:
-                return 'In progress'
-            else:
-                return 'Registered'
+            return 'In progress'
         else:
             return self.grade
 
@@ -153,7 +143,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     telephone = models.CharField(max_length=100, default='', blank=True)
     is_dcc_review_pending = models.BooleanField(default=False)
     is_dcc_sent_notification = models.BooleanField(default=False)
-    is_adviser_review_pending = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -163,15 +152,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    def is_instructor_review_pending(self):
+    def is_adviser_review_pending(self):
         if self.user_type == User.USER_TYPE_STUDENT:
-            return Participant.objects.filter(user=self, is_instructor_approved=False).first()
-
-    def is_adviser_or_instructor_pending(self):
-        if self.user_type == User.USER_TYPE_STUDENT:
-            return Participant.objects.filter(
-                Q(is_adviser_approved=False) | Q(is_instructor_approved=False),
-                user=self).first()
+            return Participant.objects.filter(user=self, is_adviser_reviewed=False).first()
 
     def cgpa(self):
         if self.user_type == User.USER_TYPE_STUDENT:
@@ -255,7 +238,6 @@ class Course(models.Model):
     term = models.ForeignKey(Term)
     credits = models.CharField(max_length=100, default='', verbose_name="Credits (ex: 3:0)")
     should_count_towards_cgpa = models.BooleanField(default=True)
-    is_instructor_review_pending = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     timings = models.CharField(max_length=100, default='Not fixed yet')
@@ -286,6 +268,9 @@ class Course(models.Model):
 
     def is_last_grade_date_passed(self):
         return timezone.now() > self.term.last_grade_date
+
+    def is_instructor_review_pending(self):
+        return Participant.objects.filter(course=self, user__user_type=User.USER_TYPE_STUDENT, is_instructor_reviewed=False).first()
 
     def __unicode__(self):
         return self.num + ' ' + self.title + ' (%s, %s)' % (self.credits, self.term)
@@ -326,13 +311,6 @@ class Config(models.Model):
         c = cls.objects.filter(key="can_adviser_add_courses_for_students").first()
         if c:
             return c.value == "1" or c.value == "true"
-
-    @classmethod
-    def num_days_before_last_reg_date_course_registerable(cls):
-        c = cls.objects.filter(key="num_days_before_last_reg_date_course_registerable").first()
-        if c:
-            return int(c.value)
-        return 60
 
     @classmethod
     def contact_email(cls):

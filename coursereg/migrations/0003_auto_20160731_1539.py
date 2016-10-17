@@ -53,6 +53,21 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='course',
+            name='timings',
+            field=models.CharField(default='Not fixed yet', max_length=100),
+        ),
+        migrations.RenameField(
+            model_name='participant',
+            old_name='is_adviser_approved',
+            new_name='is_adviser_reviewed',
+        ),
+        migrations.RenameField(
+            model_name='participant',
+            old_name='is_instructor_approved',
+            new_name='is_instructor_reviewed',
+        ),
+        migrations.AddField(
+            model_name='course',
             name='new_credits',
             field=models.CharField(default='', max_length=100, verbose_name='Credits (ex: 3:0)'),
         ),
@@ -65,11 +80,6 @@ class Migration(migrations.Migration):
             model_name='course',
             name='should_count_towards_cgpa',
             field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='is_instructor_review_pending',
-            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='participant',
@@ -110,11 +120,6 @@ class Migration(migrations.Migration):
             model_name='degree',
             name='is_active',
             field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='is_adviser_review_pending',
-            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='user',

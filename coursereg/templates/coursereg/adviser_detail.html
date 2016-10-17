@@ -95,6 +95,9 @@
                                         <div class="col-md-6 col-xs-12">
                                             <p class="text-muted">
                                                 {{ participant.get_status_desc }}
+                                                {% if not participant.is_adviser_reviewed %}
+                                                <span class="badge">new</span>
+                                                {% endif %}
                                             </p>
                                         </div>
                                     </div>
@@ -144,7 +147,7 @@
                                                     <li role="separator" class="divider"></li>
                                                     <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit()">Enable student edits</a></li>
                                                 {% endif %}
-                                                {% if not participant.course.is_last_adviser_approval_date_passed %}
+                                                {% if not participant.course.is_last_cancellation_date_passed %}
                                                     <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="origin" value="adviser">

@@ -82,6 +82,12 @@
                         <div class="col-md-6">
                             <p class="text-muted">
                                 {{ participant.get_status_desc }}
+                                {% if participant.course.is_last_adviser_approval_date_passed and not participant.is_adviser_reviewed %}
+                                (Adviser has not reviewed)
+                                {% endif %}
+                                {% if participant.course.is_last_instructor_approval_date_passed and not participant.is_instructor_reviewed %}
+                                (Instructor has not reviewed)
+                                {% endif %}
                             </p>
                         </div>
                     </div>

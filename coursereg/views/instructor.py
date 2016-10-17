@@ -19,7 +19,7 @@ def index(request):
         'nav_active': 'instructor',
         'user_email': request.user.email,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
-        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date', '-course__is_instructor_review_pending')]
+        'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date')]
     }
     return render(request, 'coursereg/instructor.html', context)
 
@@ -32,11 +32,8 @@ def detail(request, course_id):
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
         raise PermissionDenied
 
-    course.is_instructor_review_pending = False
-    course.save()
-
     if not course.is_last_adviser_approval_date_passed():
-        messages.warning(request, 'Registration for this course is still open. Please review applications after the last date for applying (%s).' % course.term.last_adviser_approval_date)
+        messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date (%s).' % course.term.last_adviser_approval_date)
 
     context = {
         'user_type': 'faculty',
@@ -45,9 +42,10 @@ def detail(request, course_id):
         'course': course,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
-        'participants': models.Participant.objects.filter(course=course,
-                            participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type')
+        'participants': list(models.Participant.objects.filter(course=course,
+                            participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type'))
     }
+    models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
     return render(request, 'coursereg/instructor_detail.html', context)
 
 @login_required

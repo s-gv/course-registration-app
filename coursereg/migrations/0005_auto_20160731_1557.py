@@ -45,18 +45,9 @@ class Migration(migrations.Migration):
             old_name='new_credits',
             new_name='credits',
         ),
-
         migrations.RemoveField(
             model_name='participant',
             name='state',
-        ),
-        migrations.RemoveField(
-            model_name='participant',
-            name='is_adviser_approved',
-        ),
-        migrations.RemoveField(
-            model_name='participant',
-            name='is_instructor_approved',
         ),
         migrations.RemoveField(
             model_name='participant',
