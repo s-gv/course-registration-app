@@ -60,12 +60,12 @@
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.full_name }}
                                     <span class="badge">{{ participant.get_reg_type_desc }}</span>
+                                    {% if not participant.is_instructor_reviewed %}
+                                    <span class="label label-success">new</span>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-3 col-xs-12">
                                     {{ participant.user.email }}
-                                    {% if not participant.is_instructor_reviewed %}
-                                    <span class="badge">new</span>
-                                    {% endif %}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
                                     {{ participant.user.department.abbreviation }}
@@ -89,6 +89,16 @@
                                                 <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right">
+                                                {% if is_manual_faculty_review_enabled and not participant.is_instructor_reviewed %}
+                                                    <form id="reviewForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}"method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
+                                                        <input type="hidden" name="origin" value="instructor">
+                                                        <input type="hidden" name="action" value="review">
+                                                    </form>
+                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit()">Mark as reviewed</a></li>
+                                                    <li role="separator" class="divider"></li>
+                                                {% endif %}
                                                 {% if not participant.course.is_last_instructor_approval_date_passed %}
                                                 <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="POST">
                                                     {% csrf_token %}

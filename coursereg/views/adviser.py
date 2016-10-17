@@ -30,12 +30,14 @@ def detail(request, student_id):
     is_last_reg_date_passed_for_all_courses = not any(not p.course.is_last_reg_date_passed() for p in models.Participant.objects.filter(user=student))
     if not is_last_reg_date_passed_for_all_courses:
         messages.warning(request, 'Registration is still open. Visit this page after the last application date.')
+    is_manual_faculty_review_enabled = models.Config.is_manual_faculty_review_enabled()
     context = {
         'user_type': 'faculty',
         'nav_active': 'adviser',
         'user_email': request.user.email,
         'student': student,
         'reg_types': models.RegistrationType.objects.filter(is_active=True),
+        'is_manual_faculty_review_enabled': is_manual_faculty_review_enabled,
         'can_adviser_add_courses_for_students': models.Config.can_adviser_add_courses_for_students(),
         'notifications': [(n.created_at, models.Notification.ORIGIN_CHOICES[n.origin][1], n.message)
             for n in models.Notification.objects.filter(user=student, is_adviser_acknowledged=False).order_by('-created_at')],
@@ -43,5 +45,6 @@ def detail(request, student_id):
         'courses': models.Course.objects.filter(term__last_adviser_approval_date__gte=timezone.now(),
                                                 term__start_reg_date__lte=timezone.now())
     }
-    models.Participant.objects.filter(user=student, is_adviser_reviewed=False).update(is_adviser_reviewed=True)
+    if not is_manual_faculty_review_enabled:
+        models.Participant.objects.filter(user=student, is_adviser_reviewed=False).update(is_adviser_reviewed=True)
     return render(request, 'coursereg/adviser_detail.html', context)

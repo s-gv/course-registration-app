@@ -71,6 +71,9 @@ def update(request, participant_id):
         if not models.Participant.objects.filter(course=participant.course,
                 user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
             raise PermissionDenied
+        if request.POST['action'] == 'review':
+            participant.is_instructor_reviewed = True
+            participant.save()
         if request.POST['action'] == 'grade':
             if participant.course.is_last_grade_date_passed(): raise PermissionDenied
             if request.POST['grade'] == 'null':
@@ -80,6 +83,9 @@ def update(request, participant_id):
             participant.save()
     elif request.POST['origin'] == 'adviser':
         if not participant.user.adviser == request.user: raise PermissionDenied
+        if request.POST['action'] == 'review':
+            participant.is_adviser_reviewed = True
+            participant.save()
         if request.POST['action'] == 'reg_type_change':
             reg_type = models.RegistrationType.objects.get(pk=request.POST['reg_type'])
             if participant.course.is_last_conversion_date_passed(): raise PermissionDenied

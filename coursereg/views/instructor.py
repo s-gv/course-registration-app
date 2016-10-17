@@ -35,17 +35,20 @@ def detail(request, course_id):
     if not course.is_last_adviser_approval_date_passed():
         messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date (%s).' % course.term.last_adviser_approval_date)
 
+    is_manual_faculty_review_enabled = models.Config.is_manual_faculty_review_enabled()
     context = {
         'user_type': 'faculty',
         'nav_active': 'instructor',
         'user_email': request.user.email,
         'course': course,
+        'is_manual_faculty_review_enabled': is_manual_faculty_review_enabled,
         'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants': list(models.Participant.objects.filter(course=course,
                             participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type'))
     }
-    models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
+    if not is_manual_faculty_review_enabled:
+        models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
     return render(request, 'coursereg/instructor_detail.html', context)
 
 @login_required

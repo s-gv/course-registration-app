@@ -318,3 +318,9 @@ class Config(models.Model):
         if c:
             return c.value
         return settings.DEFAULT_FROM_EMAIL
+
+    @classmethod
+    def is_manual_faculty_review_enabled(cls):
+        c = cls.objects.filter(key='is_manual_faculty_review_enabled').first()
+        if c:
+            return c.value == "1" or c.value == "true"

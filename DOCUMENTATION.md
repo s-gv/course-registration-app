@@ -57,6 +57,9 @@ These options can be configured by the superuser in the admin interface.
   - Value: `0` to not allow faculty to add courses for their advisees
 - Key: `contact_email`
   - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
+- Key: `is_manual_faculty_review_enabled`
+  - Value: `1` to have faculty manually click on course applications they have reviewed.
+  - Value: `0` to automatically tick as reviewed once faculty views a course application.
 
 ## DB Schema
 Tables with sample rows:
