@@ -189,17 +189,17 @@ def delete(request, participant_id):
         if participant.course.is_last_cancellation_date_passed(): raise PermissionDenied
         if participant.lock_from_student:
             messages.error(request, "Permission denied.")
-            raise PermissionDenied
-        participant.delete()
-        if participant.course.is_last_reg_date_passed():
-            msg = 'Registration for %s was cancelled by %s.' % (participant.course, student)
-            models.Notification.objects.create(user=participant.user,
-                                               origin=models.Notification.ORIGIN_STUDENT,
-                                               message=msg)
-            try:
-                send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
-            except:
-                messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
+        else:
+            participant.delete()
+            if participant.course.is_last_reg_date_passed():
+                msg = 'Registration for %s was cancelled by %s.' % (participant.course, student)
+                models.Notification.objects.create(user=participant.user,
+                                                   origin=models.Notification.ORIGIN_STUDENT,
+                                                   message=msg)
+                try:
+                    send_mail('Course registration changed', msg, settings.DEFAULT_FROM_EMAIL, [participant.user.adviser.email])
+                except:
+                    messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
     elif request.POST['origin'] == 'adviser':
         if request.user != participant.user.adviser: raise PermissionDenied
         if participant.course.is_last_adviser_approval_date_passed(): raise PermissionDenied
