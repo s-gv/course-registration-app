@@ -119,7 +119,7 @@ Tables with sample rows:
 | Aug-Dec | 2016 | 2016-05-20 15:51:20 | 2016-08-18 15:51:20 | 2016-08-18 15:51:20 | 2016-08-18 15:51:20 | 2016-08-23 15:51:20 | 2016-09-01 15:51:20 | 2016-09-01 15:51:20 | 2017-01-15 15:51:20 | True |
 
 ### User
-| password | last_login | is_superuser | email | full_name | user_type | date_joined | sr_no | is_dcc_review_pending | is_staff | is_active | degree_id | department_id | telephone | is_dcc_sent_notification | adviser_id |
+| password hash | last_login | is_superuser | email | full_name | user_type | date_joined | sr_no | is_dcc_review_pending | is_staff | is_active | degree_id | department_id | telephone | is_dcc_sent_notification | adviser_id |
 |----------|:-----------|:-------------|:-----|:----------|:----------|:------------|:------|:----------------------|:--------|:----------|:----------|:--------------|:----------|:-------------------------|:-----------|
 | password #1| 2016-10-18 15:32:45.757052 | False | dcc@ece.iisc.ernet.in | DCC | 2 | 2016-07-15 06:39:10 | - | False | False | True | NULL | 1 | - | False | NULL |
 | password #2 | 2016-10-18 07:39:12.092271 | False | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | False | False | True | 1 | 1 | 9912378901 | False | 2 | 
