@@ -7,6 +7,7 @@ from django.contrib import messages
 from datetime import date, timedelta
 from django.utils import timezone
 from coursereg import models
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import re
 
@@ -18,7 +19,7 @@ def index(request):
         'user_type': 'faculty',
         'nav_active': 'instructor',
         'user_email': request.user.email,
-        'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
+        'can_faculty_create_courses': settings.CAN_FACULTY_CREATE_COURSES,
         'courses': [p.course for p in models.Participant.objects.filter(user=request.user).order_by('-course__term__last_reg_date')]
     }
     return render(request, 'coursereg/instructor.html', context)
@@ -35,19 +36,18 @@ def detail(request, course_id):
     if not course.is_last_adviser_approval_date_passed():
         messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date (%s).' % course.term.last_adviser_approval_date)
 
-    is_manual_faculty_review_enabled = models.Config.is_manual_faculty_review_enabled()
     context = {
         'user_type': 'faculty',
         'nav_active': 'instructor',
         'user_email': request.user.email,
         'course': course,
-        'is_manual_faculty_review_enabled': is_manual_faculty_review_enabled,
-        'can_faculty_create_courses': models.Config.can_faculty_create_courses(),
+        'is_manual_faculty_review_enabled': settings.MANUAL_FACULTY_REVIEW,
+        'can_faculty_create_courses': settings.CAN_FACULTY_CREATE_COURSES,
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants': list(models.Participant.objects.filter(course=course,
                             participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type'))
     }
-    if not is_manual_faculty_review_enabled:
+    if not settings.MANUAL_FACULTY_REVIEW:
         models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
     return render(request, 'coursereg/instructor_detail.html', context)
 
@@ -55,7 +55,7 @@ def detail(request, course_id):
 def course_new(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
         raise PermissionDenied
-    if not models.Config.can_faculty_create_courses():
+    if settings.CAN_FACULTY_CREATE_COURSES:
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -102,7 +102,7 @@ def course_new(request):
 def course_update(request, course_id):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
         raise PermissionDenied
-    if not models.Config.can_faculty_create_courses():
+    if not settings.CAN_FACULTY_CREATE_COURSES:
         raise PermissionDenied
     course = models.Course.objects.get(id=course_id)
     if not models.Participant.objects.filter(

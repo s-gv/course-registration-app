@@ -21,7 +21,12 @@
     </div>
     {% endfor %}
     {% endif %}
-{% for degree in degrees %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <h2><small>Students</small></h2>
+        </div>
+    </div>
+    {% for degree in degrees %}
     <div class="row top-buffer-1">
         <div class="col-md-12">
             <table class="table table-striped">
@@ -33,9 +38,9 @@
                             <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
                             ({{ student.email }})
                             {% if student.is_dcc_sent_notification %}
-                                <span class="badge">notified</span>
+                            <span class="label label-danger">notified</span>
                             {% elif student.is_dcc_review_pending %}
-                                <span class="badge">new</span>
+                            <span class="label label-success">new</span>
                             {% endif %}
                         </tr></td>
                     {% endif %}
@@ -44,7 +49,48 @@
             </table>
         </div>
     </div>
-{% endfor %}
+    {% endfor %}
+    {% if pending_advisers %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <h2><small>Advisers with pending review</small></h2>
+        </div>
+        <div class="col-md-12">
+            <p>
+                {% for user in pending_advisers %}
+                {{ user.email }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% if pending_instructors %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <h2><small>Instructors with pending review</small></h2>
+        </div>
+        <div class="col-md-12">
+            <p>
+                {% for user in pending_instructors %}
+                {{ user.email }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% if pending_faculty %}
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <a href="mailto:{% for user in pending_faculty %}{{ user.email }},{% endfor %}?Subject=Course%20application%20review">Send a reminder email</a> to all faculty with pending review.
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}

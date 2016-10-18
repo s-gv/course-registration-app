@@ -1,5 +1,0 @@
-[
-    {"key": "can_faculty_create_courses", "value": "1"},
-    {"key": "can_adviser_add_courses_for_students", "value": "1"},
-    {"key": "contact_email", "value": "webmaster@localhost"}
-]

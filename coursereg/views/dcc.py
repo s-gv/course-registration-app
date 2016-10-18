@@ -48,10 +48,19 @@ def review(request):
     if not request.user.user_type == models.User.USER_TYPE_DCC:
         raise PermissionDenied
 
+    pending_advisers = set(p.user.adviser for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_adviser_reviewed=False))
+    pending_instructors = set(p.user.adviser for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False))
+    pending_faculty = pending_advisers | pending_instructors
+
+    print pending_advisers
+
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
         'user_email': request.user.email,
+        'pending_faculty': pending_faculty,
+        'pending_advisers': pending_advisers,
+        'pending_instructors': pending_instructors,
         'degrees': models.Degree.objects.all().order_by('name'),
         'all_active_students': [student for student in models.User.objects.filter(
             user_type=models.User.USER_TYPE_STUDENT,
@@ -67,6 +76,7 @@ def detail(request, student_id):
     student = models.User.objects.get(id=student_id)
     if not student or student.department != request.user.department:
         raise PermissionDenied
+
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',

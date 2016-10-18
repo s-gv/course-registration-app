@@ -292,35 +292,3 @@ class Faq(models.Model):
 
     def __unicode__(self):
         return self.question
-
-class Config(models.Model):
-    key = models.CharField(max_length=1000)
-    value = models.CharField(max_length=1000)
-
-    def __unicode__(self):
-        return self.key + ': ' + self.value
-
-    @classmethod
-    def can_faculty_create_courses(cls):
-        c = cls.objects.filter(key="can_faculty_create_courses").first()
-        if c:
-            return c.value == "1" or c.value == "true"
-
-    @classmethod
-    def can_adviser_add_courses_for_students(cls):
-        c = cls.objects.filter(key="can_adviser_add_courses_for_students").first()
-        if c:
-            return c.value == "1" or c.value == "true"
-
-    @classmethod
-    def contact_email(cls):
-        c = cls.objects.filter(key='contact_email').first()
-        if c:
-            return c.value
-        return settings.DEFAULT_FROM_EMAIL
-
-    @classmethod
-    def is_manual_faculty_review_enabled(cls):
-        c = cls.objects.filter(key='is_manual_faculty_review_enabled').first()
-        if c:
-            return c.value == "1" or c.value == "true"

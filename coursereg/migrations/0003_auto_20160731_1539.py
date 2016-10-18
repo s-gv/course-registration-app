@@ -51,6 +51,9 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True)),
             ],
         ),
+        migrations.DeleteModel(
+            name='Config',
+        ),
         migrations.AddField(
             model_name='course',
             name='timings',

@@ -4,7 +4,7 @@
 - [Dependencies](#dependencies)
 - [How to deploy](#how-to-deploy)
 - [Management commands](#management-commands)
-- [Config options](#config-options)
+- [Settings](#settings)
 - [DB Schema](#db-schema)
 - [Misc](#misc)
 
@@ -46,20 +46,20 @@ TODO: A YouTube screencast.
 - To bulk load registration types in `<project_root>/coursereg/data/registration_types.json`, run `python manage.py loadregtypes --datafile coursereg/data/registration_types.json`. Note that you must have at least one registration type for the application to operate properly.
 - To bulk load configs in `<project_root>/coursereg/data/configs.json`, run `python manage.py loadconfigs --datafile coursereg/data/configs.json`.
 
-## Config options
-These options can be configured by the superuser in the admin interface.
+## Settings
+These options can be configured in `bheemboy/settings.py`
 
-- Key: `can_faculty_create_courses`
-  - Value: `1` to permit course creation by faculty
-  - Value: `0` to disable course creation by faculty
-- Key: `can_adviser_add_courses_for_students`
-  - Value: `1` to permit faculty to add courses on behalf of their advisees
-  - Value: `0` to not allow faculty to add courses for their advisees
-- Key: `contact_email`
+- Key: `CAN_FACULTY_CREATE_COURSES`
+  - Value: `True` to permit course creation by faculty
+  - Value: `False` to disable course creation by faculty
+- Key: `CAN_ADVISER_ADD_COURSES_FOR_STUDENTS`
+  - Value: `True` to permit faculty to add courses on behalf of their advisees
+  - Value: `False` to not allow faculty to add courses for their advisees
+- Key: `CONTACT_EMAIL`
   - Value: the e-mail address to be displayed on the login page (ex: `admin@example.com`).
-- Key: `is_manual_faculty_review_enabled`
-  - Value: `1` to have faculty manually click on course applications they have reviewed.
-  - Value: `0` to automatically tick as reviewed once faculty views a course application.
+- Key: `MANUAL_FACULTY_REVIEW`
+  - Value: `True` to have faculty manually click on course applications to mark them as reviewed.
+  - Value: `False` to automatically mark as reviewed once faculty views a course application.
 
 ## DB Schema
 Tables with sample rows:
@@ -94,11 +94,6 @@ Tables with sample rows:
 |-----------|--------------------------|---------------------------|
 |  STUDENT  | Question from student?   | Sample answer             |
 |  FACULTY  | Question from faculty?   | Sample answer 2           |
-
-### Config
-|        key          |          value         |
-|---------------------|------------------------|
-|  contact_email      |    admin@example.com   |
 
 ### Notification
 |      user       |  origin  |          message          | is_student_acknowledged | is_adviser_acknowledged | is_dcc_acknowledged | created_at |

@@ -131,6 +131,14 @@ DEFAULT_FROM_EMAIL = 'admin@localhost'
 EMAIL_HOST = 'localhost'
 EMAIL_TIMEOUT = 3
 
+CAN_FACULTY_CREATE_COURSES = False
+
+CAN_ADVISER_ADD_COURSES_FOR_STUDENTS = False
+
+CONTACT_EMAIL = 'support@localhost'
+
+MANUAL_FACULTY_REVIEW = True
+
 
 ## Logging
 LOGGING = {

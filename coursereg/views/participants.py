@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 
 @require_POST
 @login_required
@@ -23,7 +24,7 @@ def create(request):
     user = models.User.objects.get(id=user_id)
     if request.POST['origin'] == 'adviser':
         if not request.user == user.adviser: raise PermissionDenied
-        if not models.Config.can_adviser_add_courses_for_students(): raise PermissionDenied
+        if not settings.CAN_ADVISER_ADD_COURSES_FOR_STUDENTS: raise PermissionDenied
     else:
         if not request.user == user: raise PermissionDenied
 

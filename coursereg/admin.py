@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
-from .models import User, Course, Participant, Faq, Department, Degree, Notification, Config, Grade, Term, RegistrationType
+from .models import User, Course, Participant, Faq, Department, Degree, Notification, Grade, Term, RegistrationType
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from datetime import timedelta
 from django.core.urlresolvers import reverse
@@ -427,10 +427,6 @@ class NotificationAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', )
     readonly_fields = ('created_at',)
 
-class ConfigAdmin(admin.ModelAdmin):
-    list_display = ('key', 'value')
-    search_fields = ('key',)
-
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('name', 'points', 'should_count_towards_cgpa', 'is_active')
 
@@ -476,7 +472,6 @@ admin.site.register(Faq, FaqAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Notification, NotificationAdmin)
-admin.site.register(Config, ConfigAdmin)
 admin.site.register(Grade, GradeAdmin)
 admin.site.register(Term, TermAdmin)
 admin.site.register(RegistrationType, RegistrationTypeAdmin)

@@ -11,12 +11,13 @@ from coursereg import models
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 def signin(request):
     if request.method == 'GET':
         context = {
             "next_url": request.GET.get('next', reverse('coursereg:index')),
-            "contact_email": models.Config.contact_email()
+            "contact_email": settings.CONTACT_EMAIL
         }
         return render(request, 'coursereg/signin.html', context)
     else:
