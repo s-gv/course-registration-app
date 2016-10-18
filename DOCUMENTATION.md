@@ -64,6 +64,13 @@ These options can be configured in `bheemboy/settings.py`
 ## DB Schema
 Tables with sample rows:
 
+### Course
+|   Num   |            Title           |         Created_at         |         Updated_at         | Department_id |    Timings     | Term_id | Should_count_towards_cgpa |  credits |
+|---------|:---------------------------|:---------------------------|:---------------------------|:--------------|:--------|:--------|:--------------------------|:-----|
+|  E0-284 | Math for Graduate Students | 2016-07-15 15:52:05.924628 | 2016-10-18 07:37:43.506123 |       1       | M & W, 8:30 to 10:00 |     1      |           1         |  3:0 |
+|  E0-232 |      Digital Circuits      | 2016-07-15 15:52:29.914621 | 2016-10-18 07:37:43.507363 |       1       | T & Th, 2:30 to 04:00 |     1      |           2         |  3:0 |
+
+
 ### Department
 |                Name                  | Abbreviation | is_active |
 |--------------------------------------|:-------------|:----------|
@@ -100,6 +107,31 @@ Tables with sample rows:
 |-----------------|----------|---------------------------|-------------------------|-------------------------|---------------------|------------|
 |  user1@abc.com  | ADVISER  | Enrolled for Course X     |           False         |          False          |        False        |  8/7/2016  |
 |  user2@abc.com  | DCC      | Too few courses           |           False         |          False          |        False        |  8/9/2016  |
+
+### Participant 
+| Participant_type | Is_adviser_reviwed | Is_instructor_reviwed | Course_id | User_id | Lock_from_student | Is_Drop | Should_count_towards_cgpa | registration_type_id | grade_id | created_at | updated_at |
+|------------------|:-------------------|:----------------------|:----------|:--------|:------------------|:--------|:----------------|:---------------|:-------|:-------|:-------|
+|         1        |         0          |           0           |    1      |    2    |         0         |     0   |     1               |    1    |   NULL  |   2016-10-18 07:37:43.510979    |   2016-10-18 07:37:43.511042  |
+|         1        |         0          |           0           |    2      |    2    |         0         |     0   |     1               |    1    |   NULL  |   2016-10-18 07:37:43.512202    |   2016-10-18 07:37:43.512202  |
+
+### Term
+|     name    | year | start_reg_date | last_reg_date | last_adviser_approval_date | last_instructor_approval_date | last_cancellation_date | last_conversion_date | last_drop_date | last_grade_date | is_active |
+|-------------|:-----|:---------------|:--------------|:---------------------------|:------------------------------|:------------------|:--------------------|:-------------|:-------------|:---------|
+| Aug-Dec | 2016 | 2016-05-20 15:51:20 | 2016-08-18 15:51:20 | 2016-08-18 15:51:20 | 2016-08-18 15:51:20 | 2016-08-23 15:51:20 | 2016-09-01 15:51:20 | 2016-09-01 15:51:20 | 2017-01-15 15:51:20 | 1 |
+
+### User
+| password | last_login | is_superuser |email | full_name | user_type | date_joined | sr_no | is_dcc_review_pending | is_staff | is_active | degree_id | department_id | telephone | is_dcc_sent_notification | adviser_id |
+|----------|:-----------|:-------------|:-----|:----------|:----------|:------------|:------|:----------------------|:--------|:----------|:----------|:--------------|:----------|:-------------------------|:-----------|
+| pbkdf2_sha256$24000$x3iHzLjgxeYw$FrCkSKxIgm8bvCB8br3f4Hypvc812EemmDk4B+djo2s= | 2016-10-18 15:32:45.757052 | 0 | dcc@ece.iisc.ernet.in | DCC | 2 | 2016-07-15 06:39:10 | - | 0 | 0 | 1 | NULL | 1 | - | 0 | NULL |
+| pbkdf2_sha256$24000$VOdb7wPGcURj$HMlm8c8Q00TTJeEyXesnDyR8LTU3PsnCYLAkKxL+Ayo= | 2016-10-18 07:39:12.092271 | 0 | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | 0| 0 | 1 | 1 | 1 | 9912378901 | 0 | 2 | 
+ 
+### User Groups
+| User_id | Group_id |
+|---------|:---------|
+
+### User permissions
+| User_id | Permission_id |
+|---------|:--------------|
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) and Degree (ex: PhD, ME) must be added by the admin before students can login and register for courses.
