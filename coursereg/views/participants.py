@@ -48,6 +48,8 @@ def create(request):
                 should_count_towards_cgpa=True,
             )
             participant.save()
+            user.is_dcc_review_pending = True
+            user.save()
             if request.POST['origin'] == 'adviser':
                 participant.is_adviser_reviewed = True
                 participant.save()
