@@ -121,16 +121,9 @@ Tables with sample rows:
 ### User
 | password | last_login | is_superuser | email | full_name | user_type | date_joined | sr_no | is_dcc_review_pending | is_staff | is_active | degree_id | department_id | telephone | is_dcc_sent_notification | adviser_id |
 |----------|:-----------|:-------------|:-----|:----------|:----------|:------------|:------|:----------------------|:--------|:----------|:----------|:--------------|:----------|:-------------------------|:-----------|
-| pbkdf2_sha256$24000$x3iHzLjgxeYw$FrCkSKxIgm8bvCB8br3f4Hypvc812EemmDk4B+djo2s= | 2016-10-18 15:32:45.757052 | False | dcc@ece.iisc.ernet.in | DCC | 2 | 2016-07-15 06:39:10 | - | False | False | True | NULL | 1 | - | False | NULL |
-| pbkdf2_sha256$24000$VOdb7wPGcURj$HMlm8c8Q00TTJeEyXesnDyR8LTU3PsnCYLAkKxL+Ayo= | 2016-10-18 07:39:12.092271 | False | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | False | False | True | 1 | 1 | 9912378901 | False | 2 | 
+| password #1| 2016-10-18 15:32:45.757052 | False | dcc@ece.iisc.ernet.in | DCC | 2 | 2016-07-15 06:39:10 | - | False | False | True | NULL | 1 | - | False | NULL |
+| password #2 | 2016-10-18 07:39:12.092271 | False | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | False | False | True | 1 | 1 | 9912378901 | False | 2 | 
  
-### User Groups
-| User_id | Group_id |
-|---------|:---------|
-
-### User permissions
-| User_id | Permission_id |
-|---------|:--------------|
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) and Degree (ex: PhD, ME) must be added by the admin before students can login and register for courses.
