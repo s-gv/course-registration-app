@@ -33,7 +33,7 @@ def detail(request, course_id):
             user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR):
         raise PermissionDenied
 
-    if not course.is_last_adviser_approval_date_passed():
+    if settings.WARN_REVIEW_BEFORE_LAST_DATE and not course.is_last_adviser_approval_date_passed():
         messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date.')
 
     context = {

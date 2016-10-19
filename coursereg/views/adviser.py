@@ -29,7 +29,7 @@ def detail(request, student_id):
     if not request.user == student.adviser:
         raise PermissionDenied
     is_last_reg_date_passed_for_all_courses = not any(not p.course.is_last_reg_date_passed() for p in models.Participant.objects.filter(user=student))
-    if not is_last_reg_date_passed_for_all_courses:
+    if settings.WARN_REVIEW_BEFORE_LAST_DATE and not is_last_reg_date_passed_for_all_courses:
         messages.warning(request, 'Registration is still open. Visit this page after the last application date.')
     context = {
         'user_type': 'faculty',

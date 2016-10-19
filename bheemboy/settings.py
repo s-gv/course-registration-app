@@ -139,6 +139,7 @@ CONTACT_EMAIL = 'support@localhost'
 
 MANUAL_FACULTY_REVIEW = False
 
+WARN_REVIEW_BEFORE_LAST_DATE = False
 
 ## Logging
 LOGGING = {
