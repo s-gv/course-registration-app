@@ -109,9 +109,9 @@ class Participant(models.Model):
             return 'Dropped this course'
         if self.grade == None:
             if self.user.is_dcc_review_pending:
-                return 'Registered'
-            else:
                 return 'In progress'
+            else:
+                return 'Registered'
         else:
             return self.grade
 
