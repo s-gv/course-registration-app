@@ -34,7 +34,7 @@ def detail(request, course_id):
         raise PermissionDenied
 
     if not course.is_last_adviser_approval_date_passed():
-        messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date (%s).' % course.term.last_adviser_approval_date)
+        messages.warning(request, 'Registration for this course is still open. Visit this page after the last application date.')
 
     context = {
         'user_type': 'faculty',

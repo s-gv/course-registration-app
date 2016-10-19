@@ -92,9 +92,9 @@ def update(request, participant_id):
         if request.POST['action'] == 'reg_type_change':
             reg_type = models.RegistrationType.objects.get(pk=request.POST['reg_type'])
             if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
+            msg = 'Registration for %s has changed from %s to %s.' % (participant.course, participant.registration_type, reg_type)
             participant.registration_type = reg_type
             participant.save()
-            msg = 'Registration for %s has changed to %s.' % (participant.course, reg_type)
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
                                                message=msg)
@@ -141,10 +141,10 @@ def update(request, participant_id):
             if request.POST['action'] == 'reg_type_change':
                 reg_type = models.RegistrationType.objects.get(pk=request.POST['reg_type'])
                 if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
+                msg = 'Registration for %s by %s has changed from %s to %s.' % (participant.course, participant.user, participant.registration_type, reg_type)
                 participant.registration_type = reg_type
                 participant.is_adviser_reviewed = False
                 participant.save()
-                msg = 'Registration for %s by %s has changed to %s.' % (participant.course, participant.user, reg_type)
                 models.Notification.objects.create(user=participant.user,
                                                    origin=models.Notification.ORIGIN_STUDENT,
                                                    message=msg)
@@ -218,7 +218,7 @@ def delete(request, participant_id):
         if not models.Participant.objects.filter(course=participant.course, user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR).first(): raise PermissionDenied
         if participant.course.is_last_instructor_approval_date_passed(): raise PermissionDenied
         participant.delete()
-        msg = 'Course registration application for %s by %s was cancelled by the course instructor.' % (participant.course, participant.user)
+        msg = 'Registration for %s by %s was cancelled by the course instructor.' % (participant.course, participant.user)
         models.Notification.objects.create(user=participant.user,
                                            origin=models.Notification.ORIGIN_INSTRUCTOR,
                                            message=msg)
