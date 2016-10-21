@@ -85,7 +85,7 @@
                                 {% if participant.course.is_last_adviser_approval_date_passed and not participant.is_adviser_reviewed %}
                                 (Adviser is yet to review)
                                 {% endif %}
-                                {% if participant.course.is_last_instructor_approval_date_passed and not participant.is_instructor_reviewed %}
+                                {% if participant.course.is_last_instructor_approval_date_passed and participant.course.is_instructor_assigned and not participant.is_instructor_reviewed %}
                                 (Instructor is yet to review)
                                 {% endif %}
                             </p>

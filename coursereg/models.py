@@ -272,6 +272,9 @@ class Course(models.Model):
     def is_last_grade_date_passed(self):
         return timezone.now() > self.term.last_grade_date
 
+    def is_instructor_assigned(self):
+        return Participant.objects.filter(course=self, participant_type=Participant.PARTICIPANT_INSTRUCTOR).first()
+
     def is_instructor_review_pending(self):
         return Participant.objects.filter(course=self, user__user_type=User.USER_TYPE_STUDENT, is_instructor_reviewed=False).first()
 
