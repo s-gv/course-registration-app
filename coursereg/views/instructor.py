@@ -45,7 +45,7 @@ def detail(request, course_id):
         'can_faculty_create_courses': settings.CAN_FACULTY_CREATE_COURSES,
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
         'participants': list(models.Participant.objects.filter(course=course,
-                            participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type'))
+                            participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type', 'created_at'))
     }
     if not settings.MANUAL_FACULTY_REVIEW:
         models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
