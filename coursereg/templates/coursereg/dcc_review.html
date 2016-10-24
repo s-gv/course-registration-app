@@ -26,24 +26,22 @@
             <h2><small>Students</small></h2>
         </div>
     </div>
-    {% for degree in degrees %}
+    {% for title, students in active_students.items %}
     <div class="row top-buffer-1">
         <div class="col-md-12">
             <table class="table table-striped">
-                <caption>{{ degree }} students</caption>
+                <caption>{{ title }}</caption>
                 <tbody>
-                {% for student in all_active_students %}
-                    {% if student.degree == degree %}
-                        <tr><td>
-                            <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
-                            ({{ student.email }})
-                            {% if student.is_dcc_sent_notification %}
-                            <span class="label label-danger">notified</span>
-                            {% elif student.is_dcc_review_pending %}
-                            <span class="label label-success">new</span>
-                            {% endif %}
-                        </tr></td>
-                    {% endif %}
+                {% for student in students %}
+                    <tr><td>
+                        <a href="{% url 'coursereg:dcc_detail' student.id %}">{{ student.full_name }}</a>
+                        ({{ student.email }})
+                        {% if student.is_dcc_sent_notification %}
+                        <span class="label label-danger">notified</span>
+                        {% elif student.is_dcc_review_pending %}
+                        <span class="label label-success">new</span>
+                        {% endif %}
+                    </tr></td>
                 {% endfor %}
                 </tbody>
             </table>

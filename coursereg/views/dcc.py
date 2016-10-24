@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from coursereg import utils
 from django.utils import timezone
+from collections import defaultdict
 
 @login_required
 def report(request):
@@ -52,6 +53,17 @@ def review(request):
     pending_instructors = set(instructor for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False) for instructor in p.course.instructors())
     pending_faculty = pending_advisers | pending_instructors
 
+    active_students = defaultdict(list)
+    oldest_recent_year = timezone.now().year - 1
+    for student in models.User.objects.filter(user_type=models.User.USER_TYPE_STUDENT, is_active=True, department=request.user.department).order_by('-is_dcc_review_pending', '-date_joined','full_name'):
+        regd = student.date_joined
+        if regd.year >= oldest_recent_year:
+            active_students['%s (Joined in %s %s)' % (student.degree, regd.strftime('%b'), regd.strftime('%Y'))].append(student)
+        else:
+            active_students['%s (Joined before %s)' % (student.degree, oldest_recent_year)].append(student)
+
+    print active_students
+
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',
@@ -60,10 +72,7 @@ def review(request):
         'pending_advisers': pending_advisers,
         'pending_instructors': pending_instructors,
         'degrees': models.Degree.objects.all().order_by('name'),
-        'all_active_students': [student for student in models.User.objects.filter(
-            user_type=models.User.USER_TYPE_STUDENT,
-            is_active=True,
-            department=request.user.department).order_by('-is_dcc_review_pending', '-date_joined','full_name')],
+        'active_students': dict(active_students),
     }
     return render(request, 'coursereg/dcc_review.html', context)
 
