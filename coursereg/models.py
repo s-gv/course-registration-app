@@ -163,10 +163,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.user_type == User.USER_TYPE_STUDENT:
             total_credits = 0
             total_grade_points = 0
-            for p in Participant.objects.filter(user=self).exclude(is_drop=False).exclude(should_count_towards_cgpa=False):
+            for p in Participant.objects.filter(user=self).exclude(is_drop=True).exclude(should_count_towards_cgpa=False):
                 if p.registration_type.should_count_towards_cgpa and p.course.should_count_towards_cgpa and p.grade and p.grade.should_count_towards_cgpa:
-                    total_credits += p.course.credits
-                    total_grade_points += p.grade.points * p.course.credits
+                    total_credits += p.course.get_num_credits()
+                    total_grade_points += float(p.grade.points) * p.course.get_num_credits()
             if total_credits > 0:
                 return "%.1f" % (total_grade_points * 1.0 / total_credits)
         return '-'
@@ -245,7 +245,7 @@ class Course(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     timings = models.CharField(max_length=100, default='Not fixed yet')
 
-    def get_num_credits():
+    def get_num_credits(self):
         return sum(int(c) for c in re.split(r'[^0-9]', self.credits) if c.isdigit())
 
     def is_start_reg_date_passed(self):
