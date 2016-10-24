@@ -83,6 +83,7 @@ def update(request, participant_id):
                 participant.grade = None
             else:
                 participant.grade = models.Grade.objects.get(id=request.POST['grade'])
+            participant.is_instructor_reviewed = True
             participant.save()
     elif request.POST['origin'] == 'adviser':
         if not participant.user.adviser == request.user: raise PermissionDenied
@@ -94,6 +95,7 @@ def update(request, participant_id):
             if participant.course.is_last_conversion_date_passed(): raise PermissionDenied
             msg = 'Registration for %s has changed from %s to %s.' % (participant.course, participant.registration_type, reg_type)
             participant.registration_type = reg_type
+            participant.is_adviser_reviewed = True
             participant.save()
             models.Notification.objects.create(user=participant.user,
                                                origin=models.Notification.ORIGIN_ADVISER,
@@ -105,6 +107,7 @@ def update(request, participant_id):
         if request.POST['action'] == 'drop':
             if participant.course.is_last_drop_date_passed(): raise PermissionDenied
             participant.is_drop = True
+            participant.is_adviser_reviewed = True
             participant.save()
             msg = 'Course %s dropped.' % participant.course
             models.Notification.objects.create(user=participant.user,
@@ -117,6 +120,7 @@ def update(request, participant_id):
         if request.POST['action'] == 'undrop':
             if participant.course.is_last_drop_date_passed(): raise PermissionDenied
             participant.is_drop = False
+            participant.is_adviser_reviewed = True
             participant.save()
             msg = 'Drop request for %s is cancelled.' % participant.course
             models.Notification.objects.create(user=participant.user,
@@ -128,9 +132,11 @@ def update(request, participant_id):
                 messages.warning(request, 'Error sending e-mail. But a notification has been created on this website.')
         if request.POST['action'] == 'disable_student_edits':
             participant.lock_from_student = True
+            participant.is_adviser_reviewed = True
             participant.save()
         if request.POST['action'] == 'enable_student_edits':
             participant.lock_from_student = False
+            participant.is_adviser_reviewed = True
             participant.save()
     elif request.POST['origin'] == 'student':
         student = request.user
