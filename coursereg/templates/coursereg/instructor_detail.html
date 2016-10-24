@@ -96,7 +96,7 @@
                                                         <input type="hidden" name="origin" value="instructor">
                                                         <input type="hidden" name="action" value="review">
                                                     </form>
-                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit()">Mark as reviewed</a></li>
+                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit()">Approved</a></li>
                                                     <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_instructor_approval_date_passed %}
