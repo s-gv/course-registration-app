@@ -122,7 +122,7 @@
                                                         <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="action" value="review">
                                                     </form>
-                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit()">Mark as read</a></li>
+                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit(); return false;">Mark as read</a></li>
                                                     <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_conversion_date_passed %}
@@ -135,7 +135,7 @@
                                                     </form>
                                                     {% for reg_type in reg_types %}
                                                     {% if reg_type != participant.registration_type %}
-                                                        <li><a href="#" onclick="$('#switchForm{{ participant.id }} input[name=reg_type]').val('{{ reg_type.id }}'); $('#switchForm{{ participant.id }}').submit()">Switch to {{ reg_type }}</a></li>
+                                                        <li><a href="#" onclick="$('#switchForm{{ participant.id }} input[name=reg_type]').val('{{ reg_type.id }}'); $('#switchForm{{ participant.id }}').submit(); return false;">Switch to {{ reg_type }}</a></li>
                                                     {% endif %}
                                                     {% endfor %}
                                                 {% endif %}
@@ -147,7 +147,7 @@
                                                         <input type="hidden" name="action" value="disable_student_edits">
                                                     </form>
                                                     <li role="separator" class="divider"></li>
-                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit()">Disable student edits</a></li>
+                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit(); return false;">Disable student edits</a></li>
                                                 {% else %}
                                                     <form id="studentEditForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                                         {% csrf_token %}
@@ -156,7 +156,7 @@
                                                         <input type="hidden" name="action" value="enable_student_edits">
                                                     </form>
                                                     <li role="separator" class="divider"></li>
-                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit()">Enable student edits</a></li>
+                                                    <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit(); return false;">Enable student edits</a></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_cancellation_date_passed %}
                                                     <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">
@@ -165,7 +165,7 @@
                                                         <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
                                                     </form>
                                                     <li role="separator" class="divider"></li>
-                                                    <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit()">Cancel registration</a></li>
+                                                    <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit(); return false;">Cancel registration</a></li>
                                                 {% elif not participant.course.is_last_drop_date_passed %}
                                                     <form id="dropForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                                         {% csrf_token %}
@@ -179,7 +179,7 @@
                                                     </form>
                                                     <li role="separator" class="divider"></li>
                                                     <li>
-                                                        <a href="#" onclick="$('#dropForm{{ participant.id }}').submit()">
+                                                        <a href="#" onclick="$('#dropForm{{ participant.id }}').submit(); return false;">
                                                         {% if participant.is_drop %}
                                                         Undo drop
                                                         {% else %}

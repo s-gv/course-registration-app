@@ -96,7 +96,7 @@
                                                         <input type="hidden" name="origin" value="instructor">
                                                         <input type="hidden" name="action" value="review">
                                                     </form>
-                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit()">Mark as read</a></li>
+                                                    <li><a href="#" onclick="$('#reviewForm{{ participant.id }}').submit(); return false;">Mark as read</a></li>
                                                     <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_instructor_approval_date_passed %}
@@ -105,7 +105,7 @@
                                                     <input type="hidden" name="origin" value="instructor">
                                                     <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
                                                 </form>
-                                                <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit()">Reject application</a></li>
+                                                <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit(); return false;">Reject application</a></li>
                                                 <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 <form id="gradeForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="POST">
@@ -115,9 +115,9 @@
                                                     <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
                                                     <input type="hidden" name="grade" value="null">
                                                 </form>
-                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }}').submit()">Not graded</a></li>
+                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }}').submit(); return false;">Not graded</a></li>
                                                 {% for grade in grades %}
-                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }} input[name=grade]').val('{{ grade.id }}'); $('#gradeForm{{ participant.id }}').submit()">{{ grade }}</a></li>
+                                                <li><a href="#" onclick="$('#gradeForm{{ participant.id }} input[name=grade]').val('{{ grade.id }}'); $('#gradeForm{{ participant.id }}').submit(); return false;">{{ grade }}</a></li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
