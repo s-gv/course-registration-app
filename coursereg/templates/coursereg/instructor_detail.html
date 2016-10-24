@@ -100,13 +100,13 @@
                                                     <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_instructor_approval_date_passed %}
-                                                <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="POST">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="origin" value="instructor">
-                                                    <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
-                                                </form>
-                                                <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit(); return false;">Reject application</a></li>
-                                                <li role="separator" class="divider"></li>
+                                                    <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="origin" value="instructor">
+                                                        <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' participant.course.id %}">
+                                                    </form>
+                                                    <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit(); return false;">Cancel registration</a></li>
+                                                    <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 <form id="gradeForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="POST">
                                                     {% csrf_token %}

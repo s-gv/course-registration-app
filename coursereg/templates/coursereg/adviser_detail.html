@@ -138,6 +138,7 @@
                                                         <li><a href="#" onclick="$('#switchForm{{ participant.id }} input[name=reg_type]').val('{{ reg_type.id }}'); $('#switchForm{{ participant.id }}').submit(); return false;">Switch to {{ reg_type }}</a></li>
                                                     {% endif %}
                                                     {% endfor %}
+                                                    <li role="separator" class="divider"></li>
                                                 {% endif %}
                                                 {% if not participant.lock_from_student %}
                                                     <form id="studentEditForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
@@ -146,7 +147,6 @@
                                                         <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="action" value="disable_student_edits">
                                                     </form>
-                                                    <li role="separator" class="divider"></li>
                                                     <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit(); return false;">Disable student edits</a></li>
                                                 {% else %}
                                                     <form id="studentEditForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
@@ -155,18 +155,18 @@
                                                         <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="action" value="enable_student_edits">
                                                     </form>
-                                                    <li role="separator" class="divider"></li>
                                                     <li><a href="#" onclick="$('#studentEditForm{{ participant.id }}').submit(); return false;">Enable student edits</a></li>
                                                 {% endif %}
                                                 {% if not participant.course.is_last_cancellation_date_passed %}
+                                                    <li role="separator" class="divider"></li>
                                                     <form id="deleteForm{{ participant.id }}" action="{% url 'coursereg:participants_delete' participant.id %}" method="post">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="origin" value="adviser">
                                                         <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
                                                     </form>
-                                                    <li role="separator" class="divider"></li>
                                                     <li><a href="#" onclick="$('#deleteForm{{ participant.id }}').submit(); return false;">Cancel registration</a></li>
                                                 {% elif not participant.course.is_last_drop_date_passed %}
+                                                    <li role="separator" class="divider"></li>
                                                     <form id="dropForm{{ participant.id }}" action="{% url 'coursereg:participants_update' participant.id %}" method="post">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' participant.user.id %}">
@@ -177,7 +177,6 @@
                                                         <input type="hidden" name="action" value="drop">
                                                         {% endif %}
                                                     </form>
-                                                    <li role="separator" class="divider"></li>
                                                     <li>
                                                         <a href="#" onclick="$('#dropForm{{ participant.id }}').submit(); return false;">
                                                         {% if participant.is_drop %}
