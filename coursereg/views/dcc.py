@@ -49,10 +49,8 @@ def review(request):
         raise PermissionDenied
 
     pending_advisers = set(p.user.adviser for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_adviser_reviewed=False))
-    pending_instructors = set(p.user.adviser for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False))
+    pending_instructors = set(instructor for p in models.Participant.objects.filter(user__department=request.user.department, participant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False) for instructor in p.course.instructors())
     pending_faculty = pending_advisers | pending_instructors
-
-    print pending_advisers
 
     context = {
         'user_type': 'dcc',

@@ -275,6 +275,10 @@ class Course(models.Model):
     def is_instructor_assigned(self):
         return Participant.objects.filter(course=self, participant_type=Participant.PARTICIPANT_INSTRUCTOR).first()
 
+    def instructors(self):
+        for p in Participant.objects.filter(course=self, participant_type=Participant.PARTICIPANT_INSTRUCTOR):
+            yield p.user
+
     def is_instructor_review_pending(self):
         return Participant.objects.filter(course=self, user__user_type=User.USER_TYPE_STUDENT, is_instructor_reviewed=False).first()
 
