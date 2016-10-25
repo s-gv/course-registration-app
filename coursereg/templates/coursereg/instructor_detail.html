@@ -59,12 +59,13 @@
                             <div class="row">
                                 <div class="col-md-5 col-xs-12">
                                     <a tabindex="0" data-placement="bottom" role="button" data-toggle="popover" data-trigger="focus" data-html="true"
-                                       data-content="E-mail: {{ participant.user.email }}<br/>
-                                                     Department: {{ participant.user.department }}<br/>
-                                                     Program: {{ participant.user.degree }}<br />
-                                                     Adviser: {{ participant.user.adviser.full_name }}<br />
-                                                     SR No: {{ participant.user.sr_no }}<br />
-                                                     Applied at: {{ participant.created_at|date:'M d, Y h:i A T' }}">
+                                        title='Details <button type="button" style="position: relative; bottom: 5px;" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                                        data-content="E-mail: {{ participant.user.email }}<br/>
+                                                      Department: {{ participant.user.department }}<br/>
+                                                      Program: {{ participant.user.degree }}<br />
+                                                      Adviser: {{ participant.user.adviser.full_name }}<br />
+                                                      SR No: {{ participant.user.sr_no }}<br />
+                                                      Applied: {{ participant.created_at|date:'M d, Y h:i A T' }}">
                                         {{ participant.user.full_name }}
                                     </a>
                                     <span class="badge">{{ participant.get_reg_type_desc }}</span>
