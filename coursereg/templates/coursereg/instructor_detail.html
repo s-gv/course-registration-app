@@ -63,6 +63,7 @@
                                         data-content="E-mail: {{ participant.user.email }}<br/>
                                                       Department: {{ participant.user.department }}<br/>
                                                       Program: {{ participant.user.degree }}<br />
+                                                      Join date: {{ participant.user.date_joined|date:'M Y' }}<br />
                                                       Adviser: {{ participant.user.adviser.full_name }}<br />
                                                       SR No: {{ participant.user.sr_no }}<br />
                                                       Applied: {{ participant.created_at|date:'M d, Y h:i A T' }}">
