@@ -57,14 +57,22 @@
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.full_name }}
+                                <div class="col-md-5 col-xs-12">
+                                    <a tabindex="0" data-placement="bottom" role="button" data-toggle="popover" data-trigger="focus" data-html="true"
+                                       data-content="E-mail: {{ participant.user.email }}<br/>
+                                                     Department: {{ participant.user.department }}<br/>
+                                                     Program: {{ participant.user.degree }}<br />
+                                                     Adviser: {{ participant.user.adviser.full_name }}<br />
+                                                     SR No: {{ participant.user.sr_no }}<br />
+                                                     Applied at: {{ participant.created_at|date:'M d, Y h:i A T' }}">
+                                        {{ participant.user.full_name }}
+                                    </a>
                                     <span class="badge">{{ participant.get_reg_type_desc }}</span>
                                     {% if not participant.is_instructor_reviewed %}
                                     <span class="label label-success">new</span>
                                     {% endif %}
                                 </div>
-                                <div class="col-md-3 col-xs-12">
+                                <div class="col-md-4 col-xs-12">
                                     {{ participant.user.email }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
@@ -72,9 +80,6 @@
                                 </div>
                                 <div class="col-md-1 col-xs-12">
                                     {{ participant.user.degree }}
-                                </div>
-                                <div class="col-md-3 col-xs-12">
-                                    {{ participant.user.sr_no }}
                                 </div>
                                 <div class="col-md-1 col-xs-12">
                                     <div title="Options" style="margin-left:-10px;">
@@ -245,6 +250,9 @@
         var csv = exportData['rows'].map(function(arr) {return arr.join(',');}).join('\n');
         var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
         saveAs(blob, exportData['fileNameWithoutExt']+'.csv');
+    });
+    $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
     });
 </script>
 {% endblock %}
