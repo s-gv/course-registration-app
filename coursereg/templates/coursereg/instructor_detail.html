@@ -57,43 +57,50 @@
                     <div class="row requestrow">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
-                                <div class="col-md-5 col-xs-12">
-                                    <a tabindex="0" data-placement="bottom" role="button" data-toggle="popover" data-trigger="focus" data-html="true"
-                                        title='Details <button type="button" style="position: relative; bottom: 5px;" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
-                                        data-content="E-mail: {{ participant.user.email }}<br/>
-                                                      Department: {{ participant.user.department }}<br/>
-                                                      Program: {{ participant.user.degree }}<br />
-                                                      Join date: {{ participant.user.date_joined|date:'M Y' }}<br />
-                                                      Adviser: {{ participant.user.adviser.full_name }}<br />
-                                                      SR No: {{ participant.user.sr_no }}<br />
-                                                      Applied: {{ participant.created_at|date:'M d, Y h:i A T' }}">
-                                        {{ participant.user.full_name }}
-                                    </a>
-                                    <span class="badge">{{ participant.get_reg_type_desc }}</span>
-                                    {% if not participant.is_instructor_reviewed %}
-                                    <span class="label label-success">new</span>
-                                    {% endif %}
+                                <div class="col-md-11 col-xs-10">
+                                    <div class="row">
+                                        <div class="col-md-5 col-xs-12">
+                                            <a tabindex="0" data-placement="bottom" role="button" data-toggle="popover" data-trigger="focus" data-html="true"
+                                                title='Details <button type="button" style="position: relative; bottom: 5px;" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                                                data-content="E-mail: {{ participant.user.email }}<br/>
+                                                              Department: {{ participant.user.department }}<br/>
+                                                              Program: {{ participant.user.degree }}<br />
+                                                              Join date: {{ participant.user.date_joined|date:'M Y' }}<br />
+                                                              Adviser: {{ participant.user.adviser.full_name }}<br />
+                                                              SR No: {{ participant.user.sr_no }}<br />
+                                                              Applied: {{ participant.created_at|date:'M d, Y h:i A T' }}">
+                                                {{ participant.user.full_name }}
+                                            </a>
+                                            <span class="badge">{{ participant.get_reg_type_desc }}</span>
+                                            {% if not participant.is_instructor_reviewed %}
+                                            <span class="label label-success">new</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            {{ participant.user.email }}
+                                        </div>
+                                        <div class="col-md-1 col-xs-12">
+                                            {{ participant.user.department.abbreviation }}
+                                        </div>
+                                        <div class="col-md-1 col-xs-12">
+                                            {{ participant.user.degree }}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4 col-xs-12">
-                                    {{ participant.user.email }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.department.abbreviation }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    {{ participant.user.degree }}
-                                </div>
-                                <div class="col-md-1 col-xs-12">
-                                    <div title="Options" style="margin-left:-10px;">
+                                <div class="col-md-1 col-xs-2">
+                                    <div title="Options" class="pull-right">
                                         {% if not participant.course.is_last_grade_date_passed %}
                                         <div class="dropdown">
-                                            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <button class="btn btn-default dropdown-toggle hidden-xs" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                 {% if participant.grade %}
                                                 {{ participant.grade }}
                                                 {% else %}
                                                 Actions
                                                 {% endif %}
                                                 <span class="caret"></span>
+                                            </button>
+                                            <button class="btn btn-default dropdown-toggle btn-circle visible-xs-block" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <span class="glyphicon glyphicon-option-vertical"></span>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right">
                                                 {% if is_manual_faculty_review_enabled and not participant.is_instructor_reviewed %}
