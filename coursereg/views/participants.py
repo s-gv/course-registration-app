@@ -199,7 +199,7 @@ def update_all(request):
         if request.POST['action'] == 'review':
             course = models.Course.objects.get(id=request.POST['course_id'])
             if not models.Participant.objects.filter(course=course, user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR).first(): raise PermissionDenied
-            models.Participant.objects.filter(course=course).update(is_instructor_reviewed=True)
+            models.Participant.objects.filter(course=course, participant_type=models.Participant.PARTICIPANT_STUDENT).update(is_instructor_reviewed=True)
     return redirect(request.POST.get('next', reverse('coursereg:index')))
 
 @require_POST
