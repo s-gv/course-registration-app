@@ -16,6 +16,7 @@ urlpatterns = [
 
     url(r'^participants/create$', views.participants.create, name='participants_create'),
     url(r'^participants/([0-9]+)/update$', views.participants.update, name='participants_update'),
+    url(r'^participants/all/update$', views.participants.update_all, name='participants_update_all'),
     url(r'^participants/([0-9]+)/delete$', views.participants.delete, name='participants_delete'),
 
     url(r'^notifications/dismiss$', views.notifications.dismiss, name='notifications_dismiss'),

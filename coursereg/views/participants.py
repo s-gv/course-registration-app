@@ -189,6 +189,21 @@ def update(request, participant_id):
 
 @require_POST
 @login_required
+def update_all(request):
+    if request.POST['origin'] == 'adviser':
+        if request.POST['action'] == 'review':
+            student = models.User.objects.get(id=request.POST['student_id'])
+            if student.adviser != request.user: raise PermissionDenied
+            models.Participant.objects.filter(user=student).update(is_adviser_reviewed=True)
+    if request.POST['origin'] == 'instructor':
+        if request.POST['action'] == 'review':
+            course = models.Course.objects.get(id=request.POST['course_id'])
+            if not models.Participant.objects.filter(course=course, user=request.user, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR).first(): raise PermissionDenied
+            models.Participant.objects.filter(course=course).update(is_instructor_reviewed=True)
+    return redirect(request.POST.get('next', reverse('coursereg:index')))
+
+@require_POST
+@login_required
 def delete(request, participant_id):
     participant = models.Participant.objects.get(id=participant_id)
     student = participant.user

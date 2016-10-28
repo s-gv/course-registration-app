@@ -201,6 +201,20 @@
         </div>
     </div>
     {% endif %}
+    {% if is_manual_faculty_review_enabled and is_adviser_review_needed %}
+    <div class="row">
+        <div class="col-md-12">
+            <form action="{% url 'coursereg:participants_update_all' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="origin" value="adviser">
+                <input type="hidden" name="action" value="review">
+                <input type="hidden" name="student_id" value="{{ student.id }}">
+                <input type="hidden" name="next" value="{% url 'coursereg:adviser_detail' student.id %}">
+                <button type="submit" class="btn btn-primary">Mark all as read</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
     {% if can_adviser_add_courses_for_students %}
     <div class="row top-buffer-1">
         <div class="col-md-12">

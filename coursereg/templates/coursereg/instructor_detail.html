@@ -155,6 +155,16 @@
 
     <div class="row top-buffer-1">
         <div class="col-md-12 col-xs-12">
+            {% if is_manual_faculty_review_enabled and is_instructor_review_needed %}
+            <form id="reviewallForm" action="{% url 'coursereg:participants_update_all' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="origin" value="instructor">
+                <input type="hidden" name="action" value="review">
+                <input type="hidden" name="course_id" value="{{ course.id }}">
+                <input type="hidden" name="next" value="{% url 'coursereg:instructor_detail' course.id %}">
+            </form>
+            <button type="button" class="btn btn-primary" onclick="$('#reviewallForm').submit(); return false;">Mark all as read</button>
+            {% endif %}
             <button id="pdfexport" type="button" class="btn btn-primary" data-loading-text="Loading..." >Export as PDF</button>
             <button id="csvexport" type="button" class="btn btn-primary">Export as CSV</button>
         </div>

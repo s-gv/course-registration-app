@@ -44,11 +44,12 @@ def detail(request, course_id):
         'is_manual_faculty_review_enabled': settings.MANUAL_FACULTY_REVIEW,
         'can_faculty_create_courses': settings.CAN_FACULTY_CREATE_COURSES,
         'grades': models.Grade.objects.filter(is_active=True).order_by('-points'),
+        'is_instructor_review_needed': models.Participant.objects.filter(course=course, participant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False),
         'participants': list(models.Participant.objects.filter(course=course,
                             participant_type=models.Participant.PARTICIPANT_STUDENT).order_by('is_drop', '-registration_type', 'created_at'))
     }
     if not settings.MANUAL_FACULTY_REVIEW:
-        models.Participant.objects.filter(course=course, user__user_type=models.User.USER_TYPE_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
+        models.Participant.objects.filter(course=course, uparticipant_type=models.Participant.PARTICIPANT_STUDENT, is_instructor_reviewed=False).update(is_instructor_reviewed=True)
     return render(request, 'coursereg/instructor_detail.html', context)
 
 @login_required
