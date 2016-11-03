@@ -243,7 +243,8 @@ class Course(models.Model):
     should_count_towards_cgpa = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    timings = models.CharField(max_length=100, default='Not fixed yet')
+    timings = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
     def get_num_credits(self):
         return sum(int(c) for c in re.split(r'[^0-9]', self.credits) if c.isdigit())
