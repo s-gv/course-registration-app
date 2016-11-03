@@ -27,11 +27,21 @@ def report(request):
         from_date = utils.parse_datetime_str(request.GET['from_date'])
         to_date = utils.parse_datetime_str(request.GET['to_date'])
 
-    participants = [p for p in models.Participant.objects.filter(
+    selected_term_ids = [int(i) for i in request.GET.getlist('term_ids')]
+
+    participants_query = models.Participant.objects.filter(
         user__department=request.user.department,
         user__user_type=models.User.USER_TYPE_STUDENT,
-        course__term__last_reg_date__range=[from_date, to_date]
-    ).order_by('user__degree', 'user__full_name')]
+        course__term__in=selected_term_ids
+    )
+
+    orderby = request.GET.get('orderby', 'degree')
+    if orderby == 'course':
+        participants = [p for p in participants_query.order_by('course', 'is_drop', '-registration_type', 'user__degree', 'user__full_name')]
+    elif orderby == 'name':
+        participants = [p for p in participants_query.order_by('user__full_name')]
+    else:
+        participants = [p for p in participants_query.order_by('user__degree', 'user__full_name')]
 
     context = {
         'user_type': 'dcc',
@@ -40,6 +50,9 @@ def report(request):
         'dept': request.user.department,
         'default_from_date': utils.datetime_to_str(from_date),
         'default_to_date': utils.datetime_to_str(to_date),
+        'orderby': orderby,
+        'terms': models.Term.objects.filter(is_active=True).order_by('-last_reg_date'),
+        'selected_term_ids': selected_term_ids,
         'participants': participants,
     }
     return render(request, 'coursereg/dcc_report.html', context)
