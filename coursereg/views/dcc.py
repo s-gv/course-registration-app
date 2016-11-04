@@ -75,8 +75,6 @@ def review(request):
         else:
             active_students['%s (Joined before %s)' % (student.degree, oldest_recent_year)].append(student)
 
-    print active_students
-
     context = {
         'user_type': 'dcc',
         'nav_active': 'review',

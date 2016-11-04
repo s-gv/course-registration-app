@@ -56,7 +56,7 @@ def detail(request, course_id):
 def course_new(request):
     if not request.user.user_type == models.User.USER_TYPE_FACULTY:
         raise PermissionDenied
-    if settings.CAN_FACULTY_CREATE_COURSES:
+    if not settings.CAN_FACULTY_CREATE_COURSES:
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -72,6 +72,8 @@ def course_new(request):
                 department=request.user.department,
                 term=term,
                 credits=request.POST['credits'],
+                timings=request.POST.get('timings', ''),
+                description=request.POST.get('description', ''),
                 should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
             )
             models.Participant.objects.create(user=request.user, course=course, participant_type=models.Participant.PARTICIPANT_INSTRUCTOR)
@@ -123,6 +125,7 @@ def course_update(request, course_id):
             term=term,
             credits=request.POST['credits'],
             timings=request.POST['timings'],
+            description=request.POST['description'],
             should_count_towards_cgpa=request.POST.get('should_count_towards_cgpa', True)
         )
         models.Participant.objects.filter(

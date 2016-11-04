@@ -91,7 +91,7 @@ class Participant(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     participant_type = models.IntegerField(default=PARTICIPANT_INSTRUCTOR, choices=PARTICIPANT_CHOICES)
-    registration_type = models.ForeignKey('RegistrationType', null=True, on_delete=models.CASCADE)
+    registration_type = models.ForeignKey('RegistrationType', null=True, blank=True, on_delete=models.CASCADE)
     is_drop = models.BooleanField(default=False)
     grade = models.ForeignKey('Grade', on_delete=models.CASCADE, blank=True, null=True)
     should_count_towards_cgpa = models.BooleanField(default=True)
