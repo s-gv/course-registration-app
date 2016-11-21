@@ -87,7 +87,7 @@ class StudentTests(TestCase):
 			{'origin': 'student'}, follow=True)
         self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
         
-    def test_7_was_student_not_able_to_delete_course_after_adviser_locked(self):
+    def test_7_student_was_student_not_able_to_delete_course_after_adviser_locked(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow,
         participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade, lock_from_student=True)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -95,7 +95,7 @@ class StudentTests(TestCase):
 			{'origin': 'student'}, follow=True)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow))
 
-    def test_8_was_student_not_able_to_delete_approved_course_after_last_reg_date(self):
+    def test_8_student_was_student_not_able_to_delete_approved_course_after_last_reg_date(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -104,7 +104,7 @@ class StudentTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
 
-    def test_9_could_student_delete_graded_course(self):
+    def test_9_student_could_student_delete_graded_course(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -130,7 +130,7 @@ class StudentTests(TestCase):
 			{'action': 'reg_type_change', 'origin': 'student','reg_type': '2'}, follow=True)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow, registration_type = '2'))
 
-    def test_12_student_drop(self):
+    def test_12_student_was_student_able_to_drop(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -138,7 +138,7 @@ class StudentTests(TestCase):
 			{'action': 'drop', 'origin': 'student'}, follow=True)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow, is_drop = True))
 
-    def test_13_student_undrop(self):
+    def test_13_student_was_student_able_to_undrop(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_tomorrow, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade, is_drop = True)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -147,7 +147,7 @@ class StudentTests(TestCase):
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_tomorrow, is_drop = False))
 
 	# Tests for Audit/Credit/Drop after cut off dates
-    def test_14_student_switch_to_credit_after_conversiondate(self):
+    def test_14_student_was_student_unable_to_switch_to_credit_after_conversiondate(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -156,7 +156,7 @@ class StudentTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday, registration_type = '2'))
 
-    def test_15_student_switch_to_audit_after_conversiondate(self):
+    def test_15_student_was_student_unable_to_switch_to_audit_after_conversiondate(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -165,7 +165,7 @@ class StudentTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday, registration_type = '1'))
 
-    def test_16_student_drop_after_dropdate(self):
+    def test_16_student_was_student_unable_to_drop_after_dropdate(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
         self.client.login(email='ben@test.com', password='ben12345')
@@ -174,7 +174,7 @@ class StudentTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday,is_drop=False))
 
-    def test_17_student_undrop_after_dropdate(self):
+    def test_17_student_was_student_unable_to_undrop_after_dropdate(self):
         participant = Participant.objects.create(user=self.ben, course=self.course_yesterday, 
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade, is_drop=True)
         self.client.login(email='ben@test.com', password='ben12345')

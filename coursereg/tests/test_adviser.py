@@ -82,7 +82,15 @@ class AdviserTests(TestCase):
                 {'action': 'reg_type_change', 'origin': 'adviser', 'reg_type':'1'}, follow=True)
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, registration_type = '1'))
 		
-    def test_5_adviser_drop(self):
+    def test_6_adviser_switch_nonrtp(self):
+		participant = Participant.objects.create(user=self.ben, course=self.course,
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade)
+		self.client.login(email='charles@test.com', password='charles12345')
+		response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
+                {'action': 'reg_type_change', 'origin': 'adviser', 'reg_type':'3'}, follow=True)
+		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, registration_type = '3'))
+		
+    def test_7_adviser_drop(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -90,16 +98,16 @@ class AdviserTests(TestCase):
                 {'action': 'drop', 'origin': 'adviser'}, follow=True)
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, is_drop = True))
 		
-    def test_6_adviser_drop_after_dropdate(self):
+    def test_8_adviser_can_adviser_drop_after_dropdate(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade,is_drop = False)
 		self.client.login(email='charles@test.com', password='charles12345')
 		response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
                 {'action': 'drop', 'origin': 'adviser'}, follow=True)
 		self.assertEqual(response.status_code, 403)        
-		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
+		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday, is_drop = False))
 		
-    def test_7_adviser_undrop(self):
+    def test_9_adviser_undrop(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade, is_drop = True)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -107,7 +115,7 @@ class AdviserTests(TestCase):
                 {'action': 'undrop', 'origin': 'adviser'}, follow=True)
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, is_drop = False))
 		
-    def test_8_adviser_undrop_after_dropdate(self):
+    def test_10_adviser_can_adviser_undrop_after_dropdate(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade, is_drop = True)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -116,7 +124,7 @@ class AdviserTests(TestCase):
 		self.assertEqual(response.status_code, 403)        
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday, is_drop = True))
 		
-    def test_9_adviser_disable_student_edit(self):
+    def test_11_adviser_disable_student_edit(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade,lock_from_student=False)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -124,7 +132,7 @@ class AdviserTests(TestCase):
                 {'action': 'disable_student_edits', 'origin': 'adviser'}, follow=True)
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, lock_from_student= True))
 		
-    def test_10_enable_student_edit(self):
+    def test_12_adviser_enable_student_edit(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.audit, grade=self.s_grade,lock_from_student=True)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -132,7 +140,7 @@ class AdviserTests(TestCase):
                 {'action': 'enable_student_edits', 'origin': 'adviser'}, follow=True)
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course, lock_from_student= False))
 
-    def test_11_adviser_delete(self):
+    def test_13_adviser_delete_course(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -140,7 +148,7 @@ class AdviserTests(TestCase):
 			{'origin': 'adviser'}, follow=True)
 		self.assertFalse(Participant.objects.filter(user=self.ben, course=self.course))
 
-    def test_12_adviser_delete_after_adviserApprovalDate(self):
+    def test_14_adviser_can_adviser_delete_after_adviserApprovalDate(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
             participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
 		self.client.login(email='charles@test.com', password='charles12345')
@@ -148,8 +156,17 @@ class AdviserTests(TestCase):
                 {'origin': 'adviser'}, follow=True)
 		self.assertEqual(response.status_code, 403)        
 		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday))
-
-    def test_13_adviser_mark_all(self):
+		
+    def test_15_adviser_can_adviser_switch_regtype_afterAdviserApproveDate(self):
+		participant = Participant.objects.create(user=self.ben, course=self.course_yesterday,
+            participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade)
+		self.client.login(email='charles@test.com', password='charles12345')
+		response = self.client.post(reverse('coursereg:participants_update',args=[participant.id]),
+                {'action': 'reg_type_change', 'origin': 'adviser', 'reg_type':'3'}, follow=True)
+		self.assertEqual(response.status_code, 403)        
+		self.assertTrue(Participant.objects.filter(user=self.ben, course=self.course_yesterday, registration_type = '1'))
+		
+    def test_14_adviser_mark_all(self):
 		participant = Participant.objects.create(user=self.ben, course=self.course,
 			participant_type=Participant.PARTICIPANT_STUDENT, registration_type=self.credit, grade=self.s_grade,is_adviser_reviewed=False)
 		participant = Participant.objects.create(user=self.ben, course=self.course2,
