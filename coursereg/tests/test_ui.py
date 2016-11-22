@@ -8,7 +8,7 @@ import unittest
 import datetime
 import logging
 
-#@unittest.skip("skip UI tests in selenium")
+@unittest.skip("skip UI tests in selenium")
 class StudentUITests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
