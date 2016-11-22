@@ -22,9 +22,9 @@
         {% load staticfiles %}
         Note that the CSV file must have columns
         <strong>
-            (Number, Title, Credits, Term, Year, Department, should_count_towards_cgpa, Instructor 1 email (optional), Instructor 2 email (optional), etc.)
+            (Number, Title, Credits, Term, Year, Department, Class Time, Description, should_count_towards_cgpa, Instructor 1 email (optional), Instructor 2 email (optional), etc.)
         </strong>
-        like in this <a href="{% static 'coursereg/misc/add_courses_sample.csv' %}">sample CSV</a> file.
+        like in this <a href="{% static 'coursereg/misc/add_courses_sample.csv' %}">sample CSV</a> file. Enclose fields with commas in double quotes (ex: "Wednesday, Thursday 2-3PM").
     </p>
     <div>
         <input type="submit" value="Upload" name="submit">

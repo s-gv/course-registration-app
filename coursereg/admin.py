@@ -115,23 +115,23 @@ class CustomUserAdmin(UserAdmin):
                     name, email, dept_abbr = [ele.strip() for ele in row]
                     faculty[-1]['name'] = name
                 except:
-                    messages.error(request, 'Number of fields incorrect in line %s. No records added.' % line_num)
+                    messages.error(request, 'Number of fields incorrect in line %s. No records were added.' % line_num)
                     break
                 if len(name) < 3:
-                    messages.error(request, 'Name has less than 3 characters in line %s. No records added.' % line_num)
+                    messages.error(request, 'Name has less than 3 characters in line %s. No records were added.' % line_num)
                     break
                 if '@' in parseaddr(email)[1]:
                     faculty[-1]['email'] = email
                 else:
-                    messages.error(request, 'Email invalid in line %s. No records added.' % line_num)
+                    messages.error(request, 'Email invalid in line %s. No records were added.' % line_num)
                     break
                 if User.objects.filter(email=email):
-                    messages.error(request, 'Email in line %s already exists. No records added.' % line_num)
+                    messages.error(request, 'Email in line %s already exists. No records were added.' % line_num)
                     break
                 try:
                     faculty[-1]['dept'] = Department.objects.get(abbreviation=str(dept_abbr))
                 except:
-                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
+                    messages.error(request, 'Department in line %s not found. No records were added.' % line_num)
                     break
                 error = False
             if not error:
@@ -163,35 +163,35 @@ class CustomUserAdmin(UserAdmin):
                     name, email, dept_abbr, phone, degree, sr_no, join_date, adviser_email = [ele.strip() for ele in row]
                     students[-1]['name'] = name
                 except:
-                    messages.error(request, 'Number of fields incorrect in line %s. No records added.' % line_num)
+                    messages.error(request, 'Number of fields incorrect in line %s. No records were added.' % line_num)
                     break
                 if len(name) < 3:
-                    messages.error(request, 'Name has less than 3 characters in line %s. No records added.' % line_num)
+                    messages.error(request, 'Name has less than 3 characters in line %s. No records were added.' % line_num)
                     break
                 if '@' in parseaddr(email)[1]:
                     students[-1]['email'] = email
                 else:
-                    messages.error(request, 'Email invalid in line %s. No records added.' % line_num)
+                    messages.error(request, 'Email invalid in line %s. No records were added.' % line_num)
                     break
                 if User.objects.filter(email=email):
-                    messages.error(request, 'Email in line %s already exists. No records added.' % line_num)
+                    messages.error(request, 'Email in line %s already exists. No records were added.' % line_num)
                     break
                 try:
                     students[-1]['dept'] = Department.objects.get(abbreviation=str(dept_abbr))
                 except:
-                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
+                    messages.error(request, 'Department in line %s not found. No records were added.' % line_num)
                     break
                 students[-1]['phone'] = phone
                 try:
                     students[-1]['degree'] = Degree.objects.get(name=degree)
                 except:
-                    messages.error(request, 'Degree invalid in line %s. No records added.' % line_num)
+                    messages.error(request, 'Degree invalid in line %s. No records were added.' % line_num)
                     break
                 students[-1]['sr_no'] = sr_no
                 try:
                     students[-1]['join_date'] = datetime.strptime(join_date, '%d %b %Y')
                 except:
-                    messages.error(request, 'Date not in expected format (ex: 01 Aug 2011) in line %s. No records added.' % line_num)
+                    messages.error(request, 'Date not in expected format (ex: 01 Aug 2011) in line %s. No records were added.' % line_num)
                     break
                 try:
                     students[-1]['adviser'] = User.objects.get(email=adviser_email)
@@ -292,46 +292,48 @@ class CourseAdmin(admin.ModelAdmin):
             for line_num, row in enumerate(csv.reader(f), start=1):
                 error = True
                 courses.append({})
-                if len(row) < 7:
-                    messages.error(request, 'Number of fields insufficient in line %s. No records added.' % line_num)
+                if len(row) < 9:
+                    messages.error(request, 'Number of fields insufficient in line %s. No records were added.' % line_num)
                     break
-                num, title, credits, term_name, term_year, dept_abbr, should_count_towards_cgpa = [ele.strip() for ele in row[:7]]
-                instructor_emails = [ele.strip() for ele in row[7:]]
+                num, title, credits, term_name, term_year, dept_abbr, timings, description, should_count_towards_cgpa = [ele.strip() for ele in row[:9]]
+                instructor_emails = [ele.strip() for ele in row[9:]]
                 if len(num) > 1:
                     courses[-1]['num'] = num
                 else:
-                    messages.error(request, 'Course number in line %s is too short. No records added.' % line_num)
+                    messages.error(request, 'Course number in line %s is too short. No records were added.' % line_num)
                     break
                 if len(title) > 3:
                     courses[-1]['title'] = title
                 else:
-                    messages.error(request, 'Course title in line %s is too short. No records added.' % line_num)
+                    messages.error(request, 'Course title in line %s is too short. No records were added.' % line_num)
                     break
                 if len(credits) > 0:
                     courses[-1]['credits'] = credits
                 else:
-                    messages.error(request, 'Course credits in line %s is too short. No records added.' % line_num)
+                    messages.error(request, 'Course credits in line %s is too short. No records were added.' % line_num)
                     break
                 try:
                     courses[-1]['term'] = Term.objects.filter(name=term_name, year=term_year).first()
                     assert courses[-1]['term'] is not None
                 except:
-                    messages.error(request, 'Course term in line %s not found. No records added.' % line_num)
+                    messages.error(request, 'Course term in line %s not found. No records were added.' % line_num)
                     break
                 try:
                     courses[-1]['dept'] = Department.objects.get(abbreviation=dept_abbr)
                 except:
-                    messages.error(request, 'Department in line %s not found. No records added.' % line_num)
+                    messages.error(request, 'Department in line %s not found. No records were added.' % line_num)
                     break
+                courses[-1]['timings'] = timings
+                courses[-1]['description'] = description
                 if should_count_towards_cgpa.lower() == 'true' or should_count_towards_cgpa == '1':
                     courses[-1]['should_count_towards_cgpa'] = True
                 elif should_count_towards_cgpa.lower() == 'false' or should_count_towards_cgpa == '0':
                     courses[-1]['should_count_towards_cgpa'] = False
                 else:
-                    messages.error(request, 'Field should_count_towards_cgpa in line %s should be boolean (true/false). No records added.' % line_num)
+                    messages.error(request, 'Field should_count_towards_cgpa in line %s should be boolean (true/false). No records were added.' % line_num)
                     break
                 if Course.objects.filter(num=num, title=title, credits=credits, term=courses[-1]['term'], department=courses[-1]['dept']):
-                    messages.error(request, 'Course in line %s already exists. No records added.' % line_num)
+                    messages.error(request, 'Course in line %s already exists. No records were added.' % line_num)
                     break
                 courses[-1]['instructors'] = []
                 try:
@@ -340,7 +342,7 @@ class CourseAdmin(admin.ModelAdmin):
                             instructor = User.objects.get(email=instructor_email)
                             courses[-1]['instructors'].append(instructor)
                 except:
-                    messages.error(request, 'Instructor %s in line %s not found. No records added.' % (instructor_email, line_num))
+                    messages.error(request, "Instructor '%s' in line %s not found. No records were added." % (instructor_email, line_num))
                     break
                 error = False
             if not error:
@@ -351,6 +353,8 @@ class CourseAdmin(admin.ModelAdmin):
                         credits=course['credits'],
                         department=course['dept'],
                         term=course['term'],
+                        timings=course['timings'],
+                        description=course['description'],
                         should_count_towards_cgpa=course['should_count_towards_cgpa']
                     )
                     for instructor in course['instructors']:
