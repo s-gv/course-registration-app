@@ -46,7 +46,7 @@
                         <select class="form-control" id="course_select_box" name="course_id">
                             <option value="">No courses available</option>
                             {% for course in courses %}
-                                <option value="{{ course.id }}" title="Timings: {{course.timings}}">{{ course }}</option>
+                                <option value="{{ course.id }}">{{ course }}</option>
                             {% endfor %}
                         </select>
                     </label>
@@ -66,6 +66,15 @@
             </form>
         </div>
     </div>
+
+    <div class="alert alert-info alert-dismissible" id="course_select_box_info" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+          <div id="course_select_box_info_content">
+          </div>
+    </div>
+
     {% if messages %}
     {% for message in messages %}
     <div class="row top-buffer-1">
@@ -187,10 +196,42 @@
 {% load staticfiles %}
 <script src="{% static 'coursereg/js/select2.min.js' %}"></script>
 <script type="text/javascript">
+
+var all_courses = {
+    {% for course in courses %}
+    "{{ course.id }}": {
+        {% if course.timings %}
+        "timings": "{{ course.timings }}",
+        {% else %}
+        "timings": "",
+        {% endif %}
+        {% if course.description %}
+        "description": "{{ course.description }}",
+        {% else %}
+        "description": "",
+        {% endif %}
+    },
+    {% endfor %}
+};
+
     $(document).ready(function() {
         $("#course_select_box").select2({
             placeholder: "Select a course",
             theme: "bootstrap"
+        });
+
+        $("#course_select_box_info").hide();
+
+        $("#course_select_box").on("select2:select", function(env){
+              $("#course_select_box_info").hide();
+              var selected_course = $("#course_select_box").val();
+              console.log(selected_course);
+              var course_info = '<p><b>Timings</b>: ' + all_courses[selected_course].timings + '</p>' +
+                                '<p>' + all_courses[selected_course].description + '</p>';
+              $("#course_select_box_info_content").html(course_info);
+              if(all_courses[selected_course].timings + all_courses[selected_course].description){
+                  $("#course_select_box_info").show();
+              }
         });
     });
 </script>
