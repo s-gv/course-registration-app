@@ -225,18 +225,25 @@ var all_courses = {
         });
 
         $("#course_select_box_info").hide();
+        var selected_course = $("#course_select_box").val();
+        if(selected_course){
+            show_course_info(selected_course);
+        }
 
         $("#course_select_box").on("select2:select", function(env){
               $("#course_select_box_info").hide();
-              var selected_course = $("#course_select_box").val();
-              console.log(selected_course);
-              var course_info = '<p><b>Timings</b>: ' + all_courses[selected_course].timings + '</p>' +
-                                '<p>' + all_courses[selected_course].description + '</p>';
-              $("#course_select_box_info_content").html(course_info);
-              if(all_courses[selected_course].timings + all_courses[selected_course].description){
-                  $("#course_select_box_info").show();
-              }
+              selected_course = $("#course_select_box").val();
+              show_course_info(selected_course);
         });
     });
+
+    function show_course_info(selected_course){
+        var course_info = '<p><b>Timings</b>: ' + all_courses[selected_course].timings + '</p>' +
+                          '<p>' + all_courses[selected_course].description + '</p>';
+        $("#course_select_box_info_content").html(course_info);
+        if(all_courses[selected_course].timings + all_courses[selected_course].description){
+            $("#course_select_box_info").show();
+        }
+    };
 </script>
 {% endblock %}
