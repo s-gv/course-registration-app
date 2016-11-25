@@ -221,15 +221,15 @@
             <form class="form-inline" method="post" action="{% url 'coursereg:participants_create' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="id_label_single">
-                        Register for a course
-                        <select class="form-control" id="course_select_box" name="course_id">
-                            <option value="">No courses available</option>
-                            {% for course in courses %}
-                                <option value="{{ course.id }}">{{ course }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
+                    <label for="course_select_box">Register for a course</label>
+                    <select class="form-control" id="course_select_box" name="course_id">
+                        <option value="">No courses available</option>
+                        {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
                     {% for reg_type in reg_types %}
                     <label class="radio-inline">
                         {% if forloop.counter0 == 0 %}
@@ -239,18 +239,18 @@
                         {% endif %}
                     </label>
                     {% endfor %}
-                    <!--label class="radio-inline">
-                        <input type="radio" name="reg_type" value="credit" checked>Credit
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="reg_type" value="audit">Audit
-                    </label-->
                 </div>
                 <input type="hidden" name="next" value="{{ request.path }}">
                 <input type="hidden" name="user_id" value="{{ student.id }}">
                 <input type="hidden" name="origin" value="adviser">
                 <button type="submit" class="btn btn-primary btn-sm">Join Course</button>
             </form>
+        </div>
+    </div>
+    <div class="row top-buffer-1">
+        <div class="col-md-12">
+            <div id="course-info-placeholder">
+            </div>
         </div>
     </div>
     {% endif %}
@@ -267,11 +267,50 @@
 {% load staticfiles %}
 <script src="{% static 'coursereg/js/select2.min.js' %}"></script>
 <script type="text/javascript">
+    var all_courses = {
+        {% for course in courses %}
+        "{{ course.id }}": {
+            {% if course.timings %}
+            "timings": "{{ course.timings }}",
+            {% else %}
+            "timings": "",
+            {% endif %}
+            {% if course.description %}
+            "description": "{{ course.description }}",
+            {% else %}
+            "description": "",
+            {% endif %}
+        },
+        {% endfor %}
+    };
     $(document).ready(function() {
         $("#course_select_box").select2({
             placeholder: "Select a course",
             theme: "bootstrap"
         });
+
+        var selected_course = $("#course_select_box").val();
+        if(selected_course in all_courses) {
+            show_course_info(selected_course);
+        }
+
+        $("#course_select_box").on("select2:select", function(env) {
+              selected_course = $("#course_select_box").val();
+              if(selected_course in all_courses) {
+                  show_course_info(selected_course);
+              }
+        });
     });
+    function show_course_info(selected_course){
+        $('#course-info-placeholder').html(
+            '<div class="alert alert-info alert-dismissible">' +
+                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                '<span>' +
+                    '<p><b>Timings</b>: ' + all_courses[selected_course].timings + '</p>' +
+                    '<p>' + all_courses[selected_course].description + '</p>' +
+                '</span>' +
+            '</div>'
+        );
+    };
 </script>
 {% endblock %}
