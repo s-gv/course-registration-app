@@ -13,7 +13,7 @@ Coursereg is a webapp for managing course registrations at academic institutions
 
 There are four types of users in this webapp: (1) Student (2) Faculty (3) Department admin (4) Superuser. Faculty have two roles: (1) Adviser (2) Instructor. They can review courses taken by their advisees and have access to a list of students who have applied for a course they are instructing. A department admin has access to every course taken by a student in a department and can generate reports for the entire department. The superuser has full database access and can login as any other user in the system.
 
-TODO: A YouTube screencast.
+This [screencast](https://www.youtube.com/watch?v=TL8bXuYt04A) shows how to setup and use Coursereg.
 
 ## Features
 - E-mail notification is sent when a course is dropped.
