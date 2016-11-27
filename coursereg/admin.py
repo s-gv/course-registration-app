@@ -11,15 +11,20 @@ from django.core.urlresolvers import reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
 from django.utils.http import urlquote_plus, urlunquote_plus
+from django.contrib.contenttypes.models import ContentType
 from django.conf.urls import url, include
 import csv
+from django.utils.http import urlencode
 from email.utils import parseaddr
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from coursereg import utils
 from coursereg import models
+from coursereg import views
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.admin import AdminSite
+import coursereg.utils
 
 class ParticipantInline(admin.TabularInline):
     model = Participant
@@ -469,13 +474,62 @@ class TermAdmin(admin.ModelAdmin):
         self.message_user(request, "Cloned %s terms" % n)
     clone_terms_increment_year.short_description = "Clone selected terms and increment year"
 
-admin.site.register(User, CustomUserAdmin)
-admin.site.register(Course, CourseAdmin)
-admin.site.register(Participant, ParticipantAdmin)
-admin.site.register(Faq, FaqAdmin)
-admin.site.register(Department, DepartmentAdmin)
-admin.site.register(Degree, DegreeAdmin)
-admin.site.register(Notification, NotificationAdmin)
-admin.site.register(Grade, GradeAdmin)
-admin.site.register(Term, TermAdmin)
-admin.site.register(RegistrationType, RegistrationTypeAdmin)
+def merge_selected_objects(modeladmin, request, queryset):
+    selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
+    ct = ContentType.objects.get_for_model(queryset.model)
+    return redirect(reverse('admin:merge_objects') + '?' + urlencode({'ctpk': ct.pk, 'ids': ','.join(selected)}))
+merge_selected_objects.short_description = "Merge selected objects"
+
+class CustomAdminSite(AdminSite):
+    site_header = 'Coursereg administration'
+
+    def get_urls(self):
+        urls = super(CustomAdminSite, self).get_urls()
+        my_urls = [
+            url(r'^logout/$', views.user.signout),
+            url(r'^mergeobjects$', self.merge_objects, name='merge_objects')
+        ]
+        return my_urls + urls
+
+    def merge_objects(self, request):
+        ctpk = request.GET['ctpk']
+        ids = request.GET['ids'].split(',')
+
+        ct = ContentType.objects.get(pk=ctpk)
+        model = ct.model_class()
+        objs = model.objects.filter(id__in=ids)
+
+        if len(ids) < 2:
+            messages.error(request, "Select at least two objects to merge.")
+            return redirect(reverse('admin:coursereg_%s_changelist' % ct.model))
+
+        if request.method == 'POST':
+            primary_id = request.POST['primary']
+            primary_obj = model.objects.get(id=primary_id)
+            alias_objs = list(model.objects.filter(id__in=ids).exclude(id=primary_id))
+            coursereg.utils.merge_model_objects(primary_obj, alias_objs)
+            messages.success(request, "Successfully merged %s objects." % len(ids))
+            return redirect(reverse('admin:coursereg_%s_changelist' % ct.model))
+        else:
+            context = dict(
+               self.each_context(request),
+               title='Merge %s' % model._meta.verbose_name_plural.title().lower(),
+               model_name=model._meta.verbose_name.title(),
+               model_changelist_url=reverse('admin:coursereg_%s_changelist' % ct.model),
+               objs_with_urls=[(reverse('admin:coursereg_%s_change' % ct.model, args=[obj.id]), obj) for obj in objs]
+            )
+            return render(request, "admin/coursereg/merge_objects.html", context)
+
+admin_site = CustomAdminSite(name='customadmin')
+admin_site.add_action(merge_selected_objects, 'merge_selected')
+
+admin_site.register(User, CustomUserAdmin)
+admin_site.register(Course, CourseAdmin)
+admin_site.register(Participant, ParticipantAdmin)
+admin_site.register(Faq, FaqAdmin)
+admin_site.register(Department, DepartmentAdmin)
+admin_site.register(Degree, DegreeAdmin)
+admin_site.register(Notification, NotificationAdmin)
+admin_site.register(Grade, GradeAdmin)
+admin_site.register(Term, TermAdmin)
+admin_site.register(RegistrationType, RegistrationTypeAdmin)

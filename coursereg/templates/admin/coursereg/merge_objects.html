@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label='coursereg' %}">Coursereg</a>
+    &rsaquo; <a href="{{ model_changelist_url }}">{{ model_name }}</a>
+    &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<p>
+    The following objects will be merged. Select the object you wish to retain.
+    The others will be deleted and all references to them will be changed to the selected object.
+</p>
+<form action="" method="post">
+    {% csrf_token %}
+    <div>
+        {% for url, obj in objs_with_urls %}
+            {% if forloop.first %}
+            <input type="radio" name="primary" value="{{ obj.id }}" checked>
+            {% else %}
+            <input type="radio" name="primary" value="{{ obj.id }}">
+            {% endif %}
+            <a href="{{ url }}">{{ obj }}</a><br>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 20px">
+        <input type="submit" value="Merge objects" name="submit">
+    </div>
+</form>
+{% endblock %}

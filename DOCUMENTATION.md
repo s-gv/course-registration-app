@@ -20,6 +20,7 @@ This [screencast](https://www.youtube.com/watch?v=TL8bXuYt04A) shows how to setu
 - Bulk upload users, courses from a CSV file.
 - Superuser can login as any user.
 - Department-wise report in CSV/PDF.
+- Merging duplicate entities.
 - Faculty can export registered students to PDF/CSV.
 - Layout is mobile friendly.
 
@@ -107,7 +108,7 @@ Tables with sample rows:
 |  user1@abc.com  | ADVISER  | Enrolled for Course X     |           False         |          False          |        False        |  8/7/2016  |
 |  user2@abc.com  | DCC      | Too few courses           |           False         |          False          |        False        |  8/9/2016  |
 
-### Participant 
+### Participant
 | Participant_type | Is_adviser_reviewed | Is_instructor_reviewed | Course_id | User_id | Lock_from_student | Is_Drop | Should_count_towards_cgpa | registration_type_id | grade_id | created_at | updated_at |
 |------------------|:-------------------|:----------------------|:----------|:--------|:------------------|:--------|:----------------|:---------------|:-------|:-------|:-------|
 |         1        |       False        |          False        |    1      |    2    |       False       |  False  |   True               |    1    |   NULL  |   2016-10-18 07:37:43.510979    |   2016-10-18 07:37:43.511042  |
@@ -122,9 +123,10 @@ Tables with sample rows:
 | password hash | last_login | is_superuser | email | full_name | user_type | date_joined | sr_no | is_dcc_review_pending | is_staff | is_active | degree_id | department_id | telephone | is_dcc_sent_notification | adviser_id |
 |----------|:-----------|:-------------|:-----|:----------|:----------|:------------|:------|:----------------------|:--------|:----------|:----------|:--------------|:----------|:-------------------------|:-----------|
 | password #1| 2016-10-18 15:32:45.757052 | False | dcc@ece.iisc.ernet.in | DCC | 2 | 2016-07-15 06:39:10 | - | False | False | True | NULL | 1 | - | False | NULL |
-| password #2 | 2016-10-18 07:39:12.092271 | False | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | False | False | True | 1 | 1 | 9912378901 | False | 2 | 
- 
+| password #2 | 2016-10-18 07:39:12.092271 | False | ben@ece.iisc.ernet.in | Ben Bitdiddle | 0 | 2016-07-15 06:38:16 | 04-02-01-10-41-2-12345 | False | False | True | 1 | 1 | 9912378901 | False | 2 |
+
 
 ## Misc
 - At least one registration type (ex: Credit, Audit) and Degree (ex: PhD, ME) must be added by the admin before students can login and register for courses.
 - A fatal error occurs if a student with `adviser` NULL logs in. Always assign `adviser` when creating student users.
+- Duplicate entities can be merged in the admin page. Suppose you have two degrees `PhD` and `Ph.D`, and some students are registered under the former and some under the latter. If you would like to merge the two degrees, login as the admin, select the two degrees to be merged and perform the merge action from the action menu. After merging, all students who had either `PhD` or `Ph.D` as their degree will have a reference to `PhD` (if you chose this as the primary object) as their degree and the alias degree `Ph.D` will be deleted. All other entities such as departments, users, etc. can also be merged.

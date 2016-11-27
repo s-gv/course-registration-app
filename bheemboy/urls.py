@@ -14,13 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import include, url
-from django.contrib import admin
-import coursereg.views
-from . import settings
+from coursereg.admin import admin_site
 
-admin.site.site_header = 'Coursereg administration'
 urlpatterns = [
-    url(r'^sudo/logout/$', coursereg.views.user.signout),
-    url(r'^sudo/', admin.site.urls),
+    url(r'^sudo/', admin_site.urls),
     url(r'', include('coursereg.urls'))
 ]
