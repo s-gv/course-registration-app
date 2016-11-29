@@ -108,7 +108,12 @@
                                     {% else %}
                                     <p title="Timings: {{participant.course.timings}}" class="text-muted">
                                     {% endif %}
-                                        {{ participant.course }} <span class="badge">{{ participant.get_reg_type_desc }}</span>
+                                        {{ participant.course }}
+                                        {% if participant.is_drop %}
+                                        <span class="badge">{{ participant.get_reg_type_desc }}</span>
+                                        {% else %}
+                                        <span class="badge" style="background-color: {{ participant.registration_type.badge_color }}!important;">{{ participant.get_reg_type_desc }}</span>
+                                        {% endif %}
                                     </p>
                                 </div>
                                 <div class="col-md-5 col-xs-12">

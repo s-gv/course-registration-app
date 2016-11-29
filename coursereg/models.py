@@ -77,6 +77,10 @@ class RegistrationType(models.Model):
     def __unicode__(self):
         return self.name
 
+    def badge_color(self):
+        colors = ['#D32F2F', '#1976D2', '#689F38', '#7B1FA2', '#FBC02D', '#5D4037', '#F48FB1', '#80CBC4', '#283593', '#9E9D24']
+        return colors[self.id % len(colors)]
+
 class Participant(models.Model):
     PARTICIPANT_STUDENT = 0
     PARTICIPANT_INSTRUCTOR = 1
