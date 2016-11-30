@@ -236,7 +236,7 @@ class Term(models.Model):
                             if self.last_conversion_date <= self.last_drop_date:
                                     if self.last_drop_date <= self.last_grade_date:
                                         return
-        raise ValidationError('Dates must be in increasing order. Last registration date <= Last adviser approval date <= Last instructor approval date and so on.')
+        raise ValidationError('Dates must be in increasing order (Start registration date <= Last registration date <= Last adviser approval date <= Last instructor approval date and so on) with the exception of last cancellation date which can be any date before the last conversion date.')
 
 class Course(models.Model):
     num = models.CharField(max_length=100)
