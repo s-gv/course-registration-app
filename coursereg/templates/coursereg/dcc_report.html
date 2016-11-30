@@ -205,7 +205,14 @@ $('#pdfexport').on('click', function() {
     });
 });
 $('#csvexport').on('click', function() {
-    var csv = exportData['rows'].map(function(arr) {return arr.join(',');}).join('\n');
+    var csv = exportData['rows'].map(function(arr) {
+        return arr.map(function(cell) {
+            if(cell.indexOf(',') >= 0) {
+                return '"' + cell + '"';
+            }
+            return cell;
+        }).join(',');
+    }).join('\n');
     var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});
     saveAs(blob, exportData['fileNameWithoutExt']+'.csv');
 });
