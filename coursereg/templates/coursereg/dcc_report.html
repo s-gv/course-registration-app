@@ -65,7 +65,7 @@
                 <table class="table table-striped">
                     <tr>
                         <th>
-                            <a href="{{ request.path }}?orderby=name{% for term_id in selected_term_ids %}&term_ids={{ term_id }}{% endfor %}">
+                            <a href="{{ request.path }}?orderby=name{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
                                 Name
                                 {% if orderby == 'name' %}
                                 <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
@@ -75,7 +75,7 @@
                         <th>Email</th>
                         <th>SR No.</th>
                         <th>
-                            <a href="{{ request.path }}?orderby=degree{% for term_id in selected_term_ids %}&term_ids={{ term_id }}{% endfor %}">
+                            <a href="{{ request.path }}?orderby=degree{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
                                 Degree
                                 {% if orderby == 'degree' %}
                                 <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
@@ -83,7 +83,7 @@
                             </a>
                         </th>
                         <th>
-                            <a href="{{ request.path }}?orderby=course{% for term_id in selected_term_ids %}&term_ids={{ term_id }}{% endfor %}">
+                            <a href="{{ request.path }}?orderby=course{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
                                 Course
                                 {% if orderby == 'course' %}
                                 <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>

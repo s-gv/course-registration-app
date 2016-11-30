@@ -2,7 +2,7 @@
 
 {% block extrastyle %}
 {% load staticfiles %}
-<link href="{% static 'coursereg/css/pikaday.css' %}" rel="stylesheet">
+<link href="{% static 'coursereg/css/select2.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -17,16 +17,16 @@
 {% block content %}
 <form action="" method="get">
     <div>
-        <p>
-            Generate report of students in {{ dept }} for courses with last registration date in the range:
-        </p>
-    </div>
-    <div>
-        <label for="from_date">From:</label>
-        <input id="from_date" size="40" type="text" name="from_date" value="{{ default_from_date }}">
-
-        <label for="to_date">To:</label>
-        <input id="to_date" size="40" type="text" name="to_date" value="{{ default_to_date }}">
+        <label for="select-terms">Report of all students in {{ dept }} for terms:</label>
+        <select id="select-terms" multiple="multiple" style="width:350px;" name="term_ids">
+            {% for term in terms %}
+            {% if term.id in selected_term_ids %}
+            <option value="{{ term.id }}" selected>{{ term }}</option>
+            {% else %}
+            <option value="{{ term.id }}">{{ term }}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
 
         <input type="submit" value="Generate report" />
     </div>
@@ -38,11 +38,32 @@
 </div>
 <table>
     <tr>
-        <th>Name</th>
+        <th>
+            <a href="{{ request.path }}?orderby=name{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
+                Name
+                {% if orderby == 'name' %}
+                &darr;
+                {% endif %}
+            </a>
+        </th>
         <th>Email</th>
         <th>SR No.</th>
-        <th>Degree</th>
-        <th>Course</th>
+        <th>
+            <a href="{{ request.path }}?orderby=degree{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
+                Degree
+                {% if orderby == 'degree' %}
+                &darr;
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ request.path }}?orderby=course{% for term_id in selected_term_ids %}&amp;term_ids={{ term_id }}{% endfor %}">
+                Course
+                {% if orderby == 'course' %}
+                &darr;
+                {% endif %}
+            </a>
+        </th>
         <th>Enrollment</th>
         <th>Grade</th>
     </tr>
@@ -67,12 +88,11 @@
 {% endif %}
 {% load staticfiles %}
 <script src="{% static 'coursereg/js/jquery-1.12.3.min.js' %}"></script>
-<script src="{% static 'coursereg/js/pikaday.js' %}"></script>
+<script src="{% static 'coursereg/js/select2.min.js' %}"></script>
 <script src="{% static 'coursereg/js/Blob.js' %}"></script>
 <script src="{% static 'coursereg/js/FileSaver.min.js' %}"></script>
 <script type='text/javascript'>
-var picker = new Pikaday({ field: $('#from_date')[0] });
-var picker2 = new Pikaday({ field: $('#to_date')[0] });
+$("#select-terms").select2();
 var exportData = {
     'fileNameWithoutExt': "{{ dept }}".replace(/\s/g, '_').replace(/[^A-Za-z0-9_]/g, '') + '_report',
     'columnNames': ['#', 'Name', 'Email', 'SrNo', 'Degree', 'Course', 'Enrollment', 'Grade'],

@@ -401,22 +401,30 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def report_view(self, request, dept_id):
         dept = models.Department.objects.get(id=dept_id)
-        from_date = timezone.now()
-        to_date = timezone.now()
-        if request.GET.get('from_date') and request.GET.get('to_date'):
-            from_date = utils.parse_datetime_str(request.GET['from_date'])
-            to_date = utils.parse_datetime_str(request.GET['to_date'])
-        participants = [p for p in models.Participant.objects.filter(
+        terms = models.Term.objects.filter(is_active=True).order_by('-last_reg_date')
+        selected_term_ids = [int(i) for i in request.GET.getlist('term_ids')]
+
+        participants_query = models.Participant.objects.filter(
             user__department=dept,
             user__user_type=models.User.USER_TYPE_STUDENT,
-            course__term__last_reg_date__range=[from_date, to_date]
-        ).order_by('user__degree', 'is_drop', 'registration_type', 'user__full_name')]
+            course__term__in=selected_term_ids
+        )
+
+        orderby = request.GET.get('orderby', 'degree')
+        if orderby == 'course':
+            participants = [p for p in participants_query.order_by('course', 'is_drop', '-registration_type', 'user__degree', 'user__full_name')]
+        elif orderby == 'name':
+            participants = [p for p in participants_query.order_by('user__full_name')]
+        else:
+            participants = [p for p in participants_query.order_by('user__degree', 'user__full_name')]
+
         context = dict(
            self.admin_site.each_context(request),
            title='Report',
-           default_from_date=utils.datetime_to_str(from_date),
-           default_to_date=utils.datetime_to_str(to_date),
+           selected_term_ids=selected_term_ids,
            participants=participants,
+           terms=terms,
+           orderby=orderby,
            dept=dept
         )
         return render(request, 'admin/coursereg/department/report.html', context)

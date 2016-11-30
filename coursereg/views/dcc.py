@@ -21,11 +21,6 @@ from collections import defaultdict
 def report(request):
     if not request.user.user_type == models.User.USER_TYPE_DCC:
         raise PermissionDenied
-    from_date = timezone.now()
-    to_date = timezone.now()
-    if request.GET.get('from_date') and request.GET.get('to_date'):
-        from_date = utils.parse_datetime_str(request.GET['from_date'])
-        to_date = utils.parse_datetime_str(request.GET['to_date'])
 
     selected_term_ids = [int(i) for i in request.GET.getlist('term_ids')]
 
@@ -48,8 +43,6 @@ def report(request):
         'nav_active': 'report',
         'user_email': request.user.email,
         'dept': request.user.department,
-        'default_from_date': utils.datetime_to_str(from_date),
-        'default_to_date': utils.datetime_to_str(to_date),
         'orderby': orderby,
         'terms': models.Term.objects.filter(is_active=True).order_by('-last_reg_date'),
         'selected_term_ids': selected_term_ids,
